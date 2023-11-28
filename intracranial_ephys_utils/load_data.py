@@ -210,17 +210,18 @@ def write_timestamps(event_folder, sort_folder):
     event_times_sec, _, _ = get_event_times(event_folder, rescale=True)
     print(event_labels)
     task_start = int(input("Where does the task start? (start counting at 0), -1 if we should take the whole file"))
-
+    microsec_sec = 10**-6
+    sec_microsec = 10**6
     if task_start < 0:
         return None
     else:
         buffer = 30  # buffer of 30 seconds before and after task annotation in case of experimenter delay
-        optimal_start = event_times_sec[task_start]*10**-6-global_start-buffer
+        optimal_start = event_times_sec[task_start]*microsec_sec-global_start-buffer
         if optimal_start < global_start:
-            spike_sort_start = global_start
+            spike_sort_start = global_start*sec_microsec
         else:
-            spike_sort_start = optimal_start
-        spike_sort_end = event_times[task_start+1]*10**-6+buffer
+            spike_sort_start = optimal_start*sec_microsec
+        spike_sort_end = (event_times[task_start+1]*microsec_sec+buffer)*sec_microsec
     timestamps_file = sort_folder / f"timestampsInclude.txt"
     with open(timestamps_file, 'w') as f:
         f.write(f'{spike_sort_start}    {spike_sort_end}')
