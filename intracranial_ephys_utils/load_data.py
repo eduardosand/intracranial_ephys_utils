@@ -209,7 +209,7 @@ def write_timestamps(event_folder, sort_folder):
     event_times, event_labels, global_start = get_event_times(event_folder, rescale=False)
     event_times_sec, _, _ = get_event_times(event_folder, rescale=True)
     print(event_labels)
-    task_start = int(input("Where does the task start? (start counting at 0), -1 if we should take the whole file"))
+    task_start = int(input("Where does the task start? (start counting at 0), -1 if we should take the whole file \n"))
     microsec_sec = 10**-6
     sec_microsec = 10**6
     if task_start < 0:
