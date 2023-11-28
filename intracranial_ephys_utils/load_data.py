@@ -224,6 +224,6 @@ def write_timestamps(event_folder, sort_folder):
         spike_sort_end = (event_times[task_start+1]*microsec_sec+buffer)*sec_microsec
     timestamps_file = sort_folder / f"timestampsInclude.txt"
     with open(timestamps_file, 'w') as f:
-        f.write(f'{spike_sort_start}    {spike_sort_end}')
+        f.write(f'{int(spike_sort_start)}    {int(spike_sort_end)}')
     return None
 
