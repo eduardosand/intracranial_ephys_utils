@@ -215,7 +215,7 @@ def write_timestamps(event_folder, sort_folder):
         return None
     else:
         buffer = 30  # buffer of 30 seconds before and after task annotation in case of experimenter delay
-        optimal_start = event_times_sec*10**-6-global_start-buffer
+        optimal_start = event_times_sec[task_start]*10**-6-global_start-buffer
         if optimal_start < global_start:
             spike_sort_start = global_start
         else:
