@@ -11,6 +11,7 @@ from neo.rawio import NeuralynxRawIO
 import numpy as np
 import os
 from scipy.interpolate import CubicSpline
+import warnings
 
 
 def read_file(file_path):
@@ -36,8 +37,13 @@ def get_event_times(folder, rescale=True):
     """
     # Obtained in seconds and assumes that the start of the file (not necessarily the task) is 0.
     all_files = os.listdir(folder)
-    events_file = [file_path for file_path in all_files if file_path.startswith('Events')][0]
-    event_reader = read_file(os.path.join(folder, events_file))
+    events_file = [file_path for file_path in all_files if file_path.startswith('Events')]
+    if len(events_file) > 1:
+        warnings.warn("More than one event file found.")
+    elif len(events_file) == 0:
+        raise FileNotFoundError
+
+    event_reader = read_file(os.path.join(folder, events_file[0]))
     event_reader.parse_header()
     event_timestamps, _, event_labels = event_reader.get_event_timestamps()
     if rescale:
