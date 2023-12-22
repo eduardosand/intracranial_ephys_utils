@@ -1,8 +1,31 @@
 from ephyviewer import mkQApp, MainViewer, TraceViewer, CsvEpochSource, EpochEncoder
 import numpy as np
 from pathlib import Path
-from load_data import read_task_ncs
+from load_data import read_task_ncs, get_event_times
 import os
+import pandas as pd
+
+
+def reformat_event_labels(event_folder, output_folder, subject, session, task):
+    """
+    This script takes the events files, reads the timestamps in, and organizes them suitably for
+    the data_viewer.
+    :param event_folder: Path object, where the neuralynx data sits in
+    :param output_folder: where to put the events file after reformatting
+    :param subject:
+    :param session:
+    :param task:
+    :return:
+    """
+    event_times, event_labels, global_start = get_event_times(event_folder, rescale=False)
+    event_times_sec, _, _ = get_event_times(event_folder, rescale=True)
+    durations = np.zeros((event_times_sec.shape[0], 1))
+    source_epoch = pd.DataFrame([event_times_sec, durations, event_labels], columns=['time', 'duration', 'label'])
+    if f'{subject}_session_{session}_{task}.csv' in os.listdir(output_folder):
+        raise FileExistsError
+    else:
+        source_epoch.to_csv(output_folder / f'{subject}_session_{session}_{task}.csv', index=False)
+    return None
 
 
 def photodiode_check_viewer(subject, session, task, data_directory):
