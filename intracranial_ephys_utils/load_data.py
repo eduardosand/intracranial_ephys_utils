@@ -50,6 +50,13 @@ def get_event_times(folder, rescale=True):
 
 
 def missing_samples_check(file_path):
+    """
+    This script checks for missing samples.
+    :param file_path:
+    :return: skipped_samples
+    :return: t_starts
+    :return: seg_sizes
+    """
     file_reader = read_file(file_path)
     file_reader.parse_header()
     n_segments = file_reader._nb_segment
@@ -83,17 +90,22 @@ def missing_samples_check(file_path):
 
 def read_task_ncs(folder_name, file, task='None'):
     """
+    Read neuralynx data into an array, with sampling rate, and start time of the task.
+    To deal with discontinuities and dropped samples, we take a pragmatic approach. We assume continuous sampling, and
+    if there are inconsistencies between the number of samples in segments and the array itself, we fill in samples by
+    interpolating.
     Ideally this spits out neuralynx data in the form of an array, with the sampling rate, and the start time of the task
-    :param folder_name:
-    :param file:
+    :param folder_name: Path object that gives me the path of all the data files for a given recording session
+    :param file: filename we want to read currently
     :param task: string that matches the event label in the actual events file. Ideally it matches the name of the task
     :return: ncs_signal:
     :return: sampling_rate:
-    :return: task_start_segment_time:
+    :return: interp:
+    :return: timestamps:
     """
 
     # task - string that matches the event label in the actual events file. Ideally it matches the name of the task
-    file_path = os.path.join(folder_name, file)
+    file_path = folder_name / file
     ncs_reader = read_file(file_path)
     ncs_reader.parse_header()
     n_segments = ncs_reader._nb_segment
@@ -149,8 +161,8 @@ def read_task_ncs(folder_name, file, task='None'):
     task_end_segment_time = ncs_reader.segment_t_stop(block_index=0, seg_index=task_end_segment_index)
 
     array_size = (task_end_segment_time-task_start_segment_time) * sampling_rate
-    # timestamps = np.linspace(task_start_segment_time, task_end_segment_time, int(array_size))
-    # interp = np.zeros((int(array_size), ))
+    timestamps = np.linspace(task_start_segment_time, task_end_segment_time, int(array_size))
+    interp = np.zeros((int(array_size), ))
     ncs_signal = np.zeros((int(array_size), ))
     for i in range(task_start_segment_index, task_end_segment_index+1):
         # First stop. Get the time_segment_start and t_end for each segment.
@@ -193,9 +205,9 @@ def read_task_ncs(folder_name, file, task='None'):
 
                 ncs_signal[start_index-missing_samples:start_index] = data_x_interp[missing_samples_start_ind:
                                                                                     missing_samples_end_ind]
-                # interp[start_index-missing_samples:start_index] = np.ones((missing_samples_end_ind -
-                #                                                            missing_samples_start_ind, ))
-    return ncs_signal, sampling_rate, task_start_segment_time
+                interp[start_index-missing_samples:start_index] = np.ones((missing_samples_end_ind -
+                                                                           missing_samples_start_ind, ))
+    return ncs_signal, sampling_rate, interp, timestamps
 
 
 def write_timestamps(event_folder, sort_folder):
