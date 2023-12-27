@@ -17,8 +17,7 @@ def reformat_event_labels(subject, session, task, data_directory, result_directo
     :param result_directory: (Path). The Path object that points to where the annotations file will go.
     :return:
     """
-    data_dir = data_directory / subject / session
-    event_times, event_labels, global_start = get_event_times(data_dir, rescale=False)
+    event_times, event_labels, global_start = get_event_times(data_directory, rescale=False)
     event_times_sec, _, _ = get_event_times(data_dir, rescale=True)
     durations = np.ones((event_times_sec.shape[0], ))*0.5
     source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration',
