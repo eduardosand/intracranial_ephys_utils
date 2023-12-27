@@ -25,7 +25,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     if f'{subject}_{session}_{task}.csv' in os.listdir(annotations_directory):
         raise FileExistsError
     else:
-        source_epoch.to_csv(result_directory / f'{subject}_{session}_{task}.csv', index=False)
+        source_epoch.to_csv(annotations_directory / f'{subject}_{session}_{task}.csv', index=False)
 
 
 def photodiode_check_viewer(subject, session, task, data_directory, annotations_directory):
