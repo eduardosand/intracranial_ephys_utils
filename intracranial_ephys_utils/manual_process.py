@@ -80,7 +80,7 @@ def write_timestamps(subject, session, task, annotations_directory, event_folder
     Looks in event folders for labels. Elicits user input to determine which labels are relevant for spike sorting
     to constrain looking at only task-relevant data. User can input -1 if the whole datastream should be spike sorted.
     :param annotations_directory: This is the folder where manual annotations are found
-    :param data_directory: This is the folder where events live (helpful to get global machine time)
+    :param event_folder: This is the folder where events live (helpful to get global machine time)
     :param local_data_directory:  This is where the microwire data to be sorted is
     :return: None. A txt file is generated with relative timestamps if needed, or not if not needed.
     """
@@ -112,7 +112,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
     """
     reformat_event_labels(subject, session, task, data_directory, annotations_directory)
     photodiode_check_viewer(subject, session, task, data_directory, annotations_directory)
-    write_timestamps(subject, session, task, annotations_directory, data_dir, results_directory)
+    write_timestamps(subject, session, task, annotations_directory, data_directory, results_directory)
 
 
 def main():
