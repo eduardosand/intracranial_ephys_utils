@@ -113,24 +113,3 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
     reformat_event_labels(subject, session, task, data_directory, annotations_directory)
     photodiode_check_viewer(subject, session, task, data_directory, annotations_directory)
     write_timestamps(subject, session, task, annotations_directory, data_directory, results_directory)
-
-
-def main():
-    test_subject = 'IR87'
-    test_session = 'sess-1'
-    task = 'wcst'
-    results_directory = Path("C:/Users/edsan/PycharmProjects/tt_su/data/")
-    # task = 'Starting Recording'
-    # task = 'WCST - begun'
-    # task = 'wcst end'
-    # reformat_event_labels(test_subject, test_session, task, results_directory)
-
-    photodiode_check_viewer(test_subject, test_session, task, results_directory)
-
-    # data_clean_viewer(test_subject, test_session, task, processed_data_directory, electrode_names, dataset, eff_fs[0])
-
-    # plt.show()
-
-
-if __name__ == "__main__":
-    main()
