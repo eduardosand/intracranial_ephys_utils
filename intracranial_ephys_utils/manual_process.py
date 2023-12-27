@@ -1,19 +1,20 @@
 from ephyviewer import mkQApp, MainViewer, TraceViewer, CsvEpochSource, EpochEncoder
 import numpy as np
 from pathlib import Path
-from load_data import read_task_ncs, get_event_times
+from .load_data import read_task_ncs, get_event_times
 import os
 import pandas as pd
 
 
-def reformat_event_labels(subject, session, task, data_directory):
+def reformat_event_labels(subject, session, task, data_directory, result_directory):
     """
     This script takes the events files, reads the timestamps in, and organizes them suitably for
     the data_viewer.
-    :param subject:
-    :param session:
-    :param task:
-    :param data_directory:
+    :param subject: (str). Subject
+    :param session: (str). Session
+    :param task: (srt). Task the subject completed in this session
+    :param data_directory: (Path). The Path object that points to the neuralynx data directory
+    :param result_directory: (Path). The Path object that points to where the annotations file will go.
     :return:
     """
     data_dir = data_directory / subject / session
@@ -21,20 +22,20 @@ def reformat_event_labels(subject, session, task, data_directory):
     event_times_sec, _, _ = get_event_times(data_dir, rescale=True)
     durations = np.ones((event_times_sec.shape[0], ))*0.5
     source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration', 'label'])
-    if f'{subject}_{session}_{task}.csv' in os.listdir(data_dir):
+    if f'{subject}_{session}_{task}.csv' in os.listdir(result_directory):
         raise FileExistsError
     else:
-        source_epoch.to_csv(data_dir / f'{subject}_{session}_{task}.csv', index=False)
-    return None
+        source_epoch.to_csv(result_directory / f'{subject}_{session}_{task}.csv', index=False)
 
 
-def photodiode_check_viewer(subject, session, task, data_directory):
+def photodiode_check_viewer(subject, session, task, data_directory, results_directory):
     """
     This script is a generalized dataviewer to look at a signal, and bring up the events
     :param subject:
     :param session:
     :param task:
     :param data_directory:
+    :param results_directory:
     :return:
     """
 
@@ -58,8 +59,8 @@ def photodiode_check_viewer(subject, session, task, data_directory):
     win.add_view(view1)
 
     possible_labels = [f'{task} duration']
-    filename = f'{subject}_{session}_{task}.csv'
-    source_epoch = CsvEpochSource(os.path.join(data_dir, filename), possible_labels)
+    file_path = results_directory / f'{subject}_{session}_{task}.csv'
+    source_epoch = CsvEpochSource(file_path, possible_labels)
 
     # create a viewer for the encoder itself
     view2 = EpochEncoder(source=source_epoch, name='Tagging events')
@@ -73,6 +74,50 @@ def photodiode_check_viewer(subject, session, task, data_directory):
     win.show()
 
     app.exec()
+
+
+def write_timestamps(subject, session, task, annotations_directory, event_folder, local_data_directory):
+    """
+    Looks in event folders for labels. Elicits user input to determine which labels are relevant for spike sorting
+    to constrain looking at only task-relevant data. User can input -1 if the whole datastream should be spike sorted.
+    :param annotations_directory: This is the folder where manual annotations are found
+    :param data_directory: This is the folder where events live (helpful to get global machine time)
+    :param local_data_directory:  This is where the microwire data to be sorted is
+    :return: None. A txt file is generated with relative timestamps if needed, or not if not needed.
+    """
+    labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}.csv')
+    task_label = labels_file[labels_file.label == f"{task} duration"]
+    print(task_label['time'].iloc[0])
+    start_time_sec = task_label['time'].iloc[0].astype(float)
+    end_time_sec = start_time_sec + task_label['duration'].iloc[0].astype(float)
+    _, _, global_start = get_event_times(event_folder, rescale=False)
+    microsec_sec = 10**-6
+    sec_microsec = 10**6
+    start_time_machine = start_time_sec*sec_microsec + global_start
+    end_time_machine = end_time_sec*sec_microsec + global_start
+    print(start_time_machine)
+    timestamps_file = local_data_directory / f"timestampsInclude.txt"
+    with open(timestamps_file, 'w') as f:
+        f.write(f'{int(start_time_machine)}    {int(end_time_machine)}')
+
+
+def su_timestamp_process(subject, session, task, data_directory, results_directory):
+    """
+    Master script that runs all timestamp writing in succession
+    :param subject:
+    :param session:
+    :param task:
+    :param data_directory:
+    :param results_directory:
+    :return:
+    """
+    reformat_event_labels(subject, session, task, data_directory, results_directory)
+
+    photodiode_check_viewer(subject, session, task, data_directory, results_directory)
+
+    data_dir = data_directory / subject / session
+    write_timestamps(subject, session, task, results_directory, data_dir, results_directory)
+
 
 
 def main():
