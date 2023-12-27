@@ -6,7 +6,7 @@ import os
 import pandas as pd
 
 
-def reformat_event_labels(subject, session, task, data_directory, result_directory):
+def reformat_event_labels(subject, session, task, data_directory, annotations_directory):
     """
     This script takes the events files, reads the timestamps in, and organizes them suitably for
     the data_viewer.
@@ -14,7 +14,7 @@ def reformat_event_labels(subject, session, task, data_directory, result_directo
     :param session: (str). Session
     :param task: (srt). Task the subject completed in this session
     :param data_directory: (Path). The Path object that points to the neuralynx data directory
-    :param result_directory: (Path). The Path object that points to where the annotations file will go.
+    :param annotations_directory: (Path). The Path object that points to where the annotations file will go.
     :return:
     """
     event_times, event_labels, global_start = get_event_times(data_directory, rescale=False)
@@ -22,7 +22,7 @@ def reformat_event_labels(subject, session, task, data_directory, result_directo
     durations = np.ones((event_times_sec.shape[0], ))*0.5
     source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration',
                                                                                                  'label'])
-    if f'{subject}_{session}_{task}.csv' in os.listdir(result_directory):
+    if f'{subject}_{session}_{task}.csv' in os.listdir(annotations_directory):
         raise FileExistsError
     else:
         source_epoch.to_csv(result_directory / f'{subject}_{session}_{task}.csv', index=False)
@@ -100,23 +100,19 @@ def write_timestamps(subject, session, task, annotations_directory, event_folder
         f.write(f'{int(start_time_machine)}    {int(end_time_machine)}')
 
 
-def su_timestamp_process(subject, session, task, data_directory, results_directory):
+def su_timestamp_process(subject, session, task, data_directory, annotations_directory, results_directory):
     """
-    Master script that runs all timestamp writing in succession
-    :param subject:
-    :param session:
-    :param task:
-    :param data_directory:
-    :param results_directory:
-    :return:
+    Master script that runs basic pipeline to get timestamps file for sorting minimally using OSort Matlab scripts.
+    :param subject: (str). Subject identifier
+    :param session: (str). Session identifier, useful if subject ran more than one session.
+    :param task: (str). Task identifier. The task the subject ran.
+    :param data_directory: (Path). Path object to data where events file and photodiode file lives
+    :param annotations_directory: (Path). Path object that points to where we'd like to store annotations and metadata.
+    :return: (Path). Path object that points to where the timestampInclude.txt file will end up.
     """
-    reformat_event_labels(subject, session, task, data_directory, results_directory)
-
-    photodiode_check_viewer(subject, session, task, data_directory, results_directory)
-
-    data_dir = data_directory / subject / session
-    write_timestamps(subject, session, task, results_directory, data_dir, results_directory)
-
+    reformat_event_labels(subject, session, task, data_directory, annotations_directory)
+    photodiode_check_viewer(subject, session, task, data_directory, annotations_directory)
+    write_timestamps(subject, session, task, annotations_directory, data_dir, results_directory)
 
 
 def main():
