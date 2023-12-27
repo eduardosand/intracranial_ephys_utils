@@ -75,7 +75,7 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     app.exec()
 
 
-def write_timestamps(subject, session, task, annotations_directory, event_folder, local_data_directory):
+def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory):
     """
     Looks in event folders for labels. Elicits user input to determine which labels are relevant for spike sorting
     to constrain looking at only task-relevant data. User can input -1 if the whole datastream should be spike sorted.
@@ -112,4 +112,4 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
     """
     reformat_event_labels(subject, session, task, data_directory, annotations_directory)
     photodiode_check_viewer(subject, session, task, data_directory, annotations_directory)
-    write_timestamps(subject, session, task, annotations_directory, data_directory, results_directory)
+    write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory)
