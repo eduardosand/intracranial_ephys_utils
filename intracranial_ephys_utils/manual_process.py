@@ -28,20 +28,19 @@ def reformat_event_labels(subject, session, task, data_directory, result_directo
         source_epoch.to_csv(result_directory / f'{subject}_{session}_{task}.csv', index=False)
 
 
-def photodiode_check_viewer(subject, session, task, data_directory, results_directory):
+def photodiode_check_viewer(subject, session, task, data_directory, annotations_directory):
     """
-    This script is a generalized dataviewer to look at a signal, and bring up the events
-    :param subject:
-    :param session:
-    :param task:
-    :param data_directory:
-    :param results_directory:
+    This script is a generalized dataviewer to look at a photodiode signal, and bring up the events
+    :param subject: The patient ID
+    :param session: Session of the experiment. Useful if patient completed more than one session of a task.
+    :param task: Which task
+    :param data_directory: Where the data lives
+    :param annotations_directory: Where we want to put the annotations of the data
     :return:
     """
 
-    data_dir = data_directory / subject / session
     ph_filename = 'photo1.ncs'
-    ph_signal, sampling_rate, interp, timestamps = read_task_ncs(data_dir, ph_filename)
+    ph_signal, sampling_rate, interp, timestamps = read_task_ncs(data_directory, ph_filename)
     dataset = np.expand_dims(ph_signal, axis=1)
     labels = np.expand_dims(np.array([ph_filename]), axis=1)
     t_start = 0.
@@ -59,7 +58,7 @@ def photodiode_check_viewer(subject, session, task, data_directory, results_dire
     win.add_view(view1)
 
     possible_labels = [f'{task} duration']
-    file_path = results_directory / f'{subject}_{session}_{task}.csv'
+    file_path = annotations_directory / f'{subject}_{session}_{task}.csv'
     source_epoch = CsvEpochSource(file_path, possible_labels)
 
     # create a viewer for the encoder itself
