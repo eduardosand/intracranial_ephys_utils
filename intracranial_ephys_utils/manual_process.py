@@ -108,7 +108,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
     :param task: (str). Task identifier. The task the subject ran.
     :param data_directory: (Path). Path object to data where events file and photodiode file lives
     :param annotations_directory: (Path). Path object that points to where we'd like to store annotations and metadata.
-    :return: (Path). Path object that points to where the timestampInclude.txt file will end up.
+    :param results_directory: (Path). Path object that points to where the timestampInclude.txt file will end up.
     """
     reformat_event_labels(subject, session, task, data_directory, annotations_directory)
     photodiode_check_viewer(subject, session, task, data_directory, annotations_directory)
