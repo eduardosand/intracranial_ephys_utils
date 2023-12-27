@@ -21,7 +21,8 @@ def reformat_event_labels(subject, session, task, data_directory, result_directo
     event_times, event_labels, global_start = get_event_times(data_dir, rescale=False)
     event_times_sec, _, _ = get_event_times(data_dir, rescale=True)
     durations = np.ones((event_times_sec.shape[0], ))*0.5
-    source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration', 'label'])
+    source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration',
+                                                                                                 'label'])
     if f'{subject}_{session}_{task}.csv' in os.listdir(result_directory):
         raise FileExistsError
     else:
