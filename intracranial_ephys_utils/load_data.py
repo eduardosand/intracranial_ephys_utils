@@ -18,7 +18,7 @@ def read_file(file_path):
     """
     Lazy reader of specific Neuralynx files
     :param file_path:
-    :return:
+    :return: reader
     """
     reader = NeuralynxRawIO(filename=file_path)
     return reader
@@ -31,8 +31,9 @@ def get_event_times(folder, rescale=True):
     :param folder: string path
     :param rescale: optional(default True). Rescale timestamps to seconds from start of the file. Set to false for
     to get machine time.
-    :return: event_times : I think this is in seconds.
-    :return: event_labels : Whatever the annotation was.
+    :return: event_times : I think this is in seconds from start if rescale=True,
+    or in seconds in machine time if rescale=False.
+    :return: event_labels : Whatever the annotation was for each event.
     :return: global_start : Machine code time beginning of recording(seconds) (only return if rescale=False)
     """
     # Obtained in seconds and assumes that the start of the file (not necessarily the task) is 0.

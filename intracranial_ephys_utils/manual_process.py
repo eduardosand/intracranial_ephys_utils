@@ -90,13 +90,10 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     start_time_sec = task_label['time'].iloc[0].astype(float)
     end_time_sec = start_time_sec + task_label['duration'].iloc[0].astype(float)
     _, _, global_start = get_event_times(event_folder, rescale=False)
-    print(f'{start_time_sec} start time in seconds')
-    print(f'{global_start} machine time start')
     microsec_sec = 10**-6
     sec_microsec = 10**6
     start_time_machine = (start_time_sec + global_start) * sec_microsec
     end_time_machine = (end_time_sec + global_start) * sec_microsec
-    print(start_time_machine)
     timestamps_file = local_data_directory / f"timestampsInclude.txt"
     with open(timestamps_file, 'w') as f:
         f.write(f'{int(start_time_machine)}    {int(end_time_machine)}')
