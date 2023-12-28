@@ -90,6 +90,7 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     start_time_sec = task_label['time'].iloc[0].astype(float)
     end_time_sec = start_time_sec + task_label['duration'].iloc[0].astype(float)
     _, _, global_start = get_event_times(event_folder, rescale=False)
+    print(f'{start_time_sec} start time in seconds')
     microsec_sec = 10**-6
     sec_microsec = 10**6
     start_time_machine = start_time_sec*sec_microsec + global_start
