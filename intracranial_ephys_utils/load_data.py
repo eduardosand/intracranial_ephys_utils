@@ -33,7 +33,7 @@ def get_event_times(folder, rescale=True):
     to get machine time.
     :return: event_times : I think this is in seconds.
     :return: event_labels : Whatever the annotation was.
-    :return: global_start : Machine code time beginning of recording(in microseconds) (only return if rescale=False)
+    :return: global_start : Machine code time beginning of recording(seconds) (only return if rescale=False)
     """
     # Obtained in seconds and assumes that the start of the file (not necessarily the task) is 0.
     all_files = os.listdir(folder)
