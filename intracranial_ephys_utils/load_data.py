@@ -130,7 +130,7 @@ def read_task_ncs(folder_name, file, task='None', events_file=None):
         task_label = labels_file[labels_file.label == f"{task} duration"]
         print(task_label['time'].iloc[0])
         task_start = task_label['time'].iloc[0].astype(float) # seconds from start of file
-        task_end = start_time_sec + task_label['duration'].iloc[0].astype(float)
+        task_end = task_start + task_label['duration'].iloc[0].astype(float)
 
         # print(float(ncs_reader.get_signal_size(block_index=0, seg_index=n_segments - 1))/sampling_rate)
 
