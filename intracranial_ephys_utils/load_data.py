@@ -95,23 +95,23 @@ def missing_samples_check(file_path):
     return skipped_samples, t_starts, seg_sizes
 
 
-def read_task_ncs(folder_name, file, task='None'):
+def read_task_ncs(folder_name, file, task='None', events_file=None):
     """
     Read neuralynx data into an array, with sampling rate, and start time of the task.
     To deal with discontinuities and dropped samples, we take a pragmatic approach. We assume continuous sampling, and
     if there are inconsistencies between the number of samples in segments and the array itself, we fill in samples by
     interpolating.
     Ideally this spits out neuralynx data in the form of an array, with the sampling rate, and the start time of the task
-    :param folder_name: Path object that gives me the path of all the data files for a given recording session
+    :param folder_name: Path object that tells the path of the structure
     :param file: filename we want to read currently
-    :param task: string that matches the event label in the actual events file. Ideally it matches the name of the task
+    :param task: (string, optional) that matches the event label in the actual events file. Ideally it matches the name of the task
+    :param events_file: (string, optional) needed if task argument is provided.
     :return: ncs_signal:
     :return: sampling_rate:
     :return: interp:
     :return: timestamps:
     """
 
-    # task - string that matches the event label in the actual events file. Ideally it matches the name of the task
     file_path = folder_name / file
     ncs_reader = read_file(file_path)
     ncs_reader.parse_header()
@@ -120,18 +120,16 @@ def read_task_ncs(folder_name, file, task='None'):
 
     # This loop is to get around files that have weird events files, or task wasn't in the annotation
     if task != 'None':
-        event_times, event_labels = get_event_times(folder_name)
-        # For right now, magic number per subject
-        task_event_marker = list(event_labels).index(task)
-        user_delay_time = 60  # This is to read in a little bit of data earlier than the start of the event, just in
-        # case it was manually annotated
-        task_start = event_times[task_event_marker] - user_delay_time  # In seconds from beginning of the file
-        if task_start < 0:
-            task_start = 0.
-        if task_event_marker+1 == len(event_times):
-            task_end = ncs_reader.segment_t_stop(block_index=0, seg_index=-1)
-        else:
-            task_end = event_times[task_event_marker+1]
+        # in previous iterations, we looked at the event file, in it's current form we'd rather look at the annotations
+        # so first thing to check that the annotations file exists
+        # we'll assume data is held in repo/data/task/subject/session/raw
+        # but then that annotations file is held in parent direction
+
+        labels_file = pd.read_csv(events_file)
+        task_label = labels_file[labels_file.label == f"{task} duration"]
+        print(task_label['time'].iloc[0])
+        task_start = task_label['time'].iloc[0].astype(float) # seconds from start of file
+        task_end = start_time_sec + task_label['duration'].iloc[0].astype(float)
 
         # print(float(ncs_reader.get_signal_size(block_index=0, seg_index=n_segments - 1))/sampling_rate)
 
@@ -187,7 +185,9 @@ def read_task_ncs(folder_name, file, task='None'):
             if abs(time_segment_start-previous_segment_stop) < 1/sampling_rate:
                 continue
             else:
-                # 07/19/2023 Add timestamps and whether the data was interpolated to the overall matlab structure
+                # 01/18/2024 - Consider a version of this script that doesn't interpolate, to allow for better alignment
+                # to spike data where this has in fact not been done (spike sorting (Osort) doesn't care about
+                # timestamping at all)
                 previous_seg_signal = ncs_reader.get_analogsignal_chunk(seg_index=i-1)
                 previous_seg_signal_scaled = ncs_reader.rescale_signal_raw_to_float(previous_seg_signal,
                                                                                     dtype='float32').T[0]
