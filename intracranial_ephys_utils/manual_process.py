@@ -58,7 +58,7 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     win.add_view(view1)
 
     possible_labels = [f'{task} duration']
-    file_path = annotations_directory / f'{subject}_{session}_{task}.csv'
+    file_path = annotations_directory / f'{subject}_{session}_{task}_events.csv'
     source_epoch = CsvEpochSource(file_path, possible_labels)
 
     # create a viewer for the encoder itself
