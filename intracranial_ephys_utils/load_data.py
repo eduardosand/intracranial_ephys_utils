@@ -128,7 +128,6 @@ def read_task_ncs(folder_name, file, task='None', events_file=None):
 
         labels_file = pd.read_csv(events_file)
         task_label = labels_file[labels_file.label == f"{task} duration"]
-        print(task_label['time'].iloc[0])
         task_start = task_label['time'].iloc[0].astype(float) # seconds from start of file
         task_end = task_start + task_label['duration'].iloc[0].astype(float)
 

@@ -22,10 +22,11 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     durations = np.ones((event_times_sec.shape[0], ))*0.5
     source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration',
                                                                                                  'label'])
-    if f'{subject}_{session}_{task}.csv' in os.listdir(annotations_directory):
+    annotations_file = f'{subject}_{session}_{task}_events.csv'
+    if annotations_file in os.listdir(annotations_directory):
         raise FileExistsError
     else:
-        source_epoch.to_csv(annotations_directory / f'{subject}_{session}_{task}.csv', index=False)
+        source_epoch.to_csv(annotations_directory / annotations_file, index=False)
 
 
 def photodiode_check_viewer(subject, session, task, data_directory, annotations_directory):
