@@ -79,6 +79,9 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     """
     Looks in event folders for labels. Elicits user input to determine which labels are relevant for spike sorting
     to constrain looking at only task-relevant data. User can input -1 if the whole datastream should be spike sorted.
+    :param subject: (string) Subject identifier
+    :param session: (string) Session identifier (1 if subject only completed one run of the experiment.
+    :param task: (string) Task identifier. The task or experiment subject completed.
     :param annotations_directory: This is the folder where manual annotations are found
     :param event_folder: This is the folder where events live (helpful to get global machine time)
     :param local_data_directory:  This is where the microwire data to be sorted is
