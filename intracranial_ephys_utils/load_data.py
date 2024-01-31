@@ -106,7 +106,8 @@ def read_task_ncs(folder_name, file, task='None', events_file=None):
     :param folder_name: Path object that tells the path of the structure
     :param file: filename we want to read currently
     :param task: (string, optional) that matches the event label in the actual events file. Ideally it matches the name of the task
-    :param events_file: (string, optional) needed if task argument is provided.
+    :param events_file: (string, optional) needed if task argument is provided, this used to be the .nev file but I
+    found it useless so now it's a csv file that I generate via the scripts in manual_process
     :return: ncs_signal:
     :return: sampling_rate:
     :return: interp:
