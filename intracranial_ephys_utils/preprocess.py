@@ -1,7 +1,9 @@
 from load_data import read_task_ncs
 from scipy import signal
 import numpy as np
-import matplotlib.pyplot as plt
+import os
+from pathlib import Path
+
 
 def BCI_LFP_processing(lfp_signals, sampling_rate):
     """
@@ -153,15 +155,29 @@ def read_in_ncs_data_directory(file_paths, neuro_folder_name, task=None,high_pas
     return dataset, eff_fs, electrode_names
 
 
-def save_data_for_Bob_clean(folder):
+def save_data_for_Bob_clean(subject, session, task_name):
     """
-    Function needs to find all the necessary data in a folder, so imagine using something like os.listdir, or with path
-    objects something like files = [f for f in pathlib.Path().iterdir() if f.is_file()]
-    That list of filenames can go into first part two parts of read in data.
-    You can then save into .npy files the dataset and everything else separately or use the dataset, eff_fs,
-    electrode_names to turn into a mne object but you'll need an dummy events file
-    Finally, you can save the mne object instead I suppose.
-    Sorry I can't help anymore until Saturday, I have a few other obligations tomorrow and a talk as a treat.
+    Load, process, and savedata.
+    :param subject:
+    :param session:
+    :param task_name:
     :return:
     """
-    return
+    # Hopefully your file structure is like mine
+    data_directory = Path(f"{os.pardir}/data/{subject}/{session}/raw")
+    results_directory = data_directory.parent.absolute() / "Bob_viewer"
+    if results_directory.exists():
+        print('great')
+    else:
+        os.mkdir(results_directory)
+    all_files_list = os.listdir(data_directory)
+    # electrode_files = [file_path for file_path in all_files_list if (re.match('m.*ncs', file_path) and not
+    #                file_path.endswith(".nse"))]
+    electrode_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs')]
+    electrode_files.sort()
+    # electrode_files.append('photo1.ncs')
+    dataset, eff_fs, electrode_names = read_in_ncs_data_directory(electrode_files, data_directory)
+    bp = str(int(eff_fs))
+    np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_{bp}_broadband'), dataset=dataset,
+             electrode_names=electrode_names, eff_fs=eff_fs)
+    return None
