@@ -1,3 +1,7 @@
+from load_data import read_task_ncs
+from scipy import signal
+import numpy as np
+import matplotlib.pyplot as plt
 
 def BCI_LFP_processing(lfp_signals, sampling_rate):
     """
@@ -98,7 +102,7 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, highfreq):
         processed_signals = signal.filtfilt(b_notch, a_notch, processed_signals)
     return processed_signals, effective_fs
 
-def read_in_ncs_data_directory(file_paths, neuro_folder_name, task, high_pass=1000):
+def read_in_ncs_data_directory(file_paths, neuro_folder_name, task=None,high_pass=1000):
     """
     Read in all data from a given directory and run basic preprocessing on it so I can load it live on my shitty
     computer.
@@ -149,5 +153,15 @@ def read_in_ncs_data_directory(file_paths, neuro_folder_name, task, high_pass=10
     return dataset, eff_fs, electrode_names
 
 
-def save_data_for_Bob():
+def save_data_for_Bob_clean(folder):
+    """
+    Function needs to find all the necessary data in a folder, so imagine using something like os.listdir, or with path
+    objects something like files = [f for f in pathlib.Path().iterdir() if f.is_file()]
+    That list of filenames can go into first part two parts of read in data.
+    You can then save into .npy files the dataset and everything else separately or use the dataset, eff_fs,
+    electrode_names to turn into a mne object but you'll need an dummy events file
+    Finally, you can save the mne object instead I suppose.
+    Sorry I can't help anymore until Saturday, I have a few other obligations tomorrow and a talk as a treat.
+    :return:
+    """
     return

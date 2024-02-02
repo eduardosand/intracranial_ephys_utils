@@ -96,7 +96,7 @@ def missing_samples_check(file_path):
     return skipped_samples, t_starts, seg_sizes
 
 
-def read_task_ncs(folder_name, file, task='None', events_file=None):
+def read_task_ncs(folder_name, file, task=None, events_file=None):
     """
     Read neuralynx data into an array, with sampling rate, and start time of the task.
     To deal with discontinuities and dropped samples, we take a pragmatic approach. We assume continuous sampling, and
@@ -121,7 +121,7 @@ def read_task_ncs(folder_name, file, task='None', events_file=None):
     sampling_rate = ncs_reader.get_signal_sampling_rate()
 
     # This loop is to get around files that have weird events files, or task wasn't in the annotation
-    if task != 'None':
+    if task is not None:
         # in previous iterations, we looked at the event file, in it's current form we'd rather look at the annotations
         # so first thing to check that the annotations file exists
         # we'll assume data is held in repo/data/task/subject/session/raw
