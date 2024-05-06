@@ -40,7 +40,9 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     :return:
     """
 
-    ph_filename = 'photo1.ncs'
+    ph_filename = 'photo1_0012.ncs'
+    ########### TO DO
+    # need to generalize photodiode finding
     ph_signal, sampling_rate, interp, timestamps = read_task_ncs(data_directory, ph_filename)
     dataset = np.expand_dims(ph_signal, axis=1)
     labels = np.expand_dims(np.array([ph_filename]), axis=1)
