@@ -29,7 +29,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
         source_epoch.to_csv(annotations_directory / annotations_file, index=False)
 
 
-def photodiode_check_viewer(subject, session, task, data_directory, annotations_directory):
+def photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, task_start=0.):
     """
     This script is a generalized dataviewer to look at a photodiode signal, and bring up the events
     :param subject: The patient ID
@@ -40,13 +40,23 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     :return:
     """
 
-    ph_filename = 'photo1_0012.ncs'
-    ########### TO DO
-    # need to generalize photodiode finding
+    all_files_list = os.listdir(data_directory)
+    # electrode_files = [file_path for file_path in all_files_list if (re.match('m.*ncs', file_path) and not
+    #                file_path.endswith(".nse"))]
+    ph_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs') and
+                       file_path.startswith('photo1')]
+    assert len(ph_files) == 1
+    ph_filename = ph_files[0]
+    print(ph_filename)
     ph_signal, sampling_rate, interp, timestamps = read_task_ncs(data_directory, ph_filename)
+    # end_signal = 1470
+    # ph_signal = ph_signal[:int(sampling_rate * end_signal)]
+    # timestamps = timestamps[:int(sampling_rate * end_signal)]
     dataset = np.expand_dims(ph_signal, axis=1)
     labels = np.expand_dims(np.array([ph_filename]), axis=1)
-    t_start = 0.
+    # On occasion, there are long recordings, which make it difficult to see what's going on, especially if there are
+    # large discontinuities...
+    t_start = task_start
 
     app = mkQApp()
 
@@ -63,11 +73,11 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     possible_labels = [f'{task} duration']
     file_path = annotations_directory / f'{subject}_{session}_{task}_events.csv'
     source_epoch = CsvEpochSource(file_path, possible_labels)
-
+    print('okay')
     # create a viewer for the encoder itself
     view2 = EpochEncoder(source=source_epoch, name='Tagging events')
     win.add_view(view2)
-
+    print('huh')
     #
     # view3 = EventList(source=source_epoch, name='events')
     # win.add_view(view3)
