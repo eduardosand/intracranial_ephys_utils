@@ -2,6 +2,7 @@ from ephyviewer import mkQApp, MainViewer, TraceViewer, CsvEpochSource, EpochEnc
 import numpy as np
 from pathlib import Path
 from .load_data import read_task_ncs, get_event_times
+from .plot_data import diagnostic_time_series_plot
 import os
 import pandas as pd
 
@@ -29,7 +30,8 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
         source_epoch.to_csv(annotations_directory / annotations_file, index=False)
 
 
-def photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, task_start=0.):
+def photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
+                            task_start=0.):
     """
     This script is a generalized dataviewer to look at a photodiode signal, and bring up the events
     :param subject: The patient ID
@@ -49,14 +51,27 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     ph_filename = ph_files[0]
     print(ph_filename)
     ph_signal, sampling_rate, interp, timestamps = read_task_ncs(data_directory, ph_filename)
-    # end_signal = 1470
-    # ph_signal = ph_signal[:int(sampling_rate * end_signal)]
-    # timestamps = timestamps[:int(sampling_rate * end_signal)]
+    if diagnostic:
+        diagnostic_time_series_plot(ph_signal, sampling_rate, electrode_name='Photodiode')
+        start_time = input('Type start time (in seconds) if not the start of signal, else press enter: ')
+        end_time = input('Type end time (in seconds) if not the end of signal, else press enter: ')
+        if len(start_time) == 0:
+            start_time = 0
+        else:
+            start_time = int(start_time)
+        if len(end_time) == 0:
+            end_time = int(ph_signal.shape[0])
+        else:
+            end_time = int(end_time)
+
+        ph_signal = ph_signal[:int(sampling_rate * end_time)]
+        timestamps = timestamps[:int(sampling_rate * end_time)]
+        t_start = start_time
+    else:
+        t_start = task_start
+
     dataset = np.expand_dims(ph_signal, axis=1)
     labels = np.expand_dims(np.array([ph_filename]), axis=1)
-    # On occasion, there are long recordings, which make it difficult to see what's going on, especially if there are
-    # large discontinuities...
-    t_start = task_start
 
     app = mkQApp()
 
