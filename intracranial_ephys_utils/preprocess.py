@@ -1,8 +1,28 @@
-from load_data import read_task_ncs
+from .load_data import read_task_ncs
 from scipy import signal
 import numpy as np
 import os
 from pathlib import Path
+
+
+def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None):
+    '''
+    Binarizes the photodiode signal using the midpoint of the signal.
+    :param ph_signal: This is the photodiode signal itself (array of floats)
+    :param sampling_rate: How many samples per second (float)
+    :param cutoff_fraction: What is the cutoff for on times. 2 is the midpoint (midpoint through the process of
+    turning off or on)
+    :param task_time: This is how long the task took (in seconds). Helpful to zoom in on particular data regions (float)
+    :return: ph_signal_bin: Array of event_lengths in seconds, to be plotted with the rts (array of floats)
+    '''
+    if task_time is not None:
+        total_time = int(task_time*sampling_rate*60)
+    else:
+        total_time = ph_signal.shape[0]
+    midpoint = (max(ph_signal[0:total_time])-min(ph_signal[0:total_time]))/cutoff_fraction+min(ph_signal[0:total_time])
+    ph_signal_bin = np.zeros((total_time, ))
+    ph_signal_bin[ph_signal[0:total_time] > midpoint] = 1.
+    return ph_signal_bin
 
 
 def BCI_LFP_processing(lfp_signals, sampling_rate):
