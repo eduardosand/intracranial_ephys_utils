@@ -24,7 +24,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
                                                                                                  'label'])
     annotations_file = f'{subject}_{session}_{task}_events.csv'
     if annotations_file in os.listdir(annotations_directory):
-        raise FileExistsError
+        print('Annotations File exists, double check')
     else:
         source_epoch.to_csv(annotations_directory / annotations_file, index=False)
 
