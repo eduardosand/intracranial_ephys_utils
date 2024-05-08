@@ -3,6 +3,7 @@ import numpy as np
 from pathlib import Path
 from .load_data import read_task_ncs, get_event_times
 from .plot_data import diagnostic_time_series_plot
+from .preprocess import binarize_ph
 import os
 import pandas as pd
 
@@ -67,11 +68,17 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
         ph_signal = ph_signal[:int(sampling_rate * end_time)]
         timestamps = timestamps[:int(sampling_rate * end_time)]
         t_start = start_time
+
+        # next step to this is to add my thresholding for photodiode
+        # print(np.max(ph_signal))
+        # print(np.min(ph_signal))
+        ph_signal_bin = binarize_ph(ph_signal, sampling_rate)
+        dataset = np.vstack([ph_signal, ph_signal_bin]).T
+        labels = np.array([ph_filename, 'Photodiode Binarized'])
     else:
         t_start = task_start
-
-    dataset = np.expand_dims(ph_signal, axis=1)
-    labels = np.expand_dims(np.array([ph_filename]), axis=1)
+        dataset = np.expand_dims(ph_signal, axis=1)
+        labels = np.expand_dims(np.array([ph_filename]), axis=1)
 
     app = mkQApp()
 
