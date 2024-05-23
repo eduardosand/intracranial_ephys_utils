@@ -47,9 +47,16 @@ def get_event_times(folder, rescale=True):
 
     event_reader = read_file(os.path.join(folder, events_file[0]))
     event_reader.parse_header()
-    event_timestamps, _, event_labels = event_reader.get_event_timestamps()
+    try:
+        event_timestamps, _, event_labels = event_reader.get_event_timestamps()
+    except IndexError:
+        warnings.warn("No events found")
+        event_timestamps, _, event_labels = [], [], []
     if rescale:
-        event_times = event_reader.rescale_event_timestamp(event_timestamps)
+        if len(event_timestamps) > 0:
+            event_times = event_reader.rescale_event_timestamp(event_timestamps)
+        else:
+            event_times = np.array([])
         global_start = None
     else:
         event_times = event_timestamps
