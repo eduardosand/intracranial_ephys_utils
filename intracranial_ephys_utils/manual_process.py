@@ -65,14 +65,15 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
         else:
             end_time = int(end_time)
 
-        ph_signal = ph_signal[:int(sampling_rate * end_time)]
-        timestamps = timestamps[:int(sampling_rate * end_time)]
+        ph_signal = ph_signal[int(start_time*sampling_rate):int(sampling_rate * end_time)]
+        timestamps = timestamps[int(start_time*sampling_rate):int(sampling_rate * end_time)]
         t_start = start_time
 
         # next step to this is to add my thresholding for photodiode
-        # print(np.max(ph_signal))
-        # print(np.min(ph_signal))
+        # we only binarize the part of the task we want to look at
         ph_signal_bin = binarize_ph(ph_signal, sampling_rate)
+        # ph_signal_bin = binarize_ph(ph_signal[int(start_time*sampling_rate):], sampling_rate)
+        # ph_signal_bin = np.concatenate((np.array([0]*int(start_time*sampling_rate)), ph_signal_bin))
         dataset = np.vstack([ph_signal, ph_signal_bin]).T
         labels = np.array([ph_filename, 'Photodiode Binarized'])
     else:
@@ -86,9 +87,13 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     win = MainViewer(debug=True, show_auto_scale=True)
 
     # Create a viewer for signal
+    # T_start essentially rereferences the start time of the dataset, but leaves the annotations alone
+    # be wary of this
     view1 = TraceViewer.from_numpy(dataset, sampling_rate, t_start, 'Photodiode', channel_names=labels)
 
-    view1.params['scale_mode'] = 'same_for_all'
+    # TO DO
+    # Figure out a better way to scale the different signals when presented
+    # view1.params['scale_mode'] = 'same_for_all'
     view1.auto_scale()
     win.add_view(view1)
 
