@@ -14,6 +14,22 @@ from scipy.interpolate import CubicSpline
 import warnings
 import pandas as pd
 
+def get_file_info(directory, start, file_extension):
+    """
+    Look in the directory for files that start and end with something
+    :param directory:
+    :param start:
+    :param file_extension:
+    :return:
+    """
+    files_list = os.listdir(directory)
+    files = [file_path for file_path in files_list if file_path.endswith(file_extension) and
+                 file_path.startswith(start)]
+
+    if len(files) > 1:
+        print('Multiple files with the same start and end')
+    file_path = directory / files[0]
+    return file_path
 
 def read_file(file_path):
     """
