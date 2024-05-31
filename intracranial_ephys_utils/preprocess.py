@@ -66,7 +66,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
             nearby_occurrences = events[(events < sample_num + buffer) & (events > sample_num - buffer)]
             num_events = len(nearby_occurrences)
             if num_events > 1:
-                avg_sample_num = int(np.average(nearby_occurrences))
+                avg_sample_num = int(np.median(nearby_occurrences))
                 event_breakpoint = np.max(nearby_occurrences)
             else:
                 avg_sample_num = nearby_occurrences[0]
