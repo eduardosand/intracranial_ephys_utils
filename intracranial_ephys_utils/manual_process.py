@@ -117,7 +117,7 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     app.exec()
 
 
-def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory):
+def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory, write=True):
     """
     Looks in event folders for labels. Elicits user input to determine which labels are relevant for spike sorting
     to constrain looking at only task-relevant data. User can input -1 if the whole datastream should be spike sorted.
@@ -129,7 +129,7 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     :param local_data_directory:  This is where the microwire data to be sorted is
     :return: None. A txt file is generated with relative timestamps if needed, or not if not needed.
     """
-    labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}.csv')
+    labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_events.csv')
     task_label = labels_file[labels_file.label == f"{task} duration"]
     print(task_label['time'].iloc[0])
     start_time_sec = task_label['time'].iloc[0].astype(float)
@@ -157,3 +157,21 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
     reformat_event_labels(subject, session, task, data_directory, annotations_directory)
     photodiode_check_viewer(subject, session, task, data_directory, annotations_directory)
     write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory)
+
+def get_annotated_task_start_time(subject, session, task, annotations_directory):
+    """
+    This function serves as a helper function to grab the start and end times of the task, after annotating the
+    photodiode script. Will only work if annotations file exists, and duration event has been made.
+    :param subject:
+    :param session:
+    :param task:
+    :param annotations_directory:
+    :return: start_time_sec (float) Start time in seconds for the task. Reference is the start of the file recording.
+    :return: end_time_sec (float) End time in seconds for the task. Reference is the start of the file recording.
+    :return: duration (float) Duration in seconds for the task.
+    """
+    labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_events.csv')
+    task_label = labels_file[labels_file.label == f"{task} duration"]
+    start_time_sec = task_label['time'].iloc[0].astype(float)
+    end_time_sec = start_time_sec + task_label['duration'].iloc[0].astype(float)
+    return start_time_sec, end_time_sec, task_label['duration'].iloc[0].astype(float)
