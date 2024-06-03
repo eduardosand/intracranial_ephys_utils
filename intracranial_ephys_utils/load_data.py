@@ -59,24 +59,27 @@ def get_event_times(folder, rescale=True):
     if len(events_file) > 1:
         warnings.warn("More than one event file found.")
     elif len(events_file) == 0:
-        raise FileNotFoundError
-
-    event_reader = read_file(os.path.join(folder, events_file[0]))
-    event_reader.parse_header()
-    try:
-        event_timestamps, _, event_labels = event_reader.get_event_timestamps()
-    except IndexError:
-        warnings.warn("No events found")
-        event_timestamps, _, event_labels = [], [], []
-    if rescale:
-        if len(event_timestamps) > 0:
-            event_times = event_reader.rescale_event_timestamp(event_timestamps)
-        else:
-            event_times = np.array([])
+        warnings.warn("No events file found.")
+        event_times, event_labels = [], []
         global_start = None
     else:
-        event_times = event_timestamps
-        global_start = event_reader.global_t_start
+
+        event_reader = read_file(os.path.join(folder, events_file[0]))
+        event_reader.parse_header()
+        try:
+            event_timestamps, _, event_labels = event_reader.get_event_timestamps()
+        except IndexError:
+            warnings.warn("No events found")
+            event_timestamps, event_labels = [], []
+        if rescale:
+            if len(event_timestamps) > 0:
+                event_times = event_reader.rescale_event_timestamp(event_timestamps)
+            else:
+                event_times = np.array([])
+            global_start = None
+        else:
+            event_times = event_timestamps
+            global_start = event_reader.global_t_start
     return event_times, event_labels, global_start
 
 

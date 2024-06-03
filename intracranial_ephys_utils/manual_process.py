@@ -19,10 +19,14 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     :param annotations_directory: (Path). The Path object that points to where the annotations file will go.
     :return:
     """
-    event_times, event_labels, global_start = get_event_times(data_directory, rescale=False)
+    event_times, event_labels, _ = get_event_times(data_directory, rescale=False)
     event_times_sec, _, _ = get_event_times(data_directory, rescale=True)
-    durations = np.ones((event_times_sec.shape[0], ))*0.5
-    source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration',
+    if len(event_times) == 0:
+        source_epoch = pd.DataFrame(np.array([[],[],[]]).T, columns=['time', 'duration',
+                                                                                                     'label'])
+    else:
+        durations = np.ones((event_times_sec.shape[0], ))*0.5
+        source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration',
                                                                                                  'label'])
     annotations_file = f'{subject}_{session}_{task}_events.csv'
     if annotations_file in os.listdir(annotations_directory):
