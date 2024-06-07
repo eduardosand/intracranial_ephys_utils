@@ -59,18 +59,26 @@ def get_event_times(folder, rescale=True):
     if len(events_file) > 1:
         warnings.warn("More than one event file found.")
     elif len(events_file) == 0:
-        warnings.warn("No events file found.")
+        warnings.warn("No events file found, Using Photodiode file to get global machine time start")
         event_times, event_labels = [], []
-        global_start = None
+        ph_path = get_file_info(folder, "photo", ".ncs")
+        ph_reader = read_file(ph_path)
+        ph_reader.parse_header()
+        global_start = ph_reader.global_t_start
     else:
 
         event_reader = read_file(os.path.join(folder, events_file[0]))
         event_reader.parse_header()
+        global_start = event_reader.global_t_start
         try:
             event_timestamps, _, event_labels = event_reader.get_event_timestamps()
         except IndexError:
             warnings.warn("No events found")
             event_timestamps, event_labels = [], []
+            ph_path = get_file_info(folder, "photo", ".ncs")
+            ph_reader = read_file(ph_path)
+            ph_reader.parse_header()
+            global_start = ph_reader.global_t_start
         if rescale:
             if len(event_timestamps) > 0:
                 event_times = event_reader.rescale_event_timestamp(event_timestamps)
@@ -79,7 +87,6 @@ def get_event_times(folder, rescale=True):
             global_start = None
         else:
             event_times = event_timestamps
-            global_start = event_reader.global_t_start
     return event_times, event_labels, global_start
 
 
