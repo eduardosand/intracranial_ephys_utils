@@ -11,7 +11,7 @@ import pandas as pd
 def reformat_event_labels(subject, session, task, data_directory, annotations_directory):
     """
     This script takes the events files, reads the timestamps in, and organizes them suitably for
-    the data_viewer.
+    the data_viewer. Outputs the events as a csv file
     :param subject: (str). Subject
     :param session: (str). Session
     :param task: (srt). Task the subject completed in this session
@@ -38,15 +38,20 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
 def photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                             task_start=0.):
     """
-    This script is a generalized dataviewer to look at a photodiode signal, and bring up the events
-    :param subject: The patient ID
-    :param session: Session of the experiment. Useful if patient completed more than one session of a task.
-    :param task: Which task
-    :param data_directory: Where the data lives
-    :param annotations_directory: Where we want to put the annotations of the data
+    This script is a generalized dataviewer to look at a photodiode signal, and bring up the events.
+    With the viewer, we can make annotations and save them to a csv file. Additionally, if the diagnostic optional
+    parameter is set to True, this function will also preprocess the photodiode to check that the signal on TTL is good.
+    :param subject: (string) The patient ID
+    :param session: (string) Session of the experiment. Useful if patient completed more than one session of a task.
+    :param task: (string) Which task
+    :param data_directory: (Path object) Where the data lives
+    :param annotations_directory: (Path object) Where we want to put the annotations of the data
+    :param diagnostic: (bool) (optional) If True we will also plot diagnostics, and preprocess photodiode and overlay it.
+    :param task_start: (float) (optional) The start time of the task
     :return:
     """
 
+    # Underlying assumption is that data is organized as subject/session/raw, this is where the .ncs files live
     all_files_list = os.listdir(data_directory)
     # electrode_files = [file_path for file_path in all_files_list if (re.match('m.*ncs', file_path) and not
     #                file_path.endswith(".nse"))]
@@ -54,10 +59,15 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
                        file_path.startswith('photo1')]
     assert len(ph_files) == 1
     ph_filename = ph_files[0]
-    print(ph_filename)
+
+    # We'll read in the photodiode signal
     ph_signal, sampling_rate, interp, timestamps = read_task_ncs(data_directory, ph_filename)
+
+    # we'll make some sanity plots to check photodiode at a glance, and preprocess to double check event trigger
+    # is good
     if diagnostic:
         diagnostic_time_series_plot(ph_signal, sampling_rate, electrode_name='Photodiode')
+        # Use the diagnostic plot to limit the time interval we process photodiode in
         start_time = input('Type start time (in seconds) if not the start of signal, else press enter: ')
         end_time = input('Type end time (in seconds) if not the end of signal, else press enter: ')
         if len(start_time) == 0:
@@ -74,10 +84,7 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
         t_start = start_time
 
         # next step to this is to add my thresholding for photodiode
-        # we only binarize the part of the task we want to look at
         ph_signal_bin = binarize_ph(ph_signal, sampling_rate)
-        # ph_signal_bin = binarize_ph(ph_signal[int(start_time*sampling_rate):], sampling_rate)
-        # ph_signal_bin = np.concatenate((np.array([0]*int(start_time*sampling_rate)), ph_signal_bin))
         dataset = np.vstack([ph_signal, ph_signal_bin]).T
         labels = np.array([ph_filename, 'Photodiode Binarized'])
     else:
@@ -101,19 +108,17 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     view1.auto_scale()
     win.add_view(view1)
 
+    # annotation file details
     possible_labels = [f'{task} duration']
     file_path = annotations_directory / f'{subject}_{session}_{task}_events.csv'
     source_epoch = CsvEpochSource(file_path, possible_labels)
+
     # create a viewer for the encoder itself
     view2 = EpochEncoder(source=source_epoch, name='Tagging events')
     win.add_view(view2)
-    #
-    # view3 = EventList(source=source_epoch, name='events')
-    # win.add_view(view3)
 
     # show main window and run Qapp
     win.show()
-
     app.exec()
 
 
