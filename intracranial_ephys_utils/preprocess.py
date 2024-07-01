@@ -28,7 +28,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         total_time = ph_signal.shape[0]
 
     ph_signal_bin = np.zeros((total_time, ))
-    sos = signal.butter(4, 20, 'hp', fs=sampling_rate, output='sos')
+    sos = signal.butter(4, 15, 'hp', fs=sampling_rate, output='sos')
     filtered = signal.sosfiltfilt(sos, ph_signal)
     stdev = np.std(filtered)
     # The idea with this method of processing, slightly more complicated than midpoint
@@ -52,8 +52,8 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         ph_signal_bin[ph_signal[0:total_time] > midpoint] = 1.
     else:
         events = timepoints[abs(filtered) > 4. * stdev]
-        buffer = 0.05*sampling_rate
-        sample_size = int(0.2*sampling_rate)
+        buffer = 0.02*sampling_rate
+        sample_size = int(0.045*sampling_rate)
         event_breakpoint = 0
         event_onsets = []
         event_offsets = []
