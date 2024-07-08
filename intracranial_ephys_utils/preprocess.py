@@ -202,17 +202,20 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, highfreq):
         effective_fs = sampling_rate / second_factor
     else:
         raise Exception('Invalid sampling rate')
+
     f0 = 60.
-    Q = 30.0  # Quality Factor
-    b_notch, a_notch = signal.iirnotch(f0, Q, effective_fs)
+    q = 30.0  # Quality Factor
+    b_notch, a_notch = signal.iirnotch(f0, q, effective_fs)
     processed_signals = signal.filtfilt(b_notch, a_notch, downsampled_signal_2)
+
     # Get harmonics out of the signal as well, up to 300
     for i in range(2, 6):
         b_notch, a_notch = signal.iirnotch(f0*i, Q, effective_fs)
         processed_signals = signal.filtfilt(b_notch, a_notch, processed_signals)
     return processed_signals, effective_fs
 
-def read_in_ncs_data_directory(file_paths, neuro_folder_name, task=None,high_pass=1000):
+
+def preprocess_dataset(file_paths, neuro_folder_name, task=None,high_pass=1000):
     """
     Read in all data from a given directory and run basic preprocessing on it so I can load it live on my shitty
     computer.
@@ -263,12 +266,12 @@ def read_in_ncs_data_directory(file_paths, neuro_folder_name, task=None,high_pas
     return dataset, eff_fs, electrode_names
 
 
-def save_data_for_Bob_clean(subject, session, task_name):
+def save_small_dataset(subject, session, task_name):
     """
     Load, process, and savedata.
-    :param subject:
-    :param session:
-    :param task_name:
+    :param subject: (string) subject identifier
+    :param session: (string) subject session
+    :param task_name: (string) task name, used to select only part of entire ncs file, assuming annotations file exists
     :return:
     """
     # Hopefully your file structure is like mine
@@ -284,8 +287,8 @@ def save_data_for_Bob_clean(subject, session, task_name):
     electrode_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs')]
     electrode_files.sort()
     # electrode_files.append('photo1.ncs')
-    dataset, eff_fs, electrode_names = read_in_ncs_data_directory(electrode_files, data_directory)
+    dataset, eff_fs, electrode_names = preprocess_dataset(electrode_files, data_directory, task=task_name)
     bp = str(int(eff_fs))
-    np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_{bp}_broadband'), dataset=dataset,
+    np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_lowpass_{bp}'), dataset=dataset,
              electrode_names=electrode_names, eff_fs=eff_fs)
     return None
