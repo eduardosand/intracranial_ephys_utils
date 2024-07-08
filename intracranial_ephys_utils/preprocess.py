@@ -277,6 +277,7 @@ def save_small_dataset(subject, session, task_name):
     # Hopefully your file structure is like mine
     data_directory = Path(f"{os.pardir}/data/{subject}/{session}/raw")
     results_directory = data_directory.parent.absolute() / "preprocessed"
+    print(results_directory)
     if results_directory.exists():
         print('Results Directory already Exists')
     else:
