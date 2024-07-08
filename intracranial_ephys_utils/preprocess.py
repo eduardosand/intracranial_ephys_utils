@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from scipy import signal
 import matplotlib.pyplot as plt
+import warnings
 
 
 def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau=None):
@@ -294,7 +295,10 @@ def save_small_dataset(subject, session, task_name, events_file):
     # electrode_files.append('photo1.ncs')
     dataset, eff_fs, electrode_names = preprocess_dataset(electrode_files, data_directory, task=task_name,
                                                           events_file=events_file)
-    bp = str(int(eff_fs))
+    # print(set(eff_fs))
+    if len(set(eff_fs)) != 1:
+        warnings.warn('Different effective sampling rates across files')
+    bp = str(int(eff_fs[0]))
     np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_lowpass_{bp}'), dataset=dataset,
              electrode_names=electrode_names, eff_fs=eff_fs)
     return None
