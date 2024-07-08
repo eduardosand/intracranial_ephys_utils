@@ -155,6 +155,8 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
 
     # This loop is to get around files that have weird events files, or task wasn't in the annotation
     if task is not None:
+        if events_file is None:
+            raise ValueError("Need to provide event file")
         # in previous iterations, we looked at the event file, in it's current form we'd rather look at the annotations
         # so first thing to check that the annotations file exists
         # we'll assume data is held in repo/data/task/subject/session/raw
