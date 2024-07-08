@@ -236,21 +236,20 @@ def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None,
         print(micro_file_path)
         split_tup = os.path.splitext(micro_file_path)
         ncs_filename = split_tup[0]
-        lfp_signal, sample_rate, _, _ = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
-                                                   events_file=events_file)
         if ncs_filename.startswith('photo'):
+            lfp_signal, sample_rate, interp, timestamps = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
+                                                   events_file=events_file)
             # assume photo is 8K and we're getting down to 1000
             first_factor = 8
             fs = sample_rate / first_factor
             processed_lfp = signal.decimate(lfp_signal, first_factor)
-        elif (ncs_filename.startswith('m') and not ncs_filename.startswith('mic')):
-            # processed_lfp, fs = broadband_seeg_processing(lfp_signal, sample_rate, 0.1, 1000)
-            processed_lfp, fs = broadband_seeg_processing(lfp_signal, sample_rate, 0.1, high_pass)
+            processed_timestamps = signal.decimate(timestamps, first_factor)
         else:
-            # processed_lfp, fs = broadband_seeg_processing(lfp_signal, sample_rate, 0.1, 1000)
+            lfp_signal, sample_rate, _, _ = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
+                                                   events_file=events_file)
             processed_lfp, fs = broadband_seeg_processing(lfp_signal, sample_rate, 0.1, high_pass)
         if ind == 0:
-            dataset = np.zeros((len(file_paths), processed_lfp.shape[0]))
+            dataset = np.zeros((len(file_paths)+1, processed_lfp.shape[0]))
             dataset[ind, :] = processed_lfp
             eff_fs.append(fs)
             electrode_names.append(ncs_filename)
@@ -268,6 +267,10 @@ def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None,
                 dataset[ind, :processed_lfp.shape[0]] = processed_lfp[0:processed_lfp.shape[0]]
             eff_fs.append(fs)
             electrode_names.append(ncs_filename)
+        if ncs_filename.startswith('photo'):
+            dataset[-1, :] = processed_timestamps
+    eff_fs.append(fs)
+    electrode_names.append('Timepoints')
     return dataset, eff_fs, electrode_names
 
 
