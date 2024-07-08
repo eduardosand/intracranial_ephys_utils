@@ -295,7 +295,6 @@ def save_small_dataset(subject, session, task_name, events_file):
     # electrode_files.append('photo1.ncs')
     dataset, eff_fs, electrode_names = preprocess_dataset(electrode_files, data_directory, task=task_name,
                                                           events_file=events_file)
-    # print(set(eff_fs))
     if len(set(eff_fs)) != 1:
         warnings.warn('Different effective sampling rates across files')
     bp = str(int(eff_fs[0]))
