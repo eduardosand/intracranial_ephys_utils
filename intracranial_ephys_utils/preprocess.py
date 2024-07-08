@@ -165,12 +165,12 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, highfreq):
     a 4th order Butterworth to bandpass from lowfreq to highfreq. Downsample once more to get down to 1KHz sampling rate
     Finally, we'll pass through a Notch filter to get rid of powerline noise and associated harmonics.
     WARNING: This is NOT good for European data because of the power line noise there(its 50Hz)
-    :param lfp_signals:
-    :param sampling_rate:
-    :param lowfreq: lower frequency for bandpass
-    :param highfreq: higher frequency for bandpass
+    :param lfp_signals: (np.array) (1, n_samples)
+    :param sampling_rate: (int)
+    :param lowfreq: (int) lower frequency for bandpass
+    :param highfreq: (int) higher frequency for bandpass
     :return: processed_signals: numpy array shape (1, n_samples)
-    :return: effective_fs: Final sampling rate after processing
+    :return: effective_fs: (int) Final sampling rate after processing
     """
     if sampling_rate == 32000:
         first_factor = 4
@@ -212,17 +212,18 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, highfreq):
     for i in range(2, 6):
         b_notch, a_notch = signal.iirnotch(f0*i, Q, effective_fs)
         processed_signals = signal.filtfilt(b_notch, a_notch, processed_signals)
-    return processed_signals, effective_fs
+    return processed_signals, int(effective_fs)
 
 
 def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None, events_file=None):
     """
     Read in all data from a given directory and run basic preprocessing on it so I can load it live on my shitty
     computer.
-    :param file_paths: A list of filenames. Ex(['LAC1.ncs','LAC2.ncs'])
-    :param neuro_folder_name: The folderpath where the data is held
+    :param file_paths: (list) A list of filenames. Ex(['LAC1.ncs','LAC2.ncs'])
+    :param neuro_folder_name: (Path) The folderpath where the data is held
     :param task: (optional) A string that dictates the task name, only use if you have the event labels already, so already parsed
     through the photodiode file and annotated the task duration
+    :param events_file: (optional) (Path) Where the annotation file is located, needed if task is given.
     :param high_pass: the largest frequency to use for band-pass filtering
     :return: dataset: Numpy array, shape is (n_channels, n_samples)
     :return: eff_fs: Effective sampling rate
@@ -234,7 +235,7 @@ def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None,
         print(micro_file_path)
         split_tup = os.path.splitext(micro_file_path)
         ncs_filename = split_tup[0]
-        lfp_signal, sample_rate, _ = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
+        lfp_signal, sample_rate, _, _ = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
                                                    events_file=events_file)
         if ncs_filename.startswith('photo'):
             # assume photo is 8K and we're getting down to 1000
