@@ -210,7 +210,7 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, highfreq):
 
     # Get harmonics out of the signal as well, up to 300
     for i in range(2, 6):
-        b_notch, a_notch = signal.iirnotch(f0*i, Q, effective_fs)
+        b_notch, a_notch = signal.iirnotch(f0*i, q, effective_fs)
         processed_signals = signal.filtfilt(b_notch, a_notch, processed_signals)
     return processed_signals, int(effective_fs)
 
@@ -253,11 +253,13 @@ def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None,
             dataset[ind, :] = processed_lfp
             eff_fs.append(fs)
             electrode_names.append(ncs_filename)
+            og_file = micro_file_path
         else:
             # Currently the loading of photodiode is 3 ms different in size(it's more than the others)
             print(processed_lfp.shape[0])
             print(dataset.shape)
             if processed_lfp.shape[0] > dataset.shape[1]:
+                print(f'{micro_file_path} array is larger than {og_file}')
                 dataset[ind, 0:dataset.shape[1]] = processed_lfp[0:dataset.shape[1]]
             else:
                 print(processed_lfp.shape)
