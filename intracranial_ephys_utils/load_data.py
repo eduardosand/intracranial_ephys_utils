@@ -157,11 +157,6 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
     if task is not None:
         if events_file is None:
             raise ValueError("Need to provide event file")
-        # in previous iterations, we looked at the event file, in it's current form we'd rather look at the annotations
-        # so first thing to check that the annotations file exists
-        # we'll assume data is held in repo/data/task/subject/session/raw
-        # but then that annotations file is held in parent direction
-
         labels_file = pd.read_csv(events_file)
         task_label = labels_file[labels_file.label == f"{task} duration"]
         task_start = task_label['time'].iloc[0].astype(float) # seconds from start of file

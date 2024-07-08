@@ -215,13 +215,13 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, highfreq):
     return processed_signals, effective_fs
 
 
-def preprocess_dataset(file_paths, neuro_folder_name, task=None,high_pass=1000):
+def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None, events_file=None):
     """
     Read in all data from a given directory and run basic preprocessing on it so I can load it live on my shitty
     computer.
     :param file_paths: A list of filenames. Ex(['LAC1.ncs','LAC2.ncs'])
     :param neuro_folder_name: The folderpath where the data is held
-    :param task: A string that dictates the task name, only use if you have the event labels already, so already parsed
+    :param task: (optional) A string that dictates the task name, only use if you have the event labels already, so already parsed
     through the photodiode file and annotated the task duration
     :param high_pass: the largest frequency to use for band-pass filtering
     :return: dataset: Numpy array, shape is (n_channels, n_samples)
@@ -234,7 +234,8 @@ def preprocess_dataset(file_paths, neuro_folder_name, task=None,high_pass=1000):
         print(micro_file_path)
         split_tup = os.path.splitext(micro_file_path)
         ncs_filename = split_tup[0]
-        lfp_signal, sample_rate, _ = read_task_ncs(neuro_folder_name, micro_file_path, task=task)
+        lfp_signal, sample_rate, _ = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
+                                                   events_file=events_file)
         if ncs_filename.startswith('photo'):
             # assume photo is 8K and we're getting down to 1000
             first_factor = 8
@@ -266,7 +267,7 @@ def preprocess_dataset(file_paths, neuro_folder_name, task=None,high_pass=1000):
     return dataset, eff_fs, electrode_names
 
 
-def save_small_dataset(subject, session, task_name):
+def save_small_dataset(subject, session, task_name, events_file):
     """
     Load, process, and savedata.
     :param subject: (string) subject identifier
@@ -288,7 +289,8 @@ def save_small_dataset(subject, session, task_name):
     electrode_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs')]
     electrode_files.sort()
     # electrode_files.append('photo1.ncs')
-    dataset, eff_fs, electrode_names = preprocess_dataset(electrode_files, data_directory, task=task_name)
+    dataset, eff_fs, electrode_names = preprocess_dataset(electrode_files, data_directory, task=task_name,
+                                                          events_file=events_file)
     bp = str(int(eff_fs))
     np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_lowpass_{bp}'), dataset=dataset,
              electrode_names=electrode_names, eff_fs=eff_fs)
