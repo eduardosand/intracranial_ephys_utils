@@ -26,7 +26,6 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         total_time = int(task_time*sampling_rate*60)
     else:
         total_time = ph_signal.shape[0]
-
     ph_signal_bin = np.zeros((total_time, ))
     sos = signal.butter(4, 15, 'hp', fs=sampling_rate, output='sos')
     filtered = signal.sosfiltfilt(sos, ph_signal)
@@ -86,6 +85,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
 
 
         plt.hist(sign_changes)
+        plt.title('Histogram of sign changes')
         drop_ind = np.argmax(np.diff(np.sort(sign_changes)))
         sign_change_drop = np.sort(sign_changes)[drop_ind+1]
         event_onsets = np.array(event_onsets)
