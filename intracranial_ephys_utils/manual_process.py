@@ -163,6 +163,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
     photodiode_check_viewer(subject, session, task, data_directory, annotations_directory)
     write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory)
 
+
 def get_annotated_task_start_time(subject, session, task, annotations_directory):
     """
     This function serves as a helper function to grab the start and end times of the task, after annotating the

@@ -6,6 +6,7 @@ from pathlib import Path
 from scipy import signal
 import matplotlib.pyplot as plt
 import warnings
+import mne
 
 
 def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau=None):
@@ -304,3 +305,31 @@ def save_small_dataset(subject, session, task_name, events_file):
     np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_lowpass_{bp}'), dataset=dataset,
              electrode_names=electrode_names, eff_fs=eff_fs)
     return None
+
+
+def make_trialwise_data(event_times, electrode_names, fs, dataset, tmin=-1., tmax=1., baseline=None):
+    """
+    This function serves to convert a dataset that is from start to stop, into one that is organized by trials.
+    :param event_times: (timestamps for trial onsets, offsets, or anything of interest)
+    :param electrode_names: (list) list of strings that contain the name for each signal
+    :param fs: (int) sampling rate
+    :param dataset: (np.array) raw data
+    :param tmin: (opt)
+    :param tmax: (opt)
+    :param baseline: (opt) Tuple that defines the period to use as baseline
+    :return: epochs_object
+    """
+
+    # The safest way to do this is to build a mne object, first step is to create the info for that object
+    events = np.zeros((event_times.shape[0], 3))
+    events[:, 0] = event_times
+    events[:, 2] = np.ones((event_times.shape[0],))[:] #rule_codes commented out for now because i need something to run
+    events = events.astype(int)
+    mne_info = mne.create_info(electrode_names, fs, ch_types='seeg')
+    raw_data = mne.io.RawArray(dataset, mne_info)
+    num_electrodes, num_samples = dataset.shape
+    if baseline is not None:
+        epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=baseline)
+    else:
+        epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=None)
+    return epochs_object
