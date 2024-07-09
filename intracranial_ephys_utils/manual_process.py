@@ -22,8 +22,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     event_times, event_labels, _ = get_event_times(data_directory, rescale=False)
     event_times_sec, _, _ = get_event_times(data_directory, rescale=True)
     if len(event_times) == 0:
-        source_epoch = pd.DataFrame(np.array([[],[],[]]).T, columns=['time', 'duration',
-                                                                                                     'label'])
+        source_epoch = pd.DataFrame(np.array([[], [], []]).T, columns=['time', 'duration', 'label'])
     else:
         durations = np.ones((event_times_sec.shape[0], ))*0.5
         source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration',
