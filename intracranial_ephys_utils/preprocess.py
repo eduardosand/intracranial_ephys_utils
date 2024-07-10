@@ -246,9 +246,10 @@ def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None,
             first_factor = 8
             fs = sample_rate / first_factor
             processed_lfp = signal.decimate(lfp_signal, first_factor)
-            processed_timestamps = signal.decimate(timestamps, first_factor)
+            downsampled_timestamps = timestamps[::first_factor]
+            # processed_timestamps = signal.decimate(timestamps, first_factor)
             print('decimated timestamps below')
-            print(processed_timestamps)
+            print(downsampled_timestamps)
         else:
             lfp_signal, sample_rate, _, _ = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
                                                    events_file=events_file)
@@ -261,19 +262,15 @@ def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None,
             og_file = micro_file_path
         else:
             # Currently the loading of photodiode is 3 ms different in size(it's more than the others)
-            print(processed_lfp.shape[0])
-            print(dataset.shape)
             if processed_lfp.shape[0] > dataset.shape[1]:
                 print(f'{micro_file_path} array is larger than {og_file}')
                 dataset[ind, 0:dataset.shape[1]] = processed_lfp[0:dataset.shape[1]]
             else:
-                print(processed_lfp.shape)
-                print(dataset.shape)
                 dataset[ind, :processed_lfp.shape[0]] = processed_lfp[0:processed_lfp.shape[0]]
             eff_fs.append(fs)
             electrode_names.append(ncs_filename)
         if ncs_filename.startswith('photo'):
-            dataset[-1, :] = processed_timestamps
+            dataset[-1, :] = downsampled_timestamps
     eff_fs.append(fs)
     electrode_names.append('Timepoints')
     return dataset, eff_fs, electrode_names
