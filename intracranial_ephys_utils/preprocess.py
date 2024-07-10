@@ -240,11 +240,15 @@ def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None,
         if ncs_filename.startswith('photo'):
             lfp_signal, sample_rate, interp, timestamps = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
                                                    events_file=events_file)
+            print('timestamps below')
+            print(timestamps)
             # assume photo is 8K and we're getting down to 1000
             first_factor = 8
             fs = sample_rate / first_factor
             processed_lfp = signal.decimate(lfp_signal, first_factor)
             processed_timestamps = signal.decimate(timestamps, first_factor)
+            print('decimated timestamps below')
+            print(processed_timestamps)
         else:
             lfp_signal, sample_rate, _, _ = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
                                                    events_file=events_file)
