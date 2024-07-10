@@ -264,6 +264,8 @@ def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None,
             # Currently the loading of photodiode is 3 ms different in size(it's more than the others)
             if processed_lfp.shape[0] > dataset.shape[1]:
                 print(f'{micro_file_path} array is larger than {og_file}')
+                print(processed_lfp.shape)
+                print(dataset.shape)
                 dataset[ind, 0:dataset.shape[1]] = processed_lfp[0:dataset.shape[1]]
             else:
                 dataset[ind, :processed_lfp.shape[0]] = processed_lfp[0:processed_lfp.shape[0]]
