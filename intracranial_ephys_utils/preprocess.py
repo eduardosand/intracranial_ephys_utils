@@ -342,6 +342,7 @@ def smooth_data(data, fs, window, step):
     """
     Smooth data by taking the average in windows, and stepping by some amount of time
     Expects data to be 3D (number of trials X number of electrodes X number of timepoints)
+    We will smooth by taking the centered average about a window, so the smoothed data will be smaller than expected
     :param data:
     :param fs: sampling rate
     :param window: seconds
@@ -350,19 +351,24 @@ def smooth_data(data, fs, window, step):
     """
     # first create array that is the processed shape
     num_epochs, num_electrodes, num_timepoints = data.shape
-    smoothed_data = np.zeros((num_epochs, num_electrodes, int(num_timepoints/(fs*step))))
+    # why should our smoothed data be this?
+    # we'd like to smooth data by taking averages with a window size and moving by a certain step
+    # ideally window is centered, effectively meaning that we can only take as many timepoints that equal to
+    # (num_timepoints/fs - step) / step and this simplifies to below
+    smoothed_data = np.zeros((num_epochs, num_electrodes, int(num_timepoints/(fs*step)-1)))
     for i in range(smoothed_data.shape[2]):
         print(i)
         if i == 0:
-            start = i * step * fs
             smoothed_data[:, :, i] = np.mean(data[:, :, i:int((i+1)*window*fs)], axis=2)
         elif (i*step*fs + window*fs) > num_timepoints:
-            smoothed_data[:, :, i] = np.mean(data[:, :, int(i * step * fs): num_timepoints], axis=2)
+            print('There is an issue with this code and the estimation of the smoothed data size')
+            start = i*step*fs - window/2
+            smoothed_data[:, :, i] = np.mean(data[:, :, int(start): num_timepoints], axis=2)
         else:
-            print('int')
-            print(data.shape)
-            print(i * step * fs)
+            # print('int')
+            # print(data.shape)
+            # print(i * step * fs)
             start = i * step * fs
-            smoothed_data[:, :, i] = np.mean(data[:, :, int(start): int(start + window*fs)], axis=2)
+            smoothed_data[:, :, i] = np.mean(data[:, :, int(start-window/2*fs): int(start + window/2*fs)], axis=2)
     new_fs = 1 / step
     return smoothed_data, new_fs
