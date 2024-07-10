@@ -343,10 +343,10 @@ def smooth_data(data, fs, window, step):
     Smooth data by taking the average in windows, and stepping by some amount of time
     Expects data to be 3D (number of trials X number of electrodes X number of timepoints)
     We will smooth by taking the centered average about a window, so the smoothed data will be smaller than expected
-    :param data:
-    :param fs: sampling rate
-    :param window: seconds
-    :param step: seconds
+    :param data: np.array
+    :param fs: (int) sampling rate
+    :param window: (float) in seconds, how much to average over, the larger this is the more our signal is smeared.
+    :param step: (float) in seconds. How much to step forward, determines new_fs
     :return: smoothed_data, new_fs
     """
     # first create array that is the processed shape
