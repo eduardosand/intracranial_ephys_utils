@@ -338,6 +338,7 @@ def make_trialwise_data(event_times, electrode_names, fs, dataset, tmin=-1., tma
 def smooth_data(data, fs, window, step):
     """
     Smooth data by taking the average in windows, and stepping by some amount of time
+    Expects data to be 3D (number of trials X number of electrodes X number of timepoints)
     :param data:
     :param fs: sampling rate
     :param window: seconds

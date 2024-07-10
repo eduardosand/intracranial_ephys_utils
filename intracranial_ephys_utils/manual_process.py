@@ -167,6 +167,8 @@ def get_annotated_task_start_time(subject, session, task, annotations_directory)
     """
     This function serves as a helper function to grab the start and end times of the task, after annotating the
     photodiode script. Will only work if annotations file exists, and duration event has been made.
+    Recall that loading in .ncs files relies on loading in many segments of variable length, so we typically load in
+    more data than what start and end time would have you believe
     :param subject:
     :param session:
     :param task:

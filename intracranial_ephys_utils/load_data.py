@@ -144,7 +144,8 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
     :return: ncs_signal:
     :return: sampling_rate:
     :return: interp:
-    :return: timestamps:
+    :return: timestamps: an array that gives the timestamps from the ncs file using the start and stop task segments,
+    this is in seconds, from the start of the .ncs file recording
     """
 
     file_path = folder_name / file
