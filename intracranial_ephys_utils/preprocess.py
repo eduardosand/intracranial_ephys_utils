@@ -217,7 +217,7 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, highfreq):
     return processed_signals, int(effective_fs)
 
 
-def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None, events_file=None):
+def preprocess_dataset(file_paths, neuro_folder_name, low_pass=1000, task=None, events_file=None):
     """
     Read in all data from a given directory and run basic preprocessing on it so I can load it live on my shitty
     computer.
@@ -226,7 +226,7 @@ def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None,
     :param task: (optional) A string that dictates the task name, only use if you have the event labels already, so already parsed
     through the photodiode file and annotated the task duration
     :param events_file: (optional) (Path) Where the annotation file is located, needed if task is given.
-    :param high_pass: the largest frequency to use for band-pass filtering
+    :param low_pass: the largest frequency to use for band-pass filtering
     :return: dataset: Numpy array, shape is (n_channels, n_samples)
     :return: eff_fs: Effective sampling rate
     :return: electrode_names: List of electrode names
@@ -253,7 +253,7 @@ def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None,
         else:
             lfp_signal, sample_rate, _, _ = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
                                                    events_file=events_file)
-            processed_lfp, fs = broadband_seeg_processing(lfp_signal, sample_rate, 0.1, high_pass)
+            processed_lfp, fs = broadband_seeg_processing(lfp_signal, sample_rate, 0.1, low_pass)
         if ind == 0:
             dataset = np.zeros((len(file_paths)+1, processed_lfp.shape[0]))
             dataset[ind, :] = processed_lfp
@@ -278,12 +278,14 @@ def preprocess_dataset(file_paths, neuro_folder_name, high_pass=1000, task=None,
     return dataset, eff_fs, electrode_names
 
 
-def save_small_dataset(subject, session, task_name, events_file):
+def save_small_dataset(subject, session, task_name, events_file, low_pass=1000):
     """
     Load, process, and savedata.
     :param subject: (string) subject identifier
     :param session: (string) subject session
     :param task_name: (string) task name, used to select only part of entire ncs file, assuming annotations file exists
+    :param events_file: (Path) path to where events annotation file is located
+    :param low_pass: (int) specify
     :return:
     """
     # Hopefully your file structure is like mine
@@ -301,7 +303,7 @@ def save_small_dataset(subject, session, task_name, events_file):
     electrode_files.sort()
     # electrode_files.append('photo1.ncs')
     dataset, eff_fs, electrode_names = preprocess_dataset(electrode_files, data_directory, task=task_name,
-                                                          events_file=events_file)
+                                                          events_file=events_file, low_pass=low_pass)
     if len(set(eff_fs)) != 1:
         warnings.warn('Different effective sampling rates across files')
     bp = str(int(eff_fs[0]))
