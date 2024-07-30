@@ -121,6 +121,52 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     app.exec()
 
 
+def data_clean_viewer(subject, session, task, annotations_directory, electrode_names, dataset, fs):
+    """
+    This function serves to look at the microwire signals and look at which is the reference or to look at the
+    macrowires and clean the data for epileptic activity
+    Current: Only microwire functionality so far
+    Assumes dataset
+    :param subject:
+    :param session:
+    :param task:
+    :param annotations_directory:
+    :param electrode_names:
+    :param dataset:
+    :param fs:
+    :return:
+    """
+    possible_labels = ['epileptic activity', 'put dropped wires here']
+    file_path = annotations_directory / f'{subject}_{session}_{task}_events.csv'
+    source_epoch = CsvEpochSource(file_path, possible_labels)
+
+    t_start = 0.
+    #you must first create a main Qt application (for event loop)
+    app = mkQApp()
+
+    # Create the main window that can contain several viewers
+    win = MainViewer(debug=True, show_auto_scale=True)
+
+    # create a viewer for signal
+    view1 = TraceViewer.from_numpy(dataset.T, fs, t_start, 'Microwires', channel_names=electrode_names)
+    # view1 = TraceViewer.from_neo_analogsignal(analog_signals, 'sigs')
+    view1.params['scale_mode'] = 'same_for_all'
+    view1.auto_scale()
+    win.add_view(view1)
+
+    # create a viewer for the encoder itself
+    view2 = EpochEncoder(source=source_epoch, name='Tagging events')
+    win.add_view(view2)
+
+    #
+    # view3 = EventList(source=source_epoch, name='events')
+    # win.add_view(view3)
+    # show main window and run Qapp
+    win.show()
+
+    app.exec()
+
+
 def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory, write=True):
     """
     Looks in event folders for labels. Elicits user input to determine which labels are relevant for spike sorting
@@ -182,3 +228,4 @@ def get_annotated_task_start_time(subject, session, task, annotations_directory)
     start_time_sec = task_label['time'].iloc[0].astype(float)
     end_time_sec = start_time_sec + task_label['duration'].iloc[0].astype(float)
     return start_time_sec, end_time_sec, task_label['duration'].iloc[0].astype(float)
+
