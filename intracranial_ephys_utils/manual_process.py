@@ -127,13 +127,13 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
     macrowires and clean the data for epileptic activity
     Current: Only microwire functionality so far
     Assumes dataset
-    :param subject:
-    :param session:
-    :param task:
+    :param subject: (string) subject id
+    :param session: (string) session id
+    :param task: (string) task id
     :param annotations_directory:
-    :param electrode_names:
-    :param dataset:
-    :param fs:
+    :param electrode_names: (1d array)
+    :param dataset: (n_electrodes, n_timepoints)
+    :param fs: (int)
     :return:
     """
     possible_labels = ['epileptic activity', 'put dropped wires here']

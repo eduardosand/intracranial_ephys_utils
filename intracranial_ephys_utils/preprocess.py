@@ -359,7 +359,7 @@ def smooth_data(data, fs, window, step):
     # (num_timepoints/fs - step) / step and this simplifies to below
     smoothed_data = np.zeros((num_epochs, num_electrodes, int(num_timepoints/(fs*step)-1)))
     for i in range(smoothed_data.shape[2]):
-        print(i)
+        # print(i)
         if i == 0:
             smoothed_data[:, :, i] = np.mean(data[:, :, i:int((i+1)*window*fs)], axis=2)
         elif (i*step*fs + window*fs) > num_timepoints:
