@@ -163,7 +163,7 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, highfreq):
     This function takes in an lfp signal and performs basic processing. This function is janky but that's only
     because decimations of too big a factor result in artifacts, so I need one solution for 32K, and a different one
     for other sampling rates.
-    Preprocessing is as follows, downsample once. We want to make sure we stay above Nyquit limit, so then we run our
+    Preprocessing is as follows, downsample once. We want to make sure we stay above Nyquist limit, so then we run our
     a 4th order Butterworth to bandpass from lowfreq to highfreq. Downsample once more to get down to 1KHz sampling rate
     Finally, we'll pass through a Notch filter to get rid of powerline noise and associated harmonics.
     WARNING: This is NOT good for European data because of the power line noise there(its 50Hz)
@@ -312,7 +312,7 @@ def save_small_dataset(subject, session, task_name, events_file, low_pass=1000):
     return None
 
 
-def make_trialwise_data(event_times, electrode_names, fs, dataset, tmin=-1., tmax=1., baseline=None):
+def make_trialwise_data(event_times, electrode_names, fs, dataset, tmin=-1., tmax=1., baseline=None, annotations=None):
     """
     This function serves to convert a dataset that is from start to stop, into one that is organized by trials.
     :param event_times: (timestamps for trial onsets, offsets, or anything of interest)
@@ -322,6 +322,7 @@ def make_trialwise_data(event_times, electrode_names, fs, dataset, tmin=-1., tma
     :param tmin: (opt)
     :param tmax: (opt)
     :param baseline: (opt) Tuple that defines the period to use as baseline
+    :param annotations: mne annotations object
     :return: epochs_object
     """
 
@@ -332,11 +333,14 @@ def make_trialwise_data(event_times, electrode_names, fs, dataset, tmin=-1., tma
     events = events.astype(int)
     mne_info = mne.create_info(electrode_names, fs, ch_types='seeg')
     raw_data = mne.io.RawArray(dataset, mne_info)
+    if annotations is not None:
+        raw_data.set_annotations(annotations)
+
     num_electrodes, num_samples = dataset.shape
     if baseline is not None:
-        epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=baseline)
+        epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=baseline, reject_by_annotation=True)
     else:
-        epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=None)
+        epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=None, reject_by_annotation=True)
     return epochs_object
 
 
