@@ -136,7 +136,8 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
     :param fs: (int)
     :return:
     """
-    possible_labels = ['epileptic activity', 'bad eight hertz noise']
+    possible_labels = ['bad epileptic activity macro', 'bad eight hertz noise', 'bad epileptic activity micro',
+                       'bad epileptic activity both']
     file_path = annotations_directory / f'{subject}_{session}_{task}_post_timestamping_events.csv'
     source_epoch = CsvEpochSource(file_path, possible_labels)
 
