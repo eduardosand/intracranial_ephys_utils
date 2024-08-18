@@ -220,8 +220,8 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
             total_segment = ncs_reader.rescale_signal_raw_to_float(signal_segment, dtype='float32').T[0]
             start_index = 0
             # get the segment size after discounting those starting samples
-            start_seg_size = round(seg_size - task_start_segment_diff, 4)
-            ncs_signal[start_index: int(start_index+start_seg_size)] = total_segment[task_start_segment_index:]
+            start_seg_size = int(round(seg_size - task_start_segment_diff, 4))
+            ncs_signal[start_index: start_index+start_seg_size] = total_segment[start_seg_size:]
         else:
             print('code runs two')
             start_index = int(round(time_segment_start - task_start, 4) *
