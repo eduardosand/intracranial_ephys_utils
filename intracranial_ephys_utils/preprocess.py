@@ -248,7 +248,7 @@ def preprocess_dataset(file_paths, neuro_folder_name, low_pass=1000, task=None, 
             processed_lfp = signal.decimate(lfp_signal, first_factor)
             downsampled_timestamps = timestamps[::first_factor]
             # processed_timestamps = signal.decimate(timestamps, first_factor)
-            print('decimated timestamps below')
+            print('sliced timestamps below')
             print(downsampled_timestamps)
         else:
             lfp_signal, sample_rate, _, _ = read_task_ncs(neuro_folder_name, micro_file_path, task=task,

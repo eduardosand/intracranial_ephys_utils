@@ -1,6 +1,5 @@
 from ephyviewer import mkQApp, MainViewer, TraceViewer, CsvEpochSource, EpochEncoder
 import numpy as np
-from pathlib import Path
 from .load_data import read_task_ncs, get_event_times
 from .plot_data import diagnostic_time_series_plot
 from .preprocess import binarize_ph
@@ -26,7 +25,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     else:
         durations = np.ones((event_times_sec.shape[0], ))*0.5
         source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration',
-                                                                                                 'label'])
+                                                                                                     'label'])
     annotations_file = f'{subject}_{session}_{task}_events.csv'
     if annotations_file in os.listdir(annotations_directory):
         print('Annotations File exists, double check')
@@ -45,7 +44,8 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     :param task: (string) Which task
     :param data_directory: (Path object) Where the data lives
     :param annotations_directory: (Path object) Where we want to put the annotations of the data
-    :param diagnostic: (bool) (optional) If True we will also plot diagnostics, and preprocess photodiode and overlay it.
+    :param diagnostic: (bool) (optional) If True we will also plot diagnostics, and preprocess photodiode and overlay
+    it.
     :param task_start: (float) (optional) The start time of the task
     :return:
     """
@@ -55,14 +55,14 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     # electrode_files = [file_path for file_path in all_files_list if (re.match('m.*ncs', file_path) and not
     #                file_path.endswith(".nse"))]
     ph_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs') and
-                       file_path.startswith('photo1')]
+                file_path.startswith('photo1')]
     assert len(ph_files) == 1
     ph_filename = ph_files[0]
 
     # We'll read in the photodiode signal
     ph_signal, sampling_rate, interp, timestamps = read_task_ncs(data_directory, ph_filename)
 
-    # we'll make some sanity plots to check photodiode at a glance, and preprocess to double check event trigger
+    # we'll make some sanity plots to check photodiode at a glance, and preprocess to double-check event trigger
     # is good
     if diagnostic:
         diagnostic_time_series_plot(ph_signal, sampling_rate, electrode_name='Photodiode')
@@ -79,7 +79,7 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
             end_time = int(end_time)
 
         ph_signal = ph_signal[int(start_time*sampling_rate):int(sampling_rate * end_time)]
-        timestamps = timestamps[int(start_time*sampling_rate):int(sampling_rate * end_time)]
+        # timestamps = timestamps[int(start_time*sampling_rate):int(sampling_rate * end_time)]
         t_start = start_time
 
         # next step to this is to add my thresholding for photodiode
@@ -137,12 +137,12 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
     :return:
     """
     possible_labels = ['bad epileptic activity macro', 'bad eight hertz noise', 'bad epileptic activity micro',
-                       'bad epileptic activity both']
+                       'bad epileptic activity both', 'reference electrode', 'microPED electrode']
     file_path = annotations_directory / f'{subject}_{session}_{task}_post_timestamping_events.csv'
     source_epoch = CsvEpochSource(file_path, possible_labels)
 
     t_start = 0.
-    #you must first create a main Qt application (for event loop)
+    # you must first create a main Qt application (for event loop)
     app = mkQApp()
 
     # Create the main window that can contain several viewers
@@ -168,7 +168,7 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
     app.exec()
 
 
-def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory, write=True):
+def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory):
     """
     Looks in event folders for labels. Elicits user input to determine which labels are relevant for spike sorting
     to constrain looking at only task-relevant data. User can input -1 if the whole datastream should be spike sorted.
@@ -186,7 +186,7 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     start_time_sec = task_label['time'].iloc[0].astype(float)
     end_time_sec = start_time_sec + task_label['duration'].iloc[0].astype(float)
     _, _, global_start = get_event_times(event_folder, rescale=False)
-    microsec_sec = 10**-6
+    # microsec_sec = 10**-6
     sec_microsec = 10**6
     start_time_machine = (start_time_sec + global_start) * sec_microsec
     end_time_machine = (end_time_sec + global_start) * sec_microsec
@@ -229,4 +229,3 @@ def get_annotated_task_start_time(subject, session, task, annotations_directory)
     start_time_sec = task_label['time'].iloc[0].astype(float)
     end_time_sec = start_time_sec + task_label['duration'].iloc[0].astype(float)
     return start_time_sec, end_time_sec, task_label['duration'].iloc[0].astype(float)
-
