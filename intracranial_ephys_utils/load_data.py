@@ -14,15 +14,17 @@ from scipy.interpolate import CubicSpline
 import warnings
 import pandas as pd
 
+
 def get_file_info(directory, start, file_extension):
     """
     Look in the directory for files that start and end with something
-    :param directory:
-    :param start:
-    :param file_extension:
-    :return:
+    :param directory: (Path) object
+    :param start: (string) start prefix
+    :param file_extension: (string) end suffix
+    :return: first file path that matches (if there's multiple, oh no)
     """
     files_list = os.listdir(directory)
+    print(files_list)
     files = [file_path for file_path in files_list if file_path.endswith(file_extension) and
                  file_path.startswith(start)]
 
@@ -31,9 +33,10 @@ def get_file_info(directory, start, file_extension):
     file_path = directory / files[0]
     return file_path
 
+
 def read_file(file_path):
     """
-    Lazy reader of specific Neuralynx files
+    Lazy reader of specific Neuralynx files. Will probably be removed eventually
     :param file_path:
     :return: reader
     """
