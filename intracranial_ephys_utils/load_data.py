@@ -197,13 +197,14 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
 
     # I believe this is in number of seconds till start(if theoretically correct), the problem is that the sampling
     # rate is an average given to us by neuralynx
-    task_start_segment_time = ncs_reader.get_signal_t_start(block_index=0, seg_index=task_start_segment_index) # seconds
+    task_start_segment_time = round(ncs_reader.get_signal_t_start(block_index=0,
+                                                                  seg_index=task_start_segment_index), 4) # seconds
     # to be more precise ignore a certain number of samples from task_start_segment_time
     # we should really only ever be 4 decimal place precise for up to 32K
-    task_start_segment_diff = round(task_start - task_start_segment_time, 4) * sampling_rate  # samples
+    task_start_segment_diff = int(round(task_start - task_start_segment_time, 4) * sampling_rate)  # samples
 
     # Note the difference for getting task end
-    task_end_segment_time = ncs_reader.segment_t_stop(block_index=0, seg_index=task_end_segment_index)
+    task_end_segment_time = round(ncs_reader.segment_t_stop(block_index=0, seg_index=task_end_segment_index), 4)
 
     array_size = round(task_end_segment_time-task_start, 4) * sampling_rate
     timestamps = np.linspace(task_start_segment_time, task_end_segment_time, int(array_size))
@@ -221,7 +222,7 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
             start_index = 0
             # get the segment size after discounting those starting samples
             start_seg_size = int(round(seg_size - task_start_segment_diff, 4))
-            ncs_signal[start_index: start_index+start_seg_size] = total_segment[start_seg_size:]
+            ncs_signal[start_index: start_index+start_seg_size] = total_segment[task_start_segment_diff:]
         else:
             print('code runs two')
             start_index = int(round(time_segment_start - task_start, 4) *
