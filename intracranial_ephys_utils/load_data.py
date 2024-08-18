@@ -163,7 +163,7 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
             raise ValueError("Need to provide event file")
         labels_file = pd.read_csv(events_file)
         task_label = labels_file[labels_file.label == f"{task} duration"]
-        task_start = task_label['time'].iloc[0].astype(float) # seconds from start of file
+        task_start = task_label['time'].iloc[0].astype(float)  # seconds from start of file
         task_end = task_start + task_label['duration'].iloc[0].astype(float)
 
         # print(float(ncs_reader.get_signal_size(block_index=0, seg_index=n_segments - 1))/sampling_rate)
@@ -193,28 +193,39 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
     else:
         task_start_segment_index = 0
         task_end_segment_index = n_segments-1
+        task_start = 0
 
     # I believe this is in number of seconds till start(if theoretically correct), the problem is that the sampling
     # rate is an average given to us by neuralynx
-    task_start_segment_time = ncs_reader.get_signal_t_start(block_index=0, seg_index=task_start_segment_index)
+    task_start_segment_time = ncs_reader.get_signal_t_start(block_index=0, seg_index=task_start_segment_index) # seconds
+    # to be more precise ignore a certain number of samples from task_start_segment_time
+    task_start_segment_diff = (task_start - task_start_segment_time) * sampling_rate  # samples
+
     # Note the difference for getting task end
     task_end_segment_time = ncs_reader.segment_t_stop(block_index=0, seg_index=task_end_segment_index)
 
-    array_size = (task_end_segment_time-task_start_segment_time) * sampling_rate
+    array_size = (task_end_segment_time-task_start) * sampling_rate
     timestamps = np.linspace(task_start_segment_time, task_end_segment_time, int(array_size))
     interp = np.zeros((int(array_size), ))
     ncs_signal = np.zeros((int(array_size), ))
     for i in range(task_start_segment_index, task_end_segment_index+1):
         # First stop. Get the time_segment_start and t_end for each segment.
         time_segment_start = ncs_reader.get_signal_t_start(block_index=0, seg_index=i)
-        seg_size = ncs_reader.get_signal_size(block_index=0, seg_index=i)
+        seg_size = ncs_reader.get_signal_size(block_index=0, seg_index=i) # samples
         signal_segment = ncs_reader.get_analogsignal_chunk(seg_index=i)
-        start_index = int((time_segment_start-ncs_reader.get_signal_t_start(block_index=0,
-                                                                            seg_index=task_start_segment_index)) *
-                          sampling_rate)
-        # rescale to uV
-        ncs_signal[start_index:start_index+seg_size] = ncs_reader.rescale_signal_raw_to_float(signal_segment,
-                                                                                              dtype='float32').T[0]
+
+        if i == 0:
+            total_segment = ncs_reader.rescale_signal_raw_to_float(signal_segment, dtype='float32').T[0]
+            start_index = 0
+            # get the segment size after discounting those starting samples
+            start_seg_size = seg_size - task_start_segment_diff
+            ncs_signal[start_index: start_index+start_seg_size] = total_segment[task_start_segment_index:]
+        else:
+            start_index = int((time_segment_start - task_start) *
+                              sampling_rate)
+            # rescale to uV
+            ncs_signal[start_index:start_index+seg_size] = ncs_reader.rescale_signal_raw_to_float(signal_segment,
+                                                                                                  dtype='float32').T[0]
         if i > 0:
             previous_segment_stop = ncs_reader.segment_t_stop(block_index=0, seg_index=i-1)
             if abs(time_segment_start-previous_segment_stop) < 1/sampling_rate:
