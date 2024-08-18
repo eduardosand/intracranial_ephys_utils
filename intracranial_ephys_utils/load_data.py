@@ -184,9 +184,9 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
                     # We take the index before because time_segment_start may not overlap with the start of the segment
                     # and this is looking from below, so overlap is with previous segment
                     task_start_segment_index = max(i - 1, 0)
-            else:
+            elif time_segment_start > task_end:
                 # The end isn't as important if we overshoot
-                task_end_segment_index = i
+                task_end_segment_index = i-1
                 break
             if i == n_segments-1:
                 task_end_segment_index = n_segments-1
