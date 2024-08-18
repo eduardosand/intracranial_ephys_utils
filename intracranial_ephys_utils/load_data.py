@@ -207,7 +207,7 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
     task_end_segment_time = round(ncs_reader.segment_t_stop(block_index=0, seg_index=task_end_segment_index), 4)
 
     array_size = round(task_end_segment_time-task_start, 4) * sampling_rate
-    timestamps = np.linspace(task_start_segment_time, task_end_segment_time, int(array_size))
+    timestamps = np.linspace(task_start, task_end_segment_time, int(array_size))
     interp = np.zeros((int(array_size), ))
     ncs_signal = np.zeros((int(array_size), ))
     for i in range(task_start_segment_index, task_end_segment_index+1):
