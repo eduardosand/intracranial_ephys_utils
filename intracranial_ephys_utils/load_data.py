@@ -174,7 +174,6 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
         task_start_search = True
         for i in range(n_segments):
             time_segment_start = ncs_reader.get_signal_t_start(block_index=0, seg_index=i)
-            # print(time_segment_start)
             if time_segment_start < task_start:
                 continue
             elif (time_segment_start >= task_start) and (time_segment_start < task_end):
@@ -217,9 +216,7 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
         time_segment_start = ncs_reader.get_signal_t_start(block_index=0, seg_index=i)
         seg_size = ncs_reader.get_signal_size(block_index=0, seg_index=i)  # samples
         signal_segment = ncs_reader.get_analogsignal_chunk(seg_index=i)
-        print(i)
         if i == task_start_segment_index:
-            print('code runs')
             total_segment = ncs_reader.rescale_signal_raw_to_float(signal_segment, dtype='float32').T[0]
             start_index = 0
             # get the segment size after discounting those starting samples
