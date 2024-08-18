@@ -235,7 +235,6 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
             ncs_signal[start_index:start_index+seg_size] = ncs_reader.rescale_signal_raw_to_float(signal_segment,
                                                                                                   dtype='float32').T[0]
         if i > task_start_segment_index:
-            print('code running')
             previous_segment_stop = ncs_reader.segment_t_stop(block_index=0, seg_index=i-1)
             if abs(time_segment_start-previous_segment_stop) < 1/sampling_rate:
                 continue
