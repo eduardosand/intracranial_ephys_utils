@@ -207,7 +207,7 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
     task_end_segment_time = round(ncs_reader.segment_t_stop(block_index=0, seg_index=task_end_segment_index), 4)
     task_end_segment_diff = int(round(task_end_segment_time-task_end, 4) * sampling_rate)
 
-    array_size = round(task_end_segment_time-task_start, 4) * sampling_rate
+    array_size = round(task_end-task_start, 4) * sampling_rate
     timestamps = np.linspace(task_start, task_end, int(array_size))
     interp = np.zeros((int(array_size), ))
     ncs_signal = np.zeros((int(array_size), ))
@@ -235,10 +235,12 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
             ncs_signal[start_index:start_index+seg_size] = ncs_reader.rescale_signal_raw_to_float(signal_segment,
                                                                                                   dtype='float32').T[0]
         if i > task_start_segment_index:
+            print('code running')
             previous_segment_stop = ncs_reader.segment_t_stop(block_index=0, seg_index=i-1)
             if abs(time_segment_start-previous_segment_stop) < 1/sampling_rate:
                 continue
             else:
+                print('interpolating')
                 # 01/18/2024 - Consider a version of this script that doesn't interpolate, to allow for better alignment
                 # to spike data where this has in fact not been done (spike sorting (Osort) doesn't care about
                 # timestamping at all)

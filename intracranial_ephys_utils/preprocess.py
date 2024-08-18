@@ -239,7 +239,7 @@ def preprocess_dataset(file_paths, neuro_folder_name, low_pass=1000, task=None, 
         ncs_filename = split_tup[0]
         if ncs_filename.startswith('photo'):
             lfp_signal, sample_rate, interp, timestamps = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
-                                                   events_file=events_file)
+                                                                        events_file=events_file)
             print('timestamps below')
             print(timestamps)
             # assume photo is 8K and we're getting down to 1000
@@ -252,7 +252,7 @@ def preprocess_dataset(file_paths, neuro_folder_name, low_pass=1000, task=None, 
             print(downsampled_timestamps)
         else:
             lfp_signal, sample_rate, _, _ = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
-                                                   events_file=events_file)
+                                                          events_file=events_file)
             processed_lfp, fs = broadband_seeg_processing(lfp_signal, sample_rate, 0.1, low_pass)
         if ind == 0:
             dataset = np.zeros((len(file_paths)+1, processed_lfp.shape[0]))
