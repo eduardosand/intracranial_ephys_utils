@@ -213,7 +213,7 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
         time_segment_start = ncs_reader.get_signal_t_start(block_index=0, seg_index=i)
         seg_size = ncs_reader.get_signal_size(block_index=0, seg_index=i) # samples
         signal_segment = ncs_reader.get_analogsignal_chunk(seg_index=i)
-
+        print(i)
         if i == 0:
             total_segment = ncs_reader.rescale_signal_raw_to_float(signal_segment, dtype='float32').T[0]
             start_index = 0
@@ -223,6 +223,8 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
         else:
             start_index = int((time_segment_start - task_start) *
                               sampling_rate)
+            print(start_index)
+            print(seg_size)
             # rescale to uV
             ncs_signal[start_index:start_index+seg_size] = ncs_reader.rescale_signal_raw_to_float(signal_segment,
                                                                                                   dtype='float32').T[0]
