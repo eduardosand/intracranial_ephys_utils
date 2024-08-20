@@ -208,6 +208,8 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, high_freq):
             second_factor = 4
         elif high_freq == 2000:
             second_factor = 2
+        else:
+            second_factor = 4
         # first_factor = 1
         butterworth_bandpass = signal.butter(4, (lowfreq, high_freq), 'bp', fs=sampling_rate, output='sos')
         bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, lfp_signals)
@@ -255,7 +257,12 @@ def preprocess_dataset(file_paths, neuro_folder_name, low_pass=1000, task=None, 
             print('timestamps below')
             print(timestamps)
             # assume photo is 8K and we're getting down to 1000
-            first_factor = 8
+            if low_pass == 1000:
+                first_factor = 8
+            elif low_pass == 2000:
+                first_factor = 4
+            else:
+                first_factor = 8
             fs = sample_rate / first_factor
             processed_lfp = signal.decimate(lfp_signal, first_factor)
             downsampled_timestamps = timestamps[::first_factor]
