@@ -236,6 +236,8 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='c
                                                                                                   dtype='float32').T[0]
         if i > task_start_segment_index:
             previous_segment_stop = ncs_reader.segment_t_stop(block_index=0, seg_index=i-1)
+            print(previous_segment_stop)
+            print(time_segment_start)
             if abs(time_segment_start-previous_segment_stop) < 1/sampling_rate:
                 continue
             else:
@@ -247,12 +249,11 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='c
                 previous_seg_signal_scaled = ncs_reader.rescale_signal_raw_to_float(previous_seg_signal,
                                                                                     dtype='float32').T[0]
                 previous_seg_time_start = ncs_reader.get_signal_t_start(block_index=0, seg_index=i-1)
-                previous_seg_time_end = ncs_reader.segment_t_stop(block_index=0, seg_index=i-1)
                 previous_seg_size_samples = ncs_reader.get_signal_size(block_index=0, seg_index=i-1)
                 curr_seg_time_end = ncs_reader.segment_t_stop(block_index=0, seg_index=i)
                 current_seg_signal_scaled = ncs_signal[start_index:start_index+seg_size]
                 data_y = np.concatenate((previous_seg_signal_scaled, current_seg_signal_scaled))
-                data_t = np.concatenate((np.linspace(previous_seg_time_start, previous_seg_time_end,
+                data_t = np.concatenate((np.linspace(previous_seg_time_start, previous_segment_stop,
                                                      previous_seg_size_samples), np.linspace(time_segment_start,
                                                                                              curr_seg_time_end,
                                                                                              seg_size)))
