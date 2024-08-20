@@ -26,7 +26,7 @@ def get_file_info(directory, start, file_extension):
     files_list = os.listdir(directory)
     print(files_list)
     files = [file_path for file_path in files_list if file_path.endswith(file_extension) and
-                 file_path.startswith(start)]
+             file_path.startswith(start)]
 
     if len(files) > 1:
         print('Multiple files with the same start and end')
@@ -132,7 +132,7 @@ def missing_samples_check(file_path):
     return skipped_samples, t_starts, seg_sizes
 
 
-def read_task_ncs(folder_name, file, task=None, events_file=None):
+def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='linear'):
     """
     Read neuralynx data into an array, with sampling rate, and start time of the task.
     To deal with discontinuities and dropped samples, we take a pragmatic approach. We assume continuous sampling, and
@@ -256,7 +256,12 @@ def read_task_ncs(folder_name, file, task=None, events_file=None):
                                                      previous_seg_size_samples), np.linspace(time_segment_start,
                                                                                              curr_seg_time_end,
                                                                                              seg_size)))
-                cs = CubicSpline(data_t, data_y)
+                # Select interpolation method based on the keyword
+                if interp_type == 'cubic':
+                    cs = CubicSpline(data_t, data_y)
+                elif interp_type == 'linear':
+                    print('Using linear interpolation')
+                    cs = interp1d(data_t, data_y, kind='linear')
                 total_samples = int((curr_seg_time_end-previous_seg_time_start)*sampling_rate)
                 full_data_t = np.linspace(previous_seg_time_start, curr_seg_time_end, total_samples)
                 data_x_interp = cs(full_data_t)
