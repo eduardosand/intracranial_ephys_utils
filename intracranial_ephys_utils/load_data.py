@@ -132,7 +132,7 @@ def missing_samples_check(file_path):
     return skipped_samples, t_starts, seg_sizes
 
 
-def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='cubic'):
+def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='linear'):
     """
     Read neuralynx data into an array, with sampling rate, and start time of the task.
     To deal with discontinuities and dropped samples, we take a pragmatic approach. We assume continuous sampling, and
@@ -241,6 +241,9 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='c
             if abs(time_segment_start-previous_segment_stop) < 1/sampling_rate:
                 continue
             else:
+                if abs(time_segment_start-previous_segment_stop) > 10:
+                    print('something went wrong')
+                    continue
                 print('interpolating')
                 # 01/18/2024 - Consider a version of this script that doesn't interpolate, to allow for better alignment
                 # to spike data where this has in fact not been done (spike sorting (Osort) doesn't care about
