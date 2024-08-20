@@ -175,30 +175,42 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, highfreq):
     :return: effective_fs: (int) Final sampling rate after processing
     """
     if sampling_rate == 32000:
+        if high_freq == 1000:
+            second_factor = 8
+        elif high_freq == 2000:
+            second_factor = 4
+        else:
+            second_factor = 8
         first_factor = 4
         # for microLFP, this brings us down to 8KHz
         downsampled_signal = signal.decimate(lfp_signals, first_factor)
         effective_fs = sampling_rate/first_factor
         butterworth_bandpass = signal.butter(4, (lowfreq, highfreq), 'bp', fs=effective_fs, output='sos')
         bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, downsampled_signal)
-        second_factor = 8
         # for microLFP, this brings us down to 1 Khz
         downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
         effective_fs /= second_factor
     elif sampling_rate == 8000:
+        if high_freq == 1000:
+            second_factor = 8
+        elif high_freq == 2000:
+            second_factor = 4
+        else:
+            second_factor = 8
         # first_factor = 1
         butterworth_bandpass = signal.butter(4, (lowfreq, highfreq), 'bp', fs=sampling_rate, output='sos')
         bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, lfp_signals)
-        second_factor = 8
         # for macroLFP, this brings us down to 1 Khz
         downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
         effective_fs = sampling_rate/second_factor
     elif sampling_rate == 4000:
-        # what if sampling rate is 4K
+        if high_freq == 1000:
+            second_factor = 4
+        elif high_freq == 2000:
+            second_factor = 2
         # first_factor = 1
         butterworth_bandpass = signal.butter(4, (lowfreq, highfreq), 'bp', fs=sampling_rate, output='sos')
         bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, lfp_signals)
-        second_factor = 4
         # for macroLFP, this brings us down to 1 Khz
         downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
         effective_fs = sampling_rate / second_factor
