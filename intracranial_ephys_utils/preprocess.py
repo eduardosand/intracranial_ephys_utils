@@ -158,7 +158,7 @@ def BCI_LFP_processing(lfp_signals, sampling_rate):
     return processed_signals, effective_fs
 
 
-def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, highfreq):
+def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, high_freq):
     """
     This function takes in an lfp signal and performs basic processing. This function is janky but that's only
     because decimations of too big a factor result in artifacts, so I need one solution for 32K, and a different one
@@ -170,7 +170,7 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, highfreq):
     :param lfp_signals: (np.array) (1, n_samples)
     :param sampling_rate: (int)
     :param lowfreq: (int) lower frequency for bandpass
-    :param highfreq: (int) higher frequency for bandpass
+    :param high_freq: (int) higher frequency for bandpass
     :return: processed_signals: numpy array shape (1, n_samples)
     :return: effective_fs: (int) Final sampling rate after processing
     """
