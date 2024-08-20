@@ -236,8 +236,6 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='l
                                                                                                   dtype='float32').T[0]
         if i > task_start_segment_index:
             previous_segment_stop = ncs_reader.segment_t_stop(block_index=0, seg_index=i-1)
-            print(previous_segment_stop)
-            print(time_segment_start)
             if abs(time_segment_start-previous_segment_stop) < 1/sampling_rate:
                 continue
             else:
