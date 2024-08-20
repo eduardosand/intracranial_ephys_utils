@@ -132,7 +132,7 @@ def missing_samples_check(file_path):
     return skipped_samples, t_starts, seg_sizes
 
 
-def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='linear'):
+def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='cubic'):
     """
     Read neuralynx data into an array, with sampling rate, and start time of the task.
     To deal with discontinuities and dropped samples, we take a pragmatic approach. We assume continuous sampling, and
