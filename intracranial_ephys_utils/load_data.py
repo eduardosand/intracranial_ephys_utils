@@ -256,19 +256,33 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='c
                                                      previous_seg_size_samples), np.linspace(time_segment_start,
                                                                                              curr_seg_time_end,
                                                                                              seg_size)))
-                # Select interpolation method based on the keyword
-                if interp_type == 'cubic':
-                    cs = CubicSpline(data_t, data_y)
-                elif interp_type == 'linear':
-                    print('Using linear interpolation')
-                    cs = interp1d(data_t, data_y, kind='linear')
-                total_samples = int((curr_seg_time_end-previous_seg_time_start)*sampling_rate)
-                full_data_t = np.linspace(previous_seg_time_start, curr_seg_time_end, total_samples)
-                data_x_interp = cs(full_data_t)
-                # Below pertains to the data_x_interp array made above
+
+                # how many missing samples
                 missing_samples_start_ind = previous_seg_size_samples-1
                 missing_samples_end_ind = int((time_segment_start-previous_seg_time_start)*sampling_rate)
                 missing_samples = missing_samples_end_ind-missing_samples_start_ind
+
+                # Define a range around the missing samples
+                range_size = 100
+
+                # Determine the sample indices for interpolation, 100 before and after the missing samples
+                interpolation_start_ind = max(0, missing_samples_start_ind - range_size)
+                interpolation_end_ind = min(len(data_y), missing_samples_end_ind + range_size)
+
+                # Use only the surrounding data for interpolation
+                local_data_y = data_y[interpolation_start_ind:interpolation_end_ind]
+                local_data_t = data_t[interpolation_start_ind:interpolation_end_ind]
+                # Select interpolation method based on the keyword
+                if interp_type == 'cubic':
+                    cs = CubicSpline(local_data_t, local_data_y)
+                elif interp_type == 'linear':
+                    print('Using linear interpolation')
+                    cs = interp1d(local_data_t, local_data_y, kind='linear')
+
+                # Create the interpolated data over the missing sample range
+                full_data_t = np.linspace(data_t[missing_samples_start_ind], data_t[missing_samples_end_ind],
+                                          missing_samples)
+                data_x_interp = cs(full_data_t)
 
                 ncs_signal[start_index-missing_samples:start_index] = data_x_interp[missing_samples_start_ind:
                                                                                     missing_samples_end_ind]
