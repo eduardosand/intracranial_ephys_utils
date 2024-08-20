@@ -261,7 +261,6 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='c
                 missing_samples_start_ind = previous_seg_size_samples-1
                 missing_samples_end_ind = int((time_segment_start-previous_seg_time_start)*sampling_rate)
                 missing_samples = missing_samples_end_ind-missing_samples_start_ind
-
                 # Define a range around the missing samples
                 range_size = 100
 
@@ -280,7 +279,7 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='c
                     cs = interp1d(local_data_t, local_data_y, kind='linear')
 
                 # Create the interpolated data over the missing sample range
-                full_data_t = np.linspace(data_t[missing_samples_start_ind], data_t[missing_samples_end_ind],
+                full_data_t = np.linspace(previous_seg_time_end, time_segment_start,
                                           missing_samples)
                 data_x_interp = cs(full_data_t)
 
