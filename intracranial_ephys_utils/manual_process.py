@@ -55,7 +55,7 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     # electrode_files = [file_path for file_path in all_files_list if (re.match('m.*ncs', file_path) and not
     #                file_path.endswith(".nse"))]
     ph_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs') and
-                file_path.startswith('photo1')]
+                (file_path.startswith('photo1') or file_path.startswith('Photo'))]
     assert len(ph_files) == 1
     ph_filename = ph_files[0]
 
