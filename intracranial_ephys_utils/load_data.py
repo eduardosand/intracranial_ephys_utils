@@ -278,7 +278,7 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='l
                     cs = CubicSpline(local_data_t, local_data_y)
                 elif interp_type == 'linear':
                     print('Using linear interpolation')
-                    cs = interp1d(local_data_t, local_data_y, kind='linear')
+                    cs = interp(local_data_t, local_data_y, kind='linear')
 
                 # Create the interpolated data over the missing sample range
                 full_data_t = np.linspace(data_t[missing_samples_start_ind], data_t[missing_samples_end_ind],
