@@ -132,7 +132,7 @@ def missing_samples_check(file_path):
     return skipped_samples, t_starts, seg_sizes
 
 
-def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='cubic'):
+def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='linear'):
     """
     Read neuralynx data into an array, with sampling rate, and start time of the task.
     To deal with discontinuities and dropped samples, we take a pragmatic approach. We assume continuous sampling, and
@@ -278,20 +278,15 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='c
                 if interp_type == 'cubic':
                     cs = CubicSpline(local_data_t, local_data_y)
                 elif interp_type == 'linear':
-                    ######## TO DO
-                    # This doesn't work on DA9, fix later
                     print('Using linear interpolation')
                     cs = interp(local_data_t, local_data_y, kind='linear')
 
-                print(data_t[missing_samples_start_ind:missing_samples_start_ind+5])
                 # Create the interpolated data over the missing sample range
                 interp_data_t = np.linspace(data_t[missing_samples_start_ind], data_t[missing_samples_start_ind+1],
                                             missing_samples)
-
-                # full_data_t = np.linspace(data_t[missing_samples_start_ind], data_t[missing_samples_end_ind],
-                #                           missing_samples)
                 data_x_interp = cs(interp_data_t)
 
+                # data fill in
                 ncs_signal[start_index-missing_samples:start_index] = data_x_interp[:missing_samples]
                 interp[start_index-missing_samples:start_index] = np.ones((missing_samples_end_ind -
                                                                            missing_samples_start_ind, ))
