@@ -279,12 +279,14 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='l
                 # Use only the surrounding data for interpolation
                 local_data_y = data_y[interpolation_start_ind:interpolation_end_ind]
                 local_data_t = data_t[interpolation_start_ind:interpolation_end_ind]
+                print(local_data_y)
+                print(local_data_t)
                 # Select interpolation method based on the keyword
                 if interp_type == 'cubic':
                     cs = CubicSpline(local_data_t, local_data_y)
                 elif interp_type == 'linear':
                     print('Using linear interpolation')
-                    cs = interp(local_data_t, local_data_y, kind='linear')
+                    cs = np.interp(local_data_t, local_data_y, kind='linear')
 
                 # Create the interpolated data over the missing sample range
                 interp_data_t = np.linspace(data_t[missing_samples_start_ind], data_t[missing_samples_start_ind+1],
