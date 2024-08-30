@@ -331,6 +331,63 @@ def save_small_dataset(subject, session, task_name, events_file, low_pass=1000):
     return None
 
 
+def save_as_npy(subject, session, task_name, events_file, electrode_selection):
+    """
+    Load data from neuralynx files and package them into .npy files. No preprocessing done to the data, so microwires,
+    and macrocontacts at different sampling rates, treated separately.
+    :param subject: (string) subject identifier
+    :param session: (string) session identifier
+    :param task_name: (string) task identifier
+    :param events_file: (Path) path object that tells us where the events file, ideally the events_file contains one
+    event titled f"{task_name} duration"
+    :param electrode_selection: (string) Whether to save macrocontact or microwire data
+    :return:
+    """
+
+    # Hopefully your file structure is like mine
+    data_directory = Path(f"{os.pardir}/data/{subject}/{session}/raw")
+    results_directory = data_directory.parent.absolute() / "preprocessed"
+    print(results_directory)
+    if results_directory.exists():
+        print('Results Directory already Exists')
+    else:
+        os.mkdir(results_directory)
+    all_files_list = os.listdir(data_directory)
+    if electrode_selection == "microwire":
+        electrode_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs')
+                           and file_path.startswith('m')]
+        electrode_files.sort()
+        eff_fs = []
+        electrode_names = []
+        for ind, micro_file_path in enumerate(electrode_files):
+            print(micro_file_path)
+            split_tup = os.path.splitext(micro_file_path)
+            ncs_filename = split_tup[0]
+            lfp_signal, sample_rate, interp, timestamps = read_task_ncs(data_directory, micro_file_path,
+                                                                            task=task_name,
+                                                                            events_file=events_file)
+
+            if ind == 0:
+                dataset = np.zeros((len(electrode_files) + 1, lfp_signal.shape[0]))
+                dataset[ind, :] = lfp_signal
+                eff_fs.append(sample_rate)
+                electrode_names.append(ncs_filename)
+                og_file = micro_file_path
+            else:
+                dataset[ind, :] = lfp_signal
+                eff_fs.append(sample_rate)
+                electrode_names.append(ncs_filename)
+    elif electrode_selection == "macrocontact":
+        raise NotImplementedError
+        #### TO DO
+        # the function will be the same, but just don't know how to do the electrode selection (maybe use lazy reader
+        # to exclude files with a certain sample rate?
+    bp = str(int(eff_fs[0]))
+    np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_{electrode_selection}_{bp}'),
+             dataset=dataset, electrode_names=electrode_names, eff_fs=eff_fs, timestamps=timestamps)
+    return None
+
+
 def make_trialwise_data(event_times, electrode_names, fs, dataset, tmin=-1., tmax=1., baseline=None, annotations=None):
     """
     This function serves to convert a dataset that is from start to stop, into one that is organized by trials.
