@@ -247,6 +247,7 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='l
                     print('something went wrong')
                     continue
                 print('interpolating')
+                print(time_segment_start-previous_segment_stop)
                 # 01/18/2024 - Consider a version of this script that doesn't interpolate, to allow for better alignment
                 # to spike data where this has in fact not been done (spike sorting (Osort) doesn't care about
                 # timestamping at all)
