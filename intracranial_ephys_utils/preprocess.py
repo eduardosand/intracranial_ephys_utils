@@ -364,8 +364,8 @@ def save_as_npy(subject, session, task_name, events_file, electrode_selection):
             split_tup = os.path.splitext(micro_file_path)
             ncs_filename = split_tup[0]
             lfp_signal, sample_rate, interp, timestamps = read_task_ncs(data_directory, micro_file_path,
-                                                                            task=task_name,
-                                                                            events_file=events_file)
+                                                                        task=task_name,
+                                                                        events_file=events_file)
 
             if ind == 0:
                 dataset = np.zeros((len(electrode_files) + 1, lfp_signal.shape[0]))
@@ -379,7 +379,7 @@ def save_as_npy(subject, session, task_name, events_file, electrode_selection):
                 electrode_names.append(ncs_filename)
     elif electrode_selection == "macrocontact":
         raise NotImplementedError
-        #### TO DO
+        ########### TO DO
         # the function will be the same, but just don't know how to do the electrode selection (maybe use lazy reader
         # to exclude files with a certain sample rate?
     bp = str(int(eff_fs[0]))
