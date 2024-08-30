@@ -354,11 +354,13 @@ def save_as_npy(subject, session, task_name, events_file, electrode_selection):
         os.mkdir(results_directory)
     all_files_list = os.listdir(data_directory)
     if electrode_selection == "microwire":
+        print(all_files_list)
         electrode_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs')
                            and file_path.startswith('m')]
         electrode_files.sort()
         eff_fs = []
         electrode_names = []
+        print(electrode_files)
         for ind, micro_file_path in enumerate(electrode_files):
             print(micro_file_path)
             split_tup = os.path.splitext(micro_file_path)
