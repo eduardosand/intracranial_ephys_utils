@@ -357,7 +357,7 @@ def save_as_npy(subject, session, task_name, data_directory, events_file, electr
     if electrode_selection == "microwire":
         print(all_files_list)
         electrode_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs')
-                           and file_path.startswith('m')]
+                           and file_path.startswith('m') and not file_path.startswith('mic1')]
         electrode_files.sort()
         eff_fs = []
         electrode_names = []
