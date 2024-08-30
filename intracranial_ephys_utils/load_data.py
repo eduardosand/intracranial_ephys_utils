@@ -275,7 +275,7 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='l
                 # Determine the sample indices for interpolation, 100 before and after the missing samples
                 interpolation_start_ind = max(0, missing_samples_start_ind - range_size)
                 interpolation_end_ind = min(len(data_y), missing_samples_end_ind + range_size)
-
+                print(interpolation_start_ind, interpolation_end_ind)
                 # Use only the surrounding data for interpolation
                 local_data_y = data_y[interpolation_start_ind:interpolation_end_ind]
                 local_data_t = data_t[interpolation_start_ind:interpolation_end_ind]
