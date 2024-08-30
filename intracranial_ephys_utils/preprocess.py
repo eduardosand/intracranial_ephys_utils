@@ -331,13 +331,15 @@ def save_small_dataset(subject, session, task_name, events_file, low_pass=1000):
     return None
 
 
-def save_as_npy(subject, session, task_name, events_file, electrode_selection):
+def save_as_npy(subject, session, task_name, data_directory, events_file, electrode_selection):
     """
     Load data from neuralynx files and package them into .npy files. No preprocessing done to the data, so microwires,
     and macrocontacts at different sampling rates, treated separately.
     :param subject: (string) subject identifier
     :param session: (string) session identifier
     :param task_name: (string) task identifier
+    :param data_directory: (Path) path object that tells us where the raw data lives (if in the cluster, it won't be in
+    our expected data/subject/session style, hence why this function is the way it is)
     :param events_file: (Path) path object that tells us where the events file, ideally the events_file contains one
     event titled f"{task_name} duration"
     :param electrode_selection: (string) Whether to save macrocontact or microwire data
@@ -345,8 +347,7 @@ def save_as_npy(subject, session, task_name, events_file, electrode_selection):
     """
 
     # Hopefully your file structure is like mine
-    data_directory = Path(f"{os.pardir}/data/{subject}/{session}/raw")
-    results_directory = data_directory.parent.absolute() / "preprocessed"
+    results_directory = Path(f"{os.pardir}/data/{subject}/{session}/preprocessed")
     print(results_directory)
     if results_directory.exists():
         print('Results Directory already Exists')
