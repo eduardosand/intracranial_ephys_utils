@@ -245,6 +245,7 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='l
             else:
                 if abs(time_segment_start-previous_segment_stop) > 10:
                     print('something went wrong')
+                    print(time_segment_start, previous_segment_stop)
                     continue
                 print('interpolating')
                 print(time_segment_start-previous_segment_stop)
@@ -279,8 +280,6 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='l
                 # Use only the surrounding data for interpolation
                 local_data_y = data_y[interpolation_start_ind:interpolation_end_ind]
                 local_data_t = data_t[interpolation_start_ind:interpolation_end_ind]
-                print(local_data_y)
-                print(local_data_t)
 
                 # Create the interpolated data range over the missing sample range
                 interp_data_t = np.linspace(data_t[missing_samples_start_ind], data_t[missing_samples_start_ind+1],
@@ -291,7 +290,6 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='l
                     cs = CubicSpline(local_data_t, local_data_y)
                     data_x_interp = cs(interp_data_t)
                 elif interp_type == 'linear':
-                    print('Using linear interpolation')
                     data_x_interp = np.interp(interp_data_t, local_data_t, local_data_y)
 
                 # data fill in
