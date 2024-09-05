@@ -331,7 +331,7 @@ def save_small_dataset(subject, session, task_name, events_file, low_pass=1000):
     return None
 
 
-def save_as_npy(subject, session, task_name, data_directory, events_file, electrode_selection):
+def save_as_npy(subject, session, task_name, data_directory, events_file, electrode_selection, one_file=False):
     """
     Load data from neuralynx files and package them into .npy files. No preprocessing done to the data, so microwires,
     and macrocontacts at different sampling rates, treated separately.
@@ -343,6 +343,7 @@ def save_as_npy(subject, session, task_name, data_directory, events_file, electr
     :param events_file: (Path) path object that tells us where the events file, ideally the events_file contains one
     event titled f"{task_name} duration"
     :param electrode_selection: (string) Whether to save macrocontact or microwire data
+    :param one_file: (optional) (bool) whether to package data into one file. If false, package data into different files
     :return:
     """
 
@@ -369,25 +370,30 @@ def save_as_npy(subject, session, task_name, data_directory, events_file, electr
             lfp_signal, sample_rate, interp, timestamps = read_task_ncs(data_directory, micro_file_path,
                                                                         task=task_name,
                                                                         events_file=events_file)
-
-            if ind == 0:
-                dataset = np.zeros((len(electrode_files) + 1, lfp_signal.shape[0]))
-                dataset[ind, :] = lfp_signal
-                eff_fs.append(sample_rate)
-                electrode_names.append(ncs_filename)
-                og_file = micro_file_path
+            if one_file:
+                if ind == 0:
+                    dataset = np.zeros((len(electrode_files) + 1, lfp_signal.shape[0]))
+                    dataset[ind, :] = lfp_signal
+                    eff_fs.append(sample_rate)
+                    electrode_names.append(ncs_filename)
+                else:
+                    dataset[ind, :] = lfp_signal
+                    eff_fs.append(sample_rate)
+                    electrode_names.append(ncs_filename)
             else:
-                dataset[ind, :] = lfp_signal
-                eff_fs.append(sample_rate)
-                electrode_names.append(ncs_filename)
+                dataset = lfp_signal
+                bp = str(int(sample_rate))
+                np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_{ncs_filename}_{bp}'),
+                         dataset=dataset, electrode_name=ncs_filename, fs=sample_rate, timestamps=timestamps)
     elif electrode_selection == "macrocontact":
         raise NotImplementedError
         ########### TO DO
         # the function will be the same, but just don't know how to do the electrode selection (maybe use lazy reader
         # to exclude files with a certain sample rate?
-    bp = str(int(eff_fs[0]))
-    np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_{electrode_selection}_{bp}'),
-             dataset=dataset, electrode_names=electrode_names, eff_fs=eff_fs, timestamps=timestamps)
+    if one_file:
+        bp = str(int(eff_fs[0]))
+        np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_{electrode_selection}_{bp}'),
+                 dataset=dataset, electrode_names=electrode_names, eff_fs=eff_fs, timestamps=timestamps)
     return None
 
 
@@ -416,11 +422,13 @@ def make_trialwise_data(event_times, electrode_names, fs, dataset, tmin=-1., tma
         raw_data.set_annotations(annotations)
 
     num_electrodes, num_samples = dataset.shape
-    if baseline is not None:
-        epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=baseline, reject_by_annotation=True)
-    else:
-        epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=None, reject_by_annotation=True)
-    return epochs_object
+    # Trying to compare some things
+    epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=baseline,
+                               reject_by_annotation=False)
+    trial_based_data = epochs_object.get_data(copy=True)
+    epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=baseline,
+                               reject_by_annotation=True)
+    return epochs_object, trial_based_data
 
 
 def smooth_data(data, fs, window, step):
