@@ -208,7 +208,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
     :param results_directory: (Path). Path object that points to where the timestampInclude.txt file will end up.
     """
     reformat_event_labels(subject, session, task, data_directory, annotations_directory)
-    photodiode_check_viewer(subject, session, task, data_directory, annotations_directory)
+    photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False)
     write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory)
 
 
