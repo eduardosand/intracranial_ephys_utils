@@ -193,7 +193,7 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     start_time_machine = (start_time_sec + global_start) * sec_microsec
     end_time_machine = (end_time_sec + global_start) * sec_microsec
     timestamps_file = local_data_directory / f"timestampsInclude.txt"
-    with open(timestamps_file, 'w') as f:
+    with open(timestamps_file, 'w+') as f:
         f.write(f'{int(start_time_machine)}    {int(end_time_machine)}')
 
 
