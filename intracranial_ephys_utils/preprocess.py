@@ -34,8 +34,9 @@ def otsu_threshold(time_series):
     """
     change = np.min(np.diff(time_series)[np.nonzero(np.diff(time_series))])
     print('not great')
-    otsu_threshold = min(np.linspace(np.min(time_series)+5*change,
-                                     np.max(time_series)-5*change,100),
+    print(change)
+    otsu_threshold = min(np.linspace(np.min(time_series)+10*change,
+                                     np.max(time_series)-10*change,100),
         key=lambda th: otsu_intraclass_variance(time_series, th),
     )
     print('great')
@@ -129,22 +130,16 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         print(len(sign_changes))
         plt.hist(sign_changes)
         plt.title('Histogram of sign changes')
-        print('why')
         # drop_ind only works in cases where there is a clear separation, however it the signal is smeared, it no longer
         # works
         # drop_ind = np.argmax(np.diff(np.sort(sign_changes)))
         sign_change_drop = otsu_threshold(sign_changes)
-        print('slicing?')
         # sign_change_drop = np.sort(sign_changes)[drop_ind+1]
         event_onsets = np.array(event_onsets_initial)
         event_offsets = np.array(event_offsets_initial)
-        print('slicing? 2')
         event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop, 0]
-        print('weirdness')
         event_offsets = event_offsets[event_offsets[:,1] > sign_change_drop, 0]
-        print('interesting')
         plt.show()
-        print('weird')
         # Now we have all onsets and offsets, recreate our binarized signals using this
         # first check that these are the same length, and that the first event_onset is first
         if (len(event_onsets) == len(event_offsets)) and (event_onsets[0] < event_offsets[0]):
@@ -153,11 +148,16 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
             print('On events and off events do not have the same size')
         else:
             print('Issue with start or stop, check manual timestamping')
-
-        for i, event_onset in enumerate(event_onsets):
-            possible_offsets = event_offsets[event_offsets>event_onset]
-            best_offset = np.min(possible_offsets)
-            ph_signal_bin[int(event_onset): int(best_offset)] = 1.
+        if len(event_onsets) > len(event_offsets):
+            for i, event_onset in enumerate(event_onsets):
+                possible_offsets = event_offsets[event_offsets>event_onset]
+                best_offset = np.min(possible_offsets)
+                ph_signal_bin[int(event_onset): int(best_offset)] = 1.
+        elif len(event_onsets) < len(event_offsets):
+            for i, event_offset in enumerate(event_offsets):
+                possible_onsets = event_onsets[event_onsets<event_offset]
+                best_onset = np.max(possible_onsets)
+                ph_signal_bin[int(best_onset): int(event_offset)] = 1.
         # midpoint = ((max(ph_signal[0:total_time])-min(ph_signal[0:total_time]))/cutoff_fraction+
         #             min(ph_signal[0:total_time]))
         # ph_signal_bin[ph_signal[0:total_time] > midpoint] = 1.
