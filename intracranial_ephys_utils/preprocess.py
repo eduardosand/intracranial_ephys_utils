@@ -61,7 +61,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         total_time = ph_signal.shape[0]
     ph_signal_bin = np.zeros((total_time, ))
     # 15 hz for ir95
-    sos = signal.butter(4, 20, 'hp', fs=sampling_rate, output='sos')
+    sos = signal.butter(4, 15, 'hp', fs=sampling_rate, output='sos')
     filtered = signal.sosfiltfilt(sos, ph_signal)
     stdev = np.std(filtered)
     # The idea with this method of processing, slightly more complicated than midpoint
