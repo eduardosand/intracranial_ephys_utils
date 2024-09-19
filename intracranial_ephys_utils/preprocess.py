@@ -32,11 +32,11 @@ def otsu_threshold(time_series):
     :param time_series:
     :return:
     """
-    change = np.min(np.diff(time_series)[np.nonzero(np.diff(time_series))])
+    change = np.min(np.abs(np.diff(time_series))[np.nonzero(np.diff(time_series))])
     print('not great')
     print(change)
-    otsu_threshold = min(np.linspace(np.min(time_series)+10*change,
-                                     np.max(time_series)-10*change,100),
+    otsu_threshold = min(np.linspace(np.min(time_series)+5*change,
+                                     np.max(time_series)-5*change,100),
         key=lambda th: otsu_intraclass_variance(time_series, th),
     )
     print('great')
