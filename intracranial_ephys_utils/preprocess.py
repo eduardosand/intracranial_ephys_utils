@@ -32,7 +32,7 @@ def otsu_threshold(time_series):
     :param time_series:
     :return:
     """
-    otsu_threshold = min(np.arange(np.min(time_series), np.max(time_series)),
+    otsu_threshold = min(np.linspace(np.min(time_series), np.max(time_series),100),
         key=lambda th: otsu_intraclass_variance(time_series, th),
     )
     return otsu_threshold
@@ -85,7 +85,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         # issue with this function in low signal regime
         # with IR95 session 3, had to use 4 std dev
         # for IR94 session 1, signal is feeble, need to use a different thing
-        events = timepoints[abs(filtered) > 2.1 * stdev]
+        events = timepoints[abs(filtered) > 2.15 * stdev]
         print(len(events))
         buffer = 0.02*sampling_rate
         sample_size = int(0.045*sampling_rate)
@@ -131,7 +131,6 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         # drop_ind only works in cases where there is a clear separation, however it the signal is smeared, it no longer
         # works
         # drop_ind = np.argmax(np.diff(np.sort(sign_changes)))
-        # Set the cutoff at the 95th percentile of sign changes
         sign_change_drop = otsu_threshold(sign_changes)
 
         # sign_change_drop = np.sort(sign_changes)[drop_ind+1]
@@ -140,6 +139,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop, 0]
         event_offsets = event_offsets[event_offsets[:,1] > sign_change_drop, 0]
         plt.show()
+        print('weird')
         # Now we have all onsets and offsets, recreate our binarized signals using this
         # first check that these are the same length, and that the first event_onset is first
         if (len(event_onsets) == len(event_offsets)) and (event_onsets[0] < event_offsets[0]):
