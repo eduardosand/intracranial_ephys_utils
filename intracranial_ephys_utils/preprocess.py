@@ -58,7 +58,8 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
     else:
         total_time = ph_signal.shape[0]
     ph_signal_bin = np.zeros((total_time, ))
-    sos = signal.butter(4, 15, 'hp', fs=sampling_rate, output='sos')
+    # 15 hz for ir95
+    sos = signal.butter(4, 20, 'hp', fs=sampling_rate, output='sos')
     filtered = signal.sosfiltfilt(sos, ph_signal)
     stdev = np.std(filtered)
     # The idea with this method of processing, slightly more complicated than midpoint
@@ -84,7 +85,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         # issue with this function in low signal regime
         # with IR95 session 3, had to use 4 std dev
         # for IR94 session 1, signal is feeble, need to use a different thing
-        events = timepoints[abs(filtered) > 2.5 * stdev]
+        events = timepoints[abs(filtered) > 2. * stdev]
         print(len(events))
         buffer = 0.02*sampling_rate
         sample_size = int(0.045*sampling_rate)
