@@ -87,7 +87,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         # issue with this function in low signal regime
         # with IR95 session 3, had to use 4 std dev
         # for IR94 session 1, signal is feeble, need to use a different thing
-        events = timepoints[abs(filtered) > 2 * stdev]
+        events = timepoints[abs(filtered) > 1.7 * stdev]
         print(len(events))
         buffer = 0.02*sampling_rate
         sample_size = int(0.045*sampling_rate)
@@ -156,6 +156,11 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
                 possible_onsets = event_onsets[event_onsets<event_offset]
                 best_onset = np.max(possible_onsets)
                 ph_signal_bin[int(best_onset): int(event_offset)] = 1.
+        else:
+            for i, event_onset in enumerate(event_onsets):
+                possible_offsets = event_offsets[event_offsets>event_onset]
+                best_offset = np.min(possible_offsets)
+                ph_signal_bin[int(event_onset): int(best_offset)] = 1.
         # midpoint = ((max(ph_signal[0:total_time])-min(ph_signal[0:total_time]))/cutoff_fraction+
         #             min(ph_signal[0:total_time]))
         # ph_signal_bin[ph_signal[0:total_time] > midpoint] = 1.
