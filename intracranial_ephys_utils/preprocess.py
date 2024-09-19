@@ -33,10 +33,12 @@ def otsu_threshold(time_series):
     :return:
     """
     change = np.min(np.diff(time_series)[np.nonzero(np.diff(time_series))])
+    print('not great')
     otsu_threshold = min(np.linspace(np.min(time_series)+2*change,
                                      np.max(time_series)-2*change,100),
         key=lambda th: otsu_intraclass_variance(time_series, th),
     )
+    print('great')
     return otsu_threshold
 
 
@@ -87,7 +89,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         # issue with this function in low signal regime
         # with IR95 session 3, had to use 4 std dev
         # for IR94 session 1, signal is feeble, need to use a different thing
-        events = timepoints[abs(filtered) > 2.195 * stdev]
+        events = timepoints[abs(filtered) > 2.198 * stdev]
         print(len(events))
         buffer = 0.02*sampling_rate
         sample_size = int(0.045*sampling_rate)
@@ -110,12 +112,10 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
                 # if max_sample_num - min_sample_num > sample_size:
                 sign_change = (np.average(ph_signal[max_sample_num:min(len(ph_signal)-1,max_sample_num+sample_size)]) -
                            np.average(ph_signal[max(0, min_sample_num-sample_size):min_sample_num]))
-                print('not okay')
             else:
                 avg_sample_num = nearby_occurrences[0]
                 sign_change = (np.average(ph_signal[avg_sample_num:min(len(ph_signal)-1, avg_sample_num+sample_size)]) -
                                np.average(ph_signal[max(0, avg_sample_num-sample_size):avg_sample_num]))
-                print('okay')
             # print(sign_change)
             # plt.plot(ph_signal[avg_sample_num-sample_size:avg_sample_num+sample_size])
             # plt.show()
