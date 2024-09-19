@@ -33,13 +33,10 @@ def otsu_threshold(time_series):
     :return:
     """
     change = np.min(np.abs(np.diff(time_series))[np.nonzero(np.diff(time_series))])
-    print('not great')
-    print(change)
     otsu_threshold = min(np.linspace(np.min(time_series)+5*change,
                                      np.max(time_series)-5*change,100),
         key=lambda th: otsu_intraclass_variance(time_series, th),
     )
-    print('great')
     return otsu_threshold
 
 
@@ -90,7 +87,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         # issue with this function in low signal regime
         # with IR95 session 3, had to use 4 std dev
         # for IR94 session 1, signal is feeble, need to use a different thing
-        events = timepoints[abs(filtered) > 2.2 * stdev]
+        events = timepoints[abs(filtered) > 2.22 * stdev]
         print(len(events))
         buffer = 0.02*sampling_rate
         sample_size = int(0.045*sampling_rate)
