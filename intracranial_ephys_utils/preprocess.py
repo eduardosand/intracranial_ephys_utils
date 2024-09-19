@@ -60,8 +60,8 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         buffer = 0.02*sampling_rate
         sample_size = int(0.045*sampling_rate)
         event_breakpoint = 0
-        event_onsets = []
-        event_offsets = []
+        event_onsets_initial = []
+        event_offsets_initial = []
 
         sign_changes = []
         for i, sample_num in enumerate(events):
@@ -84,9 +84,9 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
             # plt.show()
             if sign_change > 0:
                 # positive, event_onset
-                event_onsets.append([avg_sample_num, abs(sign_change)])
+                event_onsets_initial.append([avg_sample_num, abs(sign_change)])
             else:
-                event_offsets.append([avg_sample_num, abs(sign_change)])
+                event_offsets_initial.append([avg_sample_num, abs(sign_change)])
             sign_changes.append(abs(sign_change))
 
         print(len(sign_changes))
@@ -94,8 +94,8 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         plt.title('Histogram of sign changes')
         drop_ind = np.argmax(np.diff(np.sort(sign_changes)))
         sign_change_drop = np.sort(sign_changes)[drop_ind+1]
-        event_onsets = np.array(event_onsets)
-        event_offsets = np.array(event_offsets)
+        event_onsets = np.array(event_onsets_initial)
+        event_offsets = np.array(event_offsets_initial)
         event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop, 0]
         event_offsets = event_offsets[event_offsets[:,1] > sign_change_drop, 0]
         plt.show()
@@ -103,12 +103,11 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         # first check that these are the same length, and that the first event_onset is first
         if (len(event_onsets) == len(event_offsets)) and (event_onsets[0] < event_offsets[0]):
             print('Events detected are the same size and make sense')
+        elif len(event_onsets) == len(event_offsets):
+            print('On events and off events do not have the same size')
         else:
-            print('welllllll shit')
-            # print(event_onsets[0] < event_offsets[0])
-            # print(event_onsets[-1] < event_offsets[-1])
-            # print(len(event_onsets))
-            # print(len(event_offsets))
+            print('Issue with start or stop, check manual timestamping')
+
         for i, event_onset in enumerate(event_onsets):
             possible_offsets = event_offsets[event_offsets>event_onset]
             best_offset = np.min(possible_offsets)
