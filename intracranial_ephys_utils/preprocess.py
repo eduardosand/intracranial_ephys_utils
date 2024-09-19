@@ -9,6 +9,36 @@ import warnings
 import mne
 
 
+def otsu_intraclass_variance(image, threshold):
+    """
+    Otsu's intra-class variance.
+    If all pixels are above or below the threshold, this will throw a warning that can safely be ignored.
+    """
+    return np.nansum(
+        [
+            np.mean(cls) * np.var(image, where=cls)
+            #   weight   ·  intra-class variance
+            for cls in [image >= threshold, image < threshold]
+        ]
+    )
+    # NaNs only arise if the class is empty, in which case the contribution should be zero, which `nansum` accomplishes.
+
+
+def otsu_threshold(time_series):
+    """
+    Otsu thresholding. I know it's for an image, but it should get the job done here in this time series signal, since
+    it quite literally is two classes with noise. What difference does it make it if the variation in foreground and
+    background happen in time than space.
+    :param time_series:
+    :return:
+    """
+    otsu_threshold = min(
+        range(np.min(time_series) + 1, np.max(time_series)),
+        key=lambda th: otsu_intraclass_variance(time_series, th),
+    )
+    return otsu_threshold
+
+
 def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau=None):
     '''
     Binarizes the photodiode signal using the midpoint of the signal. Use local midpoints if given a tau.
@@ -92,8 +122,13 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         print(len(sign_changes))
         plt.hist(sign_changes)
         plt.title('Histogram of sign changes')
-        drop_ind = np.argmax(np.diff(np.sort(sign_changes)))
-        sign_change_drop = np.sort(sign_changes)[drop_ind+1]
+        # drop_ind only works in cases where there is a clear separation, however it the signal is smeared, it no longer
+        # works
+        # drop_ind = np.argmax(np.diff(np.sort(sign_changes)))
+        # Set the cutoff at the 95th percentile of sign changes
+        sign_change_drop = otsu_threshold(sign_changes)
+
+        # sign_change_drop = np.sort(sign_changes)[drop_ind+1]
         event_onsets = np.array(event_onsets_initial)
         event_offsets = np.array(event_offsets_initial)
         event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop, 0]
