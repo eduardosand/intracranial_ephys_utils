@@ -32,8 +32,7 @@ def otsu_threshold(time_series):
     :param time_series:
     :return:
     """
-    otsu_threshold = min(
-        range(np.min(time_series) + 1, np.max(time_series)),
+    otsu_threshold = min(np.arange(np.min(time_series), np.max(time_series)),
         key=lambda th: otsu_intraclass_variance(time_series, th),
     )
     return otsu_threshold
