@@ -85,7 +85,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         # issue with this function in low signal regime
         # with IR95 session 3, had to use 4 std dev
         # for IR94 session 1, signal is feeble, need to use a different thing
-        events = timepoints[abs(filtered) > 2. * stdev]
+        events = timepoints[abs(filtered) > 2.25 * stdev]
         print(len(events))
         buffer = 0.02*sampling_rate
         sample_size = int(0.045*sampling_rate)
@@ -103,12 +103,15 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
             if num_events > 1:
                 avg_sample_num = int(np.median(nearby_occurrences))
                 event_breakpoint = np.max(nearby_occurrences)
+                max_sample_num = int(np.max(nearby_occurrences))
+                min_sample_num = int(np.min(nearby_occurrences))
+                # if max_sample_num - min_sample_num > sample_size:
+                sign_change = (np.average(ph_signal[max_sample_num:min(len(ph_signal)-1,max_sample_num+sample_size)]) -
+                           np.average(ph_signal[max(0, min_sample_num-sample_size):min_sample_num]))
             else:
                 avg_sample_num = nearby_occurrences[0]
-            max_sample_num = int(np.max(nearby_occurrences))
-            min_sample_num = int(np.min(nearby_occurrences))
-            sign_change = (np.average(ph_signal[max_sample_num:min(len(ph_signal)-1,max_sample_num+sample_size)]) -
-                           np.average(ph_signal[max(0, min_sample_num-sample_size):min_sample_num]))
+                sign_change = (np.average(ph_signal[avg_sample_num:avg_sample_num+sample_size]) -
+                               np.average(ph_signal[avg_sample_num-sample_size:avg_sample_num]))
             # print(sign_change)
             # plt.plot(ph_signal[avg_sample_num-sample_size:avg_sample_num+sample_size])
             # plt.show()
