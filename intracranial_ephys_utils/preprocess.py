@@ -75,8 +75,8 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
                 event_breakpoint = np.max(nearby_occurrences)
             else:
                 avg_sample_num = nearby_occurrences[0]
-            max_sample_num = int(np.max(nearby_occurrences))
-            min_sample_num = int(np.min(nearby_occurrences))
+            max_sample_num = min(int(np.max(nearby_occurrences)), len(ph_signal)-1)
+            min_sample_num = max(0, int(np.min(nearby_occurrences)))
             sign_change = (np.average(ph_signal[max_sample_num:max_sample_num+sample_size]) -
                            np.average(ph_signal[min_sample_num-sample_size:min_sample_num]))
             # print(sign_change)
