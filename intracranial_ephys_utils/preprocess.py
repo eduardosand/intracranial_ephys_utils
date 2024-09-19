@@ -52,7 +52,11 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         midpoint = midpoint[0:total_time]
         ph_signal_bin[ph_signal[0:total_time] > midpoint] = 1.
     else:
+        # issue with this function in low signal regime
+        # with IR95 session 3, had to use 4 std dev
+        # for IR94 session 1, signal is feeble, need to use a different thing
         events = timepoints[abs(filtered) > 4. * stdev]
+        print(len(events))
         buffer = 0.02*sampling_rate
         sample_size = int(0.045*sampling_rate)
         event_breakpoint = 0
@@ -85,7 +89,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
                 event_offsets.append([avg_sample_num, abs(sign_change)])
             sign_changes.append(abs(sign_change))
 
-
+        print(len(sign_changes))
         plt.hist(sign_changes)
         plt.title('Histogram of sign changes')
         drop_ind = np.argmax(np.diff(np.sort(sign_changes)))
