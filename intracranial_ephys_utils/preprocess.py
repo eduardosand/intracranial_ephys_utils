@@ -9,16 +9,16 @@ import warnings
 import mne
 
 
-def otsu_intraclass_variance(image, threshold):
+def otsu_intraclass_variance(time_series, threshold):
     """
     Otsu's intra-class variance.
-    If all pixels are above or below the threshold, this will throw a warning that can safely be ignored.
+    If all datapoints are above or below the threshold, this will throw a warning that can safely be ignored.
     """
     return np.nansum(
         [
-            np.mean(cls) * np.var(image, where=cls)
+            np.mean(cls) * np.var(time_series, where=cls)
             #   weight   ·  intra-class variance
-            for cls in [image >= threshold, image < threshold]
+            for cls in [time_series >= threshold, time_series < threshold]
         ]
     )
     # NaNs only arise if the class is empty, in which case the contribution should be zero, which `nansum` accomplishes.
@@ -32,7 +32,9 @@ def otsu_threshold(time_series):
     :param time_series:
     :return:
     """
-    otsu_threshold = min(np.linspace(np.min(time_series), np.max(time_series),100),
+
+    otsu_threshold = min(np.linspace(np.min(time_series)+2*np.min(np.diff(time_series)),
+                                     np.max(time_series)-2*np.min(np.diff(time_series)),100),
         key=lambda th: otsu_intraclass_variance(time_series, th),
     )
     return otsu_threshold
