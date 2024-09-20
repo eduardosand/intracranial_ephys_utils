@@ -244,8 +244,8 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='l
                 continue
             else:
                 if abs(time_segment_start-previous_segment_stop) > 10:
-                    print('something went wrong')
-                    print(time_segment_start, previous_segment_stop)
+                    print('There is at least 10 seconds of missing data see below')
+                    print(previous_segment_stop, time_segment_start)
                     continue
                 # 01/18/2024 - Consider a version of this script that doesn't interpolate, to allow for better alignment
                 # to spike data where this has in fact not been done (spike sorting (Osort) doesn't care about
