@@ -40,7 +40,7 @@ def read_file(file_path):
     :param file_path:
     :return: reader
     """
-    reader = NeuralynxRawIO(filename=file_path)
+    reader = NeuralynxRawIO(dirname=os.path.dirname(file_path), filename=file_path)
     return reader
 
 

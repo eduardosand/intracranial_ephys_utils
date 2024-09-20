@@ -142,7 +142,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
         if (len(event_onsets) == len(event_offsets)) and (event_onsets[0] < event_offsets[0]):
             print('Events detected are the same size and make sense')
             print(len(event_onsets))
-        elif len(event_onsets) == len(event_offsets):
+        elif len(event_onsets) != len(event_offsets):
             print('On events and off events do not have the same size')
         else:
             print('Issue with start or stop, check manual timestamping')
