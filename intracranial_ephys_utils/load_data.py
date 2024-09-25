@@ -98,7 +98,7 @@ def get_event_times(folder, rescale=True, extension=None):
             global_start = None
         else:
             event_times = event_timestamps
-    return event_times, event_labels, global_start, event_file
+    return event_times, event_labels, global_start, events_file
 
 
 def missing_samples_check(file_path):
