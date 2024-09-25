@@ -65,7 +65,7 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     ext = ext.replace('events', '')
     ext = ext.replace('Events', '')
     if ext is not None and ext != '.ncs':
-        warnings.warn(f"Most likely multiple photodiode files, picking {extension} now")
+        warnings.warn(f"Most likely multiple photodiode files, picking {ext} now")
         ph_files = [file_path for file_path in all_files_list if file_path.endswith(extension) and
                     (file_path.startswith('photo1') or file_path.startswith('Photo'))]
     else:
