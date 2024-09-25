@@ -189,7 +189,7 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
     app.exec()
 
 
-def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory):
+def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory, events_filename=None):
     """
     Looks in event folders for labels. Elicits user input to determine which labels are relevant for spike sorting
     to constrain looking at only task-relevant data. User can input -1 if the whole datastream should be spike sorted.
@@ -201,7 +201,12 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     :param local_data_directory:  This is where the microwire data to be sorted is
     :return: None. A txt file is generated with relative timestamps if needed, or not if not needed.
     """
-    labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_events.csv')
+    if events_filename is None:
+        file_root = 'events'
+        labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_events.csv')
+    else:
+        file_root, _ = os.path.splitext(events_filename)
+        labels_file = annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv'
     task_label = labels_file[labels_file.label == f"{task} duration"]
     print(task_label['time'].iloc[0])
     start_time_sec = task_label['time'].iloc[0].astype(float)
@@ -212,12 +217,14 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     start_time_machine = (start_time_sec + global_start) * sec_microsec
     end_time_machine = (end_time_sec + global_start) * sec_microsec
     timestamps_file = local_data_directory / f"timestampsInclude.txt"
-
+    specified_file = local_data_directory / f"which_files.txt"
     # generate directory if it doesn't exist
     if not os.path.exists(local_data_directory):
         os.mkdir(local_data_directory)
     with open(timestamps_file, 'w+') as f:
         f.write(f'{int(start_time_machine)}    {int(end_time_machine)}')
+    with open(specified_file, 'w+') as f:
+        f.write(f'{file_root}')
 
 
 def su_timestamp_process(subject, session, task, data_directory, annotations_directory, results_directory):
@@ -240,7 +247,15 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
             print(ext)
             photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                     events_filename=event_file)
-    write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory)
+            file_root, _ = os.path.splitext(events_filename)
+            labels_file = annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv'
+            task_label = labels_file[labels_file.label == f"{task} duration"]
+            if len(task_label) == 0:
+                continue
+            else:
+                target_file = event_file
+    write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory,
+                     events_filename=target_file)
 
 
 def get_annotated_task_start_time(subject, session, task, annotations_directory):
