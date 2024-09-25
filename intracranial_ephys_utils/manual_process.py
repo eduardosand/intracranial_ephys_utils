@@ -247,7 +247,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
             print(ext)
             photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                     events_filename=event_file)
-            file_root, _ = os.path.splitext(events_filename)
+            file_root, _ = os.path.splitext(event_file)
             labels_file = annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv'
             task_label = labels_file[labels_file.label == f"{task} duration"]
             if len(task_label) == 0:
