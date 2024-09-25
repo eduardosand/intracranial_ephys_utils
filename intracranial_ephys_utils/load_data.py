@@ -75,9 +75,8 @@ def get_event_times(folder, rescale=True, extension=None):
         ph_reader = read_file(ph_path)
         ph_reader.parse_header()
         global_start = ph_reader.global_t_start
-        event_file = None
+        events_file = None
     else:
-
         event_reader = read_file(os.path.join(folder, events_file[0]))
         event_reader.parse_header()
         global_start = event_reader.global_t_start

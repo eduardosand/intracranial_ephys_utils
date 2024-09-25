@@ -27,7 +27,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
         source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration',
                                                                                                      'label'])
 
-    file_root, _ = os.path.splitext(filename)
+    file_root, _ = os.path.splitext(event_file)
     annotations_file = f'{subject}_{session}_{task}_{file_root}.csv'
     if annotations_file in os.listdir(annotations_directory):
         print('Annotations File exists, double check')
