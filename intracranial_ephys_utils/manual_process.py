@@ -7,7 +7,7 @@ import os
 import pandas as pd
 
 
-def reformat_event_labels(subject, session, task, data_directory, annotations_directory):
+def reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=None):
     """
     This script takes the events files, reads the timestamps in, and organizes them suitably for
     the data_viewer. Outputs the events as a csv file
@@ -18,15 +18,17 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     :param annotations_directory: (Path). The Path object that points to where the annotations file will go.
     :return:
     """
-    event_times, event_labels, _ = get_event_times(data_directory, rescale=False)
-    event_times_sec, _, _ = get_event_times(data_directory, rescale=True)
+    event_times, event_labels, _, event_file = get_event_times(data_directory, rescale=False, extension=extension)
+    event_times_sec, _, _, _ = get_event_times(data_directory, rescale=True, extension=extension)
     if len(event_times) == 0:
         source_epoch = pd.DataFrame(np.array([[], [], []]).T, columns=['time', 'duration', 'label'])
     else:
         durations = np.ones((event_times_sec.shape[0], ))*0.5
         source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration',
                                                                                                      'label'])
-    annotations_file = f'{subject}_{session}_{task}_events.csv'
+
+    file_root, _ = os.path.splitext(filename)
+    annotations_file = f'{subject}_{session}_{task}_{file_root}.csv'
     if annotations_file in os.listdir(annotations_directory):
         print('Annotations File exists, double check')
     else:
@@ -211,8 +213,15 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
     :param annotations_directory: (Path). Path object that points to where we'd like to store annotations and metadata.
     :param results_directory: (Path). Path object that points to where the timestampInclude.txt file will end up.
     """
-    reformat_event_labels(subject, session, task, data_directory, annotations_directory)
-    photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False)
+    # double check if there are multiple events files
+    _, _, global_start, event_files = get_event_times(data_directory, rescale=False)
+    if len(event_files) > 1:
+        print('Multiple Events Files, we will go through the separate datasets one at a time')
+        for event_file in event_files:
+            ext = event_file[-6:]
+            reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=ext)
+            photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
+                                    extension=ext)
     write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory)
 
 

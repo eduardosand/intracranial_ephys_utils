@@ -44,23 +44,30 @@ def read_file(file_path):
     return reader
 
 
-def get_event_times(folder, rescale=True):
+def get_event_times(folder, rescale=True, extension=None):
     """
     Looks at just the events file for a Neuralynx data directory to get timestamps(default is seconds) and labels
     for recording events
     :param folder: string path
     :param rescale: optional(default True). Rescale timestamps to seconds from start of the file. Set to false for
     to get machine time.
+    :param extension: optional(default None). In case there are multiple files, use extension to prespecify
+    the right events file by just taking the last 6 characters of the file name.
     :return: event_times : I think this is in seconds from start if rescale=True,
     or in seconds in machine time if rescale=False.
     :return: event_labels : Whatever the annotation was for each event.
     :return: global_start : Machine code time beginning of recording(seconds) (only return if rescale=False)
+    :return: event_file : File name for events file (useful in case there are two events files)
     """
     # Obtained in seconds and assumes that the start of the file (not necessarily the task) is 0.
     all_files = os.listdir(folder)
-    events_file = [file_path for file_path in all_files if file_path.startswith('Events')]
+    if extension is None:
+        events_file = [file_path for file_path in all_files if file_path.startswith('Events')]
+    else:
+        events_file = [file_path for file_path in all_files if (file_path.startswith('Events') and file_path.endswith(extension))]
     if len(events_file) > 1:
         warnings.warn("More than one event file found.")
+        event_times, event_labels, global_start = None, None, None
     elif len(events_file) == 0:
         warnings.warn("No events file found, Using Photodiode file to get global machine time start")
         event_times, event_labels = [], []
@@ -68,6 +75,7 @@ def get_event_times(folder, rescale=True):
         ph_reader = read_file(ph_path)
         ph_reader.parse_header()
         global_start = ph_reader.global_t_start
+        event_file = None
     else:
 
         event_reader = read_file(os.path.join(folder, events_file[0]))
@@ -90,7 +98,7 @@ def get_event_times(folder, rescale=True):
             global_start = None
         else:
             event_times = event_timestamps
-    return event_times, event_labels, global_start
+    return event_times, event_labels, global_start, event_file
 
 
 def missing_samples_check(file_path):
