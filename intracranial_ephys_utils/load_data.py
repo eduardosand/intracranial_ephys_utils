@@ -80,6 +80,7 @@ def get_event_times(folder, rescale=True, extension=None):
         event_reader = read_file(os.path.join(folder, events_file[0]))
         event_reader.parse_header()
         global_start = event_reader.global_t_start
+        events_file = events_file[0]
         try:
             event_timestamps, _, event_labels = event_reader.get_event_timestamps()
         except IndexError:

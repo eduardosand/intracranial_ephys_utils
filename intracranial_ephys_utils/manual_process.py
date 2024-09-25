@@ -219,6 +219,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
         print('Multiple Events Files, we will go through the separate datasets one at a time')
         for event_file in event_files:
             ext = event_file[-6:]
+            print('this is the extension')
             reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=ext)
             photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                     extension=ext)
