@@ -189,7 +189,8 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
     app.exec()
 
 
-def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory, events_filename=None):
+def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory,
+                     events_filename=None):
     """
     Looks in event folders for labels. Elicits user input to determine which labels are relevant for spike sorting
     to constrain looking at only task-relevant data. User can input -1 if the whole datastream should be spike sorted.
@@ -199,6 +200,7 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     :param annotations_directory: This is the folder where manual annotations are found
     :param event_folder: This is the folder where events live (helpful to get global machine time)
     :param local_data_directory:  This is where the microwire data to be sorted is
+    :param events_filename: optional. If multiple events
     :return: None. A txt file is generated with relative timestamps if needed, or not if not needed.
     """
     if events_filename is None:
@@ -206,7 +208,7 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
         labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_events.csv')
     else:
         file_root, _ = os.path.splitext(events_filename)
-        labels_file = annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv'
+        labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv')
     task_label = labels_file[labels_file.label == f"{task} duration"]
     print(task_label['time'].iloc[0])
     start_time_sec = task_label['time'].iloc[0].astype(float)
@@ -248,7 +250,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
             photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                     events_filename=event_file)
             file_root, _ = os.path.splitext(event_file)
-            labels_file = annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv'
+            labels_file = pd.readcsv(annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv')
             task_label = labels_file[labels_file.label == f"{task} duration"]
             if len(task_label) == 0:
                 continue
