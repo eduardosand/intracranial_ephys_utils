@@ -233,6 +233,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
             reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=ext)
             ext = event_file.replace('.nev', '.ncs')
             ext = ext.replace('events', '')
+            ext = ext.replace('Events', '')
             print(ext)
             photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                     extension=ext)
