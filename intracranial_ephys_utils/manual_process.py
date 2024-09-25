@@ -213,6 +213,8 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     print(task_label['time'].iloc[0])
     start_time_sec = task_label['time'].iloc[0].astype(float)
     end_time_sec = start_time_sec + task_label['duration'].iloc[0].astype(float)
+
+    # this exists in case there are multiple events file, and we want to pick the right one
     if events_filename is None:
         ext = None
     else:
@@ -250,7 +252,6 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
         for event_file in event_files:
             ext = event_file[-6:]
             reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=ext)
-            print(ext)
             photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                     events_filename=event_file)
             file_root, _ = os.path.splitext(event_file)
