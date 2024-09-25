@@ -239,7 +239,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
             reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=ext)
             print(ext)
             photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
-                                    extension=ext)
+                                    events_filename=event_file)
     write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory)
 
 
