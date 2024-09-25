@@ -1,5 +1,7 @@
 from ephyviewer import mkQApp, MainViewer, TraceViewer, CsvEpochSource, EpochEncoder
 import numpy as np
+from yaml import warnings
+
 from .load_data import read_task_ncs, get_event_times
 from .plot_data import diagnostic_time_series_plot
 from .preprocess import binarize_ph
@@ -57,12 +59,16 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     all_files_list = os.listdir(data_directory)
     # electrode_files = [file_path for file_path in all_files_list if (re.match('m.*ncs', file_path) and not
     #                file_path.endswith(".nse"))]
-    if extension is not None:
+    if extension is not None and extension != '.ncs':
+        warnings.warn(f"Most likely multiple photodiode files, picking {extension} now")
         ph_files = [file_path for file_path in all_files_list if file_path.endswith(extension) and
                     (file_path.startswith('photo1') or file_path.startswith('Photo'))]
     else:
         ph_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs') and
                     (file_path.startswith('photo1') or file_path.startswith('Photo'))]
+        if len(ph_files) > 1:
+            warnings.warn("Multiple photodiode files picking the base one now")
+            ph_files = [file for file in ph_files if (file.endswith('photo1.ncs') or file.endswith('photo.ncs'))]
     assert len(ph_files) == 1
     ph_filename = ph_files[0]
 
@@ -225,7 +231,8 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
         for event_file in event_files:
             ext = event_file[-6:]
             reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=ext)
-            ext = event_file[-6:].replace('.nev', '.ncs')
+            ext = event_file.replace('.nev', '.ncs')
+            ext = ext.replace('events', '')
             print(ext)
             photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                     extension=ext)
