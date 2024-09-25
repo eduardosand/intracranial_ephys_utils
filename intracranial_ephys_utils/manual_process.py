@@ -66,7 +66,7 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     ext = ext.replace('Events', '')
     if ext is not None and ext != '.ncs':
         warnings.warn(f"Most likely multiple photodiode files, picking {ext} now")
-        ph_files = [file_path for file_path in all_files_list if file_path.endswith(extension) and
+        ph_files = [file_path for file_path in all_files_list if file_path.endswith(ext) and
                     (file_path.startswith('photo1') or file_path.startswith('Photo'))]
     else:
         ph_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs') and
@@ -256,6 +256,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
                 continue
             else:
                 target_file = event_file
+                break
     write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory,
                      events_filename=target_file)
 
