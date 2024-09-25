@@ -36,7 +36,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
 
 
 def photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
-                            task_start=0.):
+                            task_start=0., extension=None):
     """
     This script is a generalized dataviewer to look at a photodiode signal, and bring up the events.
     With the viewer, we can make annotations and save them to a csv file. Additionally, if the diagnostic optional
@@ -49,6 +49,7 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     :param diagnostic: (bool) (optional) If True we will also plot diagnostics, and preprocess photodiode and overlay
     it.
     :param task_start: (float) (optional) The start time of the task
+    :param extension: (str) (optional) The extension of the file (in case multiple datasets in the same folder)
     :return:
     """
 
@@ -56,8 +57,12 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     all_files_list = os.listdir(data_directory)
     # electrode_files = [file_path for file_path in all_files_list if (re.match('m.*ncs', file_path) and not
     #                file_path.endswith(".nse"))]
-    ph_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs') and
-                (file_path.startswith('photo1') or file_path.startswith('Photo'))]
+    if extension is not None:
+        ph_files = [file_path for file_path in all_files_list if file_path.endswith(extension) and
+                    (file_path.startswith('photo1') or file_path.startswith('Photo'))]
+    else:
+        ph_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs') and
+                    (file_path.startswith('photo1') or file_path.startswith('Photo'))]
     assert len(ph_files) == 1
     ph_filename = ph_files[0]
 
@@ -219,8 +224,9 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
         print('Multiple Events Files, we will go through the separate datasets one at a time')
         for event_file in event_files:
             ext = event_file[-6:]
-            print('this is the extension')
             reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=ext)
+            ext = event_file[-6:].replace('.nev', '.ncs')
+            print(ext)
             photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                     extension=ext)
     write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory)
