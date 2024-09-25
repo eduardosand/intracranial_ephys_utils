@@ -1,6 +1,6 @@
 from ephyviewer import mkQApp, MainViewer, TraceViewer, CsvEpochSource, EpochEncoder
 import numpy as np
-from yaml import warnings
+import warnings
 
 from .load_data import read_task_ncs, get_event_times
 from .plot_data import diagnostic_time_series_plot
