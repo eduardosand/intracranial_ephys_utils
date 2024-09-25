@@ -18,6 +18,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     :param task: (srt). Task the subject completed in this session
     :param data_directory: (Path). The Path object that points to the neuralynx data directory
     :param annotations_directory: (Path). The Path object that points to where the annotations file will go.
+    :param extension: str optional.
     :return:
     """
     event_times, event_labels, _, event_file = get_event_times(data_directory, rescale=False, extension=extension)
@@ -38,7 +39,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
 
 
 def photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
-                            task_start=0., extension=None):
+                            task_start=0., events_filename=None):
     """
     This script is a generalized dataviewer to look at a photodiode signal, and bring up the events.
     With the viewer, we can make annotations and save them to a csv file. Additionally, if the diagnostic optional
@@ -51,7 +52,7 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     :param diagnostic: (bool) (optional) If True we will also plot diagnostics, and preprocess photodiode and overlay
     it.
     :param task_start: (float) (optional) The start time of the task
-    :param extension: (str) (optional) The extension of the file (in case multiple datasets in the same folder)
+    :param events_filename: (str) (optional) The extension of the file (in case multiple datasets in the same folder)
     :return:
     """
 
@@ -59,7 +60,11 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     all_files_list = os.listdir(data_directory)
     # electrode_files = [file_path for file_path in all_files_list if (re.match('m.*ncs', file_path) and not
     #                file_path.endswith(".nse"))]
-    if extension is not None and extension != '.ncs':
+
+    ext = events_filename.replace('.nev', '.ncs')
+    ext = ext.replace('events', '')
+    ext = ext.replace('Events', '')
+    if ext is not None and ext != '.ncs':
         warnings.warn(f"Most likely multiple photodiode files, picking {extension} now")
         ph_files = [file_path for file_path in all_files_list if file_path.endswith(extension) and
                     (file_path.startswith('photo1') or file_path.startswith('Photo'))]
@@ -122,7 +127,8 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
 
     # annotation file details
     possible_labels = [f'{task} duration']
-    file_path = annotations_directory / f'{subject}_{session}_{task}_events.csv'
+    file_root, _ = os.path.splitext(events_filename)
+    file_path = annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv'
     source_epoch = CsvEpochSource(file_path, possible_labels)
 
     # create a viewer for the encoder itself
@@ -231,9 +237,6 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
         for event_file in event_files:
             ext = event_file[-6:]
             reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=ext)
-            ext = event_file.replace('.nev', '.ncs')
-            ext = ext.replace('events', '')
-            ext = ext.replace('Events', '')
             print(ext)
             photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                     extension=ext)
