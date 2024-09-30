@@ -248,7 +248,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
     """
     # double check if there are multiple events files
     _, _, global_start, event_files = get_event_times(data_directory, rescale=False)
-    if len(event_files) > 1:
+    if len(event_files) > 1 and type(event_files) == type([]):
         print('Multiple Events Files, we will go through the separate datasets one at a time')
         print(event_files)
         for event_file in event_files:
