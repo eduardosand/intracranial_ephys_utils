@@ -270,10 +270,10 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
         reformat_event_labels(subject, session, task, data_directory, annotations_directory)
         photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                 events_filename=event_files)
-        file_root, _ = os.path.splitext(event_file)
+        file_root, _ = os.path.splitext(event_files)
         labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv')
         task_label = labels_file[labels_file.label == f"{task} duration"]
-        target_file = event_file
+        target_file = event_files
     write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory,
                      events_filename=target_file)
 
