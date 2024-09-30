@@ -22,6 +22,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     :return:
     """
     event_times, event_labels, _, event_file = get_event_times(data_directory, rescale=False, extension=extension)
+    print(event_file)
     event_times_sec, _, _, _ = get_event_times(data_directory, rescale=True, extension=extension)
     if len(event_times) == 0:
         source_epoch = pd.DataFrame(np.array([[], [], []]).T, columns=['time', 'duration', 'label'])
@@ -250,7 +251,9 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
     if len(event_files) > 1:
         print('Multiple Events Files, we will go through the separate datasets one at a time')
         for event_file in event_files:
+            print(event_file)
             ext = event_file[-6:]
+            print(ext)
             reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=ext)
             photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                     events_filename=event_file)
