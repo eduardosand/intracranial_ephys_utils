@@ -34,9 +34,10 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     file_root, _ = os.path.splitext(event_file)
     annotations_file = f'{subject}_{session}_{task}_{file_root}.csv'
     if annotations_file in os.listdir(annotations_directory):
-        print('Annotations File exists, double check')
+        print('Annotations File exists, so nothing was written. Double check to see if it matches expectation.')
     else:
         source_epoch.to_csv(annotations_directory / annotations_file, index=False)
+    return event_file
 
 
 def photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
