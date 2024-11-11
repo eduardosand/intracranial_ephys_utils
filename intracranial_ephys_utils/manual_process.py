@@ -21,9 +21,10 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     :param extension: str optional.
     :return:
     """
-    event_times, event_labels, _, event_file = get_event_times(data_directory, rescale=False, extension=extension)
+    event_times, event_labels, global_start, event_file = get_event_times(data_directory, rescale=False, extension=extension)
     print(event_file)
     print(event_times)
+    print(global_start)
     event_times_sec, _, _, _ = get_event_times(data_directory, rescale=True, extension=extension)
     print(event_times_sec)
     print('Time of events above.')

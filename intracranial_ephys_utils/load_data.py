@@ -50,11 +50,11 @@ def get_event_times(folder, rescale=True, extension=None):
     Looks at just the events file for a Neuralynx data directory to get timestamps(default is seconds) and labels
     for recording events
     :param folder: string path
-    :param rescale: optional(default True). Rescale timestamps to seconds from start of the file. Set to false for
+    :param rescale: optional(default True). Rescale timestamps to seconds from start of the file. Set as false
     to get machine time.
     :param extension: optional(default None). In case there are multiple files, use extension to prespecify
     the right events file by just taking the last 6 characters of the file name.
-    :return: event_times : I think this is in seconds from start if rescale=True,
+    :return: event_times : this is in seconds from start if rescale=True,
     or in seconds in machine time if rescale=False.
     :return: event_labels : Whatever the annotation was for each event.
     :return: global_start : Machine code time beginning of recording(seconds) (only return if rescale=False)
