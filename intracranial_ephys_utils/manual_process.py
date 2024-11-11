@@ -195,10 +195,10 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
 
 
 def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory,
-                     events_filename=None):
+                     events_filename):
     """
-    Looks in event folders for labels. Elicits user input to determine which labels are relevant for spike sorting
-    to constrain looking at only task-relevant data. User can input -1 if the whole datastream should be spike sorted.
+    Looks in event folders for labels. Takse labels and converts them to machine time and places into a .txt file useful
+    for spike sorting.
     :param subject: (string) Subject identifier
     :param session: (string) Session identifier (1 if subject only completed one run of the experiment.
     :param task: (string) Task identifier. The task or experiment subject completed.
@@ -208,22 +208,15 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     :param events_filename: optional. If multiple events
     :return: None. A txt file is generated with relative timestamps if needed, or not if not needed.
     """
-    if events_filename is None:
-        file_root = 'events'
-        labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_events.csv')
-    else:
-        file_root, _ = os.path.splitext(events_filename)
-        labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv')
+    file_root, _ = os.path.splitext(events_filename)
+    labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv')
     task_label = labels_file[labels_file.label == f"{task} duration"]
-    print(task_label['time'].iloc[0])
+    if len(task_label) == 0:
+        raise ValueError('No label found for task. Please re-run script to find task relevant data.')
     start_time_sec = task_label['time'].iloc[0].astype(float)
     end_time_sec = start_time_sec + task_label['duration'].iloc[0].astype(float)
 
-    # this exists in case there are multiple events file, and we want to pick the right one
-    if events_filename is None:
-        ext = None
-    else:
-        ext = events_filename[-6:]
+    ext = events_filename[-6:]
     _, _, global_start, _ = get_event_times(event_folder, rescale=False, extension=ext)
     # microsec_sec = 10**-6
     sec_microsec = 10**6
