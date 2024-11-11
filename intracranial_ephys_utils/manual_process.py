@@ -241,7 +241,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
     ends up in spike_sorting folder alongside 'raw' folder that contains microwire .ncs files
     """
     # double check if there are multiple events files
-    _, _, global_start, event_files = get_event_times(data_directory, rescale=False)
+    _, _, global_start, event_files = get_event_times(data_directory)
 
     # separate pipelines for one vs multiple events files
     if len(event_files) > 1 and type(event_files) == type([]):
