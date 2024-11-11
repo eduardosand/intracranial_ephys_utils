@@ -245,17 +245,20 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
     :param task: (str). Task identifier. The task the subject ran.
     :param data_directory: (Path). Path object to data where events file and photodiode file lives
     :param annotations_directory: (Path). Path object that points to where we'd like to store annotations and metadata.
-    :param results_directory: (Path). Path object that points to where the timestampInclude.txt file will end up.
+    :param results_directory: (Path). Path object that points to where the timestampInclude.txt file will end up. Ideally
+    ends up in spike_sorting folder alongside 'raw' folder that contains microwire .ncs files
     """
     # double check if there are multiple events files
     _, _, global_start, event_files = get_event_times(data_directory, rescale=False)
+
+    # separate pipelines for one vs multiple events files
     if len(event_files) > 1 and type(event_files) == type([]):
         print('Multiple Events Files, we will go through the separate datasets one at a time')
         print(event_files)
         for event_file in event_files:
-            print(event_file)
+            print(f'Loading event file: {event_file}')
             ext = event_file[-6:]
-            print(ext)
+            # print(ext)
             reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=ext)
             photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                     events_filename=event_file)
@@ -266,8 +269,10 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
                 continue
             else:
                 target_file = event_file
+                print(f'You have determined that {event_file} has task relevant data')
                 break
     else:
+        print('One Event File, loading now')
         reformat_event_labels(subject, session, task, data_directory, annotations_directory)
         photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
                                 events_filename=event_files)
@@ -275,6 +280,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
         labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv')
         task_label = labels_file[labels_file.label == f"{task} duration"]
         target_file = event_files
+    print('Writing machine time timestamps for the task to spike_sorting folder')
     write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory,
                      events_filename=target_file)
 
