@@ -1,0 +1,21 @@
+[
+project
+]
+name = "intracranial_ephys_utils"
+version = "0.0.1"
+description = "This is a simple package of functions that could be used in the situation where you have neuralynx data"
+authors = [
+    {name = "Eduardo Sandoval", email = "esandoval@berkeley.edu"},
+]
+requires-python = ">=3.11.3"
+dynamic = ["dependencies"]
+
+[
+tool.setuptools.dynamic
+]
+dependencies = {file = ["requirements.txt"]}
+
+[
+tool.setuptools
+]
+packages = ["intracranial_ephys_utils"]

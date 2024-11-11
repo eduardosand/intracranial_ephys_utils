@@ -1,2 +1,26 @@
 /.idea/
 .idea
+.vscode/
+*.swp
+*.swo
+.DS_Store
+/intracranial_ephys_utils.egg-info
+/generate_clean_requirements.py
+
+# Python build artifacts
+*.py[cod]
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+bin/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
