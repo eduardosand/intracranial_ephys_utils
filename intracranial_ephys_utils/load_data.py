@@ -41,7 +41,7 @@ def read_file(file_path):
     :return: reader
     """
     stems = os.path.split(file_path)
-    reader = NeuralynxRawIO(dirname=stems[0], filename=stems[1])
+    reader = NeuralynxRawIO(dirname=stems[0], include_filenames=stems[1])
     return reader
 
 

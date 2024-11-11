@@ -25,6 +25,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     print(event_file)
     print(event_times)
     print(global_start)
+    print(event_times*10**-6-global_start)
     event_times_sec, _, _, _ = get_event_times(data_directory, rescale=True, extension=extension)
     print(event_times_sec)
     print('Time of events above.')
