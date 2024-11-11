@@ -24,7 +24,6 @@ def get_file_info(directory, start, file_extension):
     :return: first file path that matches (if there's multiple, oh no)
     """
     files_list = os.listdir(directory)
-    print(files_list)
     files = [file_path for file_path in files_list if file_path.endswith(file_extension) and
              file_path.startswith(start)]
 
@@ -45,17 +44,15 @@ def read_file(file_path):
     return reader
 
 
-def get_event_times(folder, rescale=True, extension=None):
+def get_event_times(folder, extension=None):
     """
     Looks at just the events file for a Neuralynx data directory to get timestamps(default is seconds) and labels
     for recording events
     :param folder: string path
-    :param rescale: optional(default True). Rescale timestamps to seconds from start of the file. Set as false
-    to get machine time.
     :param extension: optional(default None). In case there are multiple files, use extension to prespecify
     the right events file by just taking the last 6 characters of the file name.
-    :return: event_times : this is in seconds from start if rescale=True,
-    or in seconds in machine time if rescale=False.
+    :return: event_times : machine time in microseconds. To convert this to seconds relative to recording start, convert
+    to seconds and subtract from global_start
     :return: event_labels : Whatever the annotation was for each event.
     :return: global_start : Machine code time beginning of recording(seconds) (only return if rescale=False)
     :return: event_file : File name for events file (useful in case there are two events files)
@@ -87,22 +84,14 @@ def get_event_times(folder, rescale=True, extension=None):
         # global_start = event_reader.global_t_start
         events_file = events_file[0]
         try:
-            event_timestamps, _, event_labels = event_reader.get_event_timestamps()
+            event_times, _, event_labels = event_reader.get_event_timestamps()
         except IndexError:
             warnings.warn("No events found")
-            event_timestamps, event_labels = [], []
+            event_times, event_labels = [], []
             ph_path = get_file_info(folder, "photo", ".ncs")
             ph_reader = read_file(ph_path)
             ph_reader.parse_header()
             global_start = ph_reader.global_t_start
-        if rescale:
-            if len(event_timestamps) > 0:
-                event_times = event_reader.rescale_event_timestamp(event_timestamps)
-            else:
-                event_times = np.array([])
-            global_start = None
-        else:
-            event_times = event_timestamps
     return event_times, event_labels, global_start, events_file
 
 
