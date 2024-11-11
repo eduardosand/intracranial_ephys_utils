@@ -280,9 +280,13 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
         labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv')
         task_label = labels_file[labels_file.label == f"{task} duration"]
         target_file = event_files
-    print('Writing machine time timestamps for the task to spike_sorting folder')
-    write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory,
-                     events_filename=target_file)
+
+    try:
+        print('Writing machine time timestamps for the task to spike_sorting folder')
+        write_timestamps(subject, session, task, data_directory, annotations_directory, results_directory,
+                         events_filename=target_file)
+    except NameError:
+        raise NameError("No events file seems to have been made. Maybe you didn't add a task event?")
 
 
 def get_annotated_task_start_time(subject, session, task, annotations_directory):
