@@ -1,12 +1,8 @@
-[
-build-system
-]
+[build-system]
 requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[
-project
-]
+[project]
 name = "intracranial_ephys_utils"
 version = "0.0.1"
 description = "This is a simple package of functions that could be used in the situation where you have neuralynx data"
@@ -16,12 +12,8 @@ authors = [
 requires-python = ">=3.11.3"
 dynamic = ["dependencies"]
 
-[
-tool.setuptools.dynamic
-]
+[tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
-[
-tool.setuptools
-]
+[tool.setuptools]
 packages = ["intracranial_ephys_utils"]
