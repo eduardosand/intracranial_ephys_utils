@@ -21,7 +21,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     :param extension: str optional.
     :return:
     """
-    event_times, event_labels, global_start, event_file = get_event_times(data_directory, rescale=False, extension=extension)
+    event_times, event_labels, global_start, event_file = get_event_times(data_directory, extension=extension)
     event_times_sec = event_times*10**-6-global_start
     if len(event_times) == 0:
         source_epoch = pd.DataFrame(np.array([[], [], []]).T, columns=['time', 'duration', 'label'])
@@ -213,7 +213,7 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     end_time_sec = start_time_sec + task_label['duration'].iloc[0].astype(float)
 
     ext = events_filename[-6:]
-    _, _, global_start, _ = get_event_times(event_folder, rescale=False, extension=ext)
+    _, _, global_start, _ = get_event_times(event_folder, extension=ext)
     # microsec_sec = 10**-6
     sec_microsec = 10**6
     start_time_machine = (start_time_sec + global_start) * sec_microsec
