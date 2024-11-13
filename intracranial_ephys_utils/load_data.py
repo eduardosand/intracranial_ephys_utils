@@ -81,7 +81,7 @@ def get_event_times(folder, extension=None):
         ph_reader = read_file(ph_path)
         ph_reader.parse_header()
         global_start = ph_reader.global_t_start
-        # global_start = event_reader.global_t_start
+        # global_start_event_reader = event_reader.global_t_start
         events_file = events_file[0]
         try:
             event_times, _, event_labels = event_reader.get_event_timestamps()
