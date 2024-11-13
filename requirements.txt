@@ -12,7 +12,7 @@ h5py==3.11.0
 lazy_loader==0.4
 mkl-service==2.4.1
 mne==1.7.0
-neo==0.13.1
+neo>=0.13.3
 nibabel==5.2.1
 numexpr==2.10.0
 ply==3.11
@@ -25,9 +25,6 @@ QtPy==2.4.1
 quantities==0.15.0
 requests==2.31.0
 scooby==0.10.0
-torch==2.2.2
-torchaudio==2.2.2
-torchvision==0.17.2
 tqdm==4.66.4
 urllib3==2.2.1
 vtk==9.3.1
