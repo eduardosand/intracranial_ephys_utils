@@ -161,8 +161,7 @@ def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='l
     ncs_reader = read_file(file_path)
     ncs_reader.parse_header()
     n_segments = ncs_reader._nb_segment
-    print(ncs_reader)
-    sampling_rate = ncs_reader.get_signal_sampling_rate(stream_index=0)
+    sampling_rate = ncs_reader.get_signal_sampling_rate()
 
     # This loop is to get around files that have weird events files, or task wasn't in the annotation
     if task is not None:
