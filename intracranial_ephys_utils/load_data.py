@@ -62,7 +62,11 @@ def get_event_times(folder, extension=None):
     if extension is None:
         events_file = [file_path for file_path in all_files if file_path.startswith('Events')]
     else:
-        events_file = [file_path for file_path in all_files if (file_path.startswith('Events') and file_path.endswith(extension))]
+        events_file = [file_path for file_path in all_files if (file_path.startswith('Events') and
+                                                                file_path.endswith(extension))]
+        lfp_extension = extension.replace('.nev', '.ncs')
+        photo_file = [file_path for file_path in all_files if (file_path.startswith('photo') and
+                                                               file_path.endswith(lfp_extension))]
     if len(events_file) > 1:
         warnings.warn("More than one event file found.")
         event_times, event_labels, global_start = None, None, None
@@ -77,8 +81,7 @@ def get_event_times(folder, extension=None):
     else:
         event_reader = read_file(os.path.join(folder, events_file[0]))
         event_reader.parse_header()
-        ph_path = get_file_info(folder, "photo", ".ncs")
-        ph_reader = read_file(ph_path)
+        ph_reader = read_file(os.path.join(folder, events_file[0]))
         ph_reader.parse_header()
         global_start = ph_reader.global_t_start
         # global_start_event_reader = event_reader.global_t_start
