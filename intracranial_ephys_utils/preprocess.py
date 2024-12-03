@@ -1,3 +1,5 @@
+from scipy.signal import resample
+
 from .load_data import read_task_ncs
 from scipy import signal
 import numpy as np
@@ -437,6 +439,31 @@ def save_as_npy(subject, session, task_name, data_directory, events_file, electr
                 bp = str(int(sample_rate))
                 np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_{ncs_filename}_{bp}'),
                          dataset=dataset, electrode_name=ncs_filename, fs=sample_rate, timestamps=timestamps)
+    elif electrode_selection == "photodiode":
+        electrode_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs')
+                           and file_path.startswith('photo') or file_path.startswith('Photo')]
+        electrode_files.sort()
+        eff_fs = []
+        electrode_names = []
+        print(electrode_files)
+        for ind, micro_file_path in enumerate(electrode_files):
+            print(micro_file_path)
+            split_tup = os.path.splitext(micro_file_path)
+            ncs_filename = split_tup[0]
+            lfp_signal, sample_rate, interp, timestamps = read_task_ncs(data_directory, micro_file_path,
+                                                                        task=task_name,
+                                                                        events_file=events_file)
+            dataset = lfp_signal
+            bp = str(int(sample_rate))
+            np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_{ncs_filename}_{bp}'),
+                dataset=dataset, electrode_name=ncs_filename, fs=sample_rate, timestamps=timestamps)
+            # for debug purposes, also save a version of this file at 32KHz
+            og_len = len(lfp_signal) / sample_rate
+            (lfp_signal_upsampled, timestamps_upsampled) = resample(lfp_signal, int(og_len*32000), timestamps)
+            dataset_upsampled = lfp_signal_upsampled
+            bp_up = 32000
+            np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_{ncs_filename}_{bp}'),
+                dataset=dataset_upsampled, electrode_name=ncs_filename, fs=bp_up, timestamps=timestamps_upsampled)
     elif electrode_selection == "macrocontact":
         raise NotImplementedError
         ########### TO DO
