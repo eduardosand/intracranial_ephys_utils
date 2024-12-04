@@ -462,7 +462,7 @@ def save_as_npy(subject, session, task_name, data_directory, events_file, electr
             (lfp_signal_upsampled, timestamps_upsampled) = resample(lfp_signal, int(og_len*32000), timestamps)
             dataset_upsampled = lfp_signal_upsampled
             bp_up = 32000
-            np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_{ncs_filename}_{bp}'),
+            np.savez(os.path.join(results_directory, f'{subject}_{session}_{task_name}_{ncs_filename}_{bp_up}'),
                 dataset=dataset_upsampled, electrode_name=ncs_filename, fs=bp_up, timestamps=timestamps_upsampled)
     elif electrode_selection == "macrocontact":
         raise NotImplementedError
