@@ -68,13 +68,13 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     if ext is not None and ext != '.ncs':
         warnings.warn(f"Most likely multiple photodiode files, picking {ext} now")
         ph_files = [file_path for file_path in all_files_list if file_path.endswith(ext) and
-                    (file_path.startswith('photo1') or file_path.startswith('Photo'))]
+                    (file_path.startswith('photo1') or file_path.startswith('Photo') or file_path.startswith('PH_Diode'))]
     else:
         ph_files = [file_path for file_path in all_files_list if file_path.endswith('.ncs') and
-                    (file_path.startswith('photo1') or file_path.startswith('Photo'))]
+                    (file_path.startswith('photo1') or file_path.startswith('Photo') or file_path.startswith('PH_Diode'))]
         if len(ph_files) > 1:
             warnings.warn("Multiple photodiode files picking the base one now")
-            ph_files = [file for file in ph_files if (file.endswith('photo1.ncs') or file.endswith('photo.ncs'))]
+            ph_files = [file for file in ph_files if (file.endswith('photo1.ncs') or file.endswith('photo.ncs') or file.startswith('PH_Diode'))]
     assert len(ph_files) == 1
     ph_filename = ph_files[0]
 
