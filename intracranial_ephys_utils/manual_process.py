@@ -7,6 +7,7 @@ from .plot_data import diagnostic_time_series_plot
 from .preprocess import binarize_ph
 import os
 import pandas as pd
+from pathlib import Path
 
 
 def reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=None):
@@ -140,13 +141,55 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
     win.show()
     app.exec()
 
+def photodiode_event_check_viewer(subject, session, task, dataset, labels, sampling_rate, annotations_directory):
+    """
+    This code will plot the ph_signal, the binarized signal and the computed event onsets and offsets
+    with the goal of getting the types of events properly annotated.
+    :param dataset: (np.array)
+    :parma labels: (np.array) - label associated with dataset
+    :param sampling_rate: (float)
+    :param event_onsets: (np.array)
+    :param event_offsets: (np.array)
+    :param annotations_directory: (Path object)
+    :return: .csv file
+    """
+    t_start = 0 # change and make an argument if needed
+    app = mkQApp()
+
+    # Create main window that can contain several viewers
+    win = MainViewer(debug=True, show_auto_scale=True)
+
+    # Create a viewer for signal
+    # T_start essentially rereferences the start time of the dataset, but leaves the annotations alone
+    # be wary of this
+    view1 = TraceViewer.from_numpy(dataset, sampling_rate, t_start, 'Photodiode Signals', channel_names=labels)
+
+    # TO DO
+    # Figure out a better way to scale the different signals when presented
+    # view1.params['scale_mode'] = 'same_for_all'
+    view1.auto_scale()
+    win.add_view(view1)
+
+    # annotation file details
+    possible_labels = ['block start', 'trial start', 'feedback', 'event']
+    events_filename = annotations_directory / f'{subject}_{session}_{task}_ph_events.csv'
+
+    source_epoch = CsvEpochSource(events_filename, possible_labels)
+
+    # create a viewer for the encoder itself
+    view2 = EpochEncoder(source=source_epoch, name='Tagging events')
+    win.add_view(view2)
+
+    # show main window and run Qapp
+    win.show()
+    app.exec()
+
 
 def data_clean_viewer(subject, session, task, annotations_directory, electrode_names, dataset, fs):
     """
-    This function serves to look at the microwire signals and look at which is the reference or to look at the
+    This function serves to look at lfp signals and look at which is the reference or to look at the
     macrowires and clean the data for epileptic activity
-    Current: Only microwire functionality so far
-    Assumes dataset
+    Current: Only array functionality, so data should be hard loaded as an array for this function to work
     :param subject: (string) subject id
     :param session: (string) session id
     :param task: (string) task id
