@@ -1,5 +1,5 @@
 from scipy.signal import resample
-
+from scipy.stats import iqr
 from .load_data import read_task_ncs
 from scipy import signal
 import numpy as np
@@ -42,8 +42,8 @@ def otsu_threshold(time_series):
     return otsu_threshold
 
 
-def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau=None):
-    '''
+def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau=None, event_threshold=1.7):
+    """
     Binarizes the photodiode signal using the midpoint of the signal. Use local midpoints if given a tau.
     New version of this script uses a high pass filter and then peaks to find timepoints at which the signal changes by
     a lot and fast. We then try to find the exact timepoints when this happens by localizing runs where the high pass
@@ -56,16 +56,27 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
     turning off or on)
     :param task_time: This is how long the task took (in minutes). Helpful to zoom in on particular data regions (float)
     :return: ph_signal_bin: Array of event_lengths in seconds, to be plotted with the rts (array of floats)
-    '''
+    """
+
     if task_time is not None:
         total_time = int(task_time*sampling_rate*60)
     else:
         total_time = ph_signal.shape[0]
+
     ph_signal_bin = np.zeros((total_time, ))
+
+    # step 1. quick detrend to remove slow drift
+    detrended = signal.detrend(ph_signal)
+
+    # step 2: baseline estimation
+    baseline = np.percentile(detrended, 15)
+
+    # trying out different approaches to filtering
     # 15 hz for ir95
     sos = signal.butter(4, 15, 'hp', fs=sampling_rate, output='sos')
     filtered = signal.sosfiltfilt(sos, ph_signal)
     stdev = np.std(filtered)
+
     # The idea with this method of processing, slightly more complicated than midpoint
     # is to take points significantly far away from 4 * stdeviations of the high passed signal
     # Then sequentially take pre and post averages to dictate signs. If sign is positive, then the value after this
@@ -73,99 +84,95 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
 
     # ph_signal = filtered
     timepoints = np.arange(ph_signal.shape[0])
-    if tau is not None:
-        tau_samples = tau*sampling_rate
-        partitions = (total_time // tau_samples) + 1
-        print('huh')
-        # Okay so calculating a rolling midpoint for even a 10 minute segment will take forever with
-        # a sampling rate of several thoughsand
-        midpoint = np.array([[(max(ph_signal[i*int(tau_samples):int(tau_samples)*(i+1)])-
-                     min(ph_signal[i*int(tau_samples):int(tau_samples)*(i+1)]))/cutoff_fraction+
-                    min(ph_signal[i*int(tau_samples):int(tau_samples)*(i+1)])]*int(tau_samples)
-                    for i in range(int(partitions))]).flatten()
-        midpoint = midpoint[0:total_time]
-        ph_signal_bin[ph_signal[0:total_time] > midpoint] = 1.
+
+    # issue with this method of detecting events is that
+    # with IR95 session 3, had to use 4 std dev
+    # for IR94 session 1, signal is feeble, need to use a different thing
+    events = timepoints[abs(filtered) > event_threshold * stdev]
+    print(len(events))
+    buffer = 0.02*sampling_rate
+    sample_size = int(0.045*sampling_rate)
+    event_breakpoint = 0
+    event_onsets_initial = []
+    event_offsets_initial = []
+
+    sign_changes = []
+    for i, sample_num in enumerate(events):
+        # deal with multiple events and looping
+        if sample_num <= event_breakpoint:
+            continue
+        nearby_occurrences = events[(events < sample_num + buffer) & (events > sample_num - buffer)]
+        num_events = len(nearby_occurrences)
+        if num_events > 1:
+            avg_sample_num = int(np.median(nearby_occurrences))
+            event_breakpoint = np.max(nearby_occurrences)
+            max_sample_num = int(np.max(nearby_occurrences))
+            min_sample_num = int(np.min(nearby_occurrences))
+            # if max_sample_num - min_sample_num > sample_size:
+            sign_change = (np.average(ph_signal[max_sample_num:min(len(ph_signal)-1,max_sample_num+sample_size)]) -
+                       np.average(ph_signal[max(0, min_sample_num-sample_size):min_sample_num]))
+        else:
+            avg_sample_num = nearby_occurrences[0]
+            sign_change = (np.average(ph_signal[avg_sample_num:min(len(ph_signal)-1, avg_sample_num+sample_size)]) -
+                           np.average(ph_signal[max(0, avg_sample_num-sample_size):avg_sample_num]))
+        # print(sign_change)
+        # plt.plot(ph_signal[avg_sample_num-sample_size:avg_sample_num+sample_size])
+        # plt.show()
+        if sign_change > 0:
+            # positive, event_onset
+            event_onsets_initial.append([avg_sample_num, abs(sign_change)])
+        else:
+            event_offsets_initial.append([avg_sample_num, abs(sign_change)])
+        sign_changes.append(abs(sign_change))
+
+    print(len(sign_changes))
+    plt.hist(sign_changes)
+    # drop_ind only works in cases where there is a clear separation, however it the signal is smeared, it no longer
+    # works
+    # drop_ind = np.argmax(np.diff(np.sort(sign_changes)))
+    sign_change_drop = otsu_threshold(sign_changes)
+    # sign_change_drop = np.sort(sign_changes)[drop_ind+1]
+    event_onsets = np.array(event_onsets_initial)
+    event_offsets = np.array(event_offsets_initial)
+    event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop, 0]
+    event_offsets = event_offsets[event_offsets[:,1] > sign_change_drop, 0]
+    plt.title(f'Histogram of sign changes: Threshold {sign_change_drop}')
+    plt.show()
+    print('Initial passthrough events')
+    print(len(event_onsets))
+    print(len(event_offsets))
+    # okay so we have some events for onsets and offsets, the next step is to make these times more precise.
+    # for each onset, and offset we will fit a radioactive decay with step function to get the precise time that
+    # the transition step started, which should make our estimates much more robust.
+
+
+    # Now we have all onsets and offsets, recreate our binarized signals using this
+    # first check that these are the same length, and that the first event_onset is first
+    if (len(event_onsets) == len(event_offsets)) and (event_onsets[0] < event_offsets[0]):
+        print('Events detected are the same size and make sense')
+        print(len(event_onsets))
+    elif len(event_onsets) != len(event_offsets):
+        print('On events and off events do not have the same size')
     else:
-        # issue with this function in low signal regime
-        # with IR95 session 3, had to use 4 std dev
-        # for IR94 session 1, signal is feeble, need to use a different thing
-        events = timepoints[abs(filtered) > 1.7 * stdev]
-        print(len(events))
-        buffer = 0.02*sampling_rate
-        sample_size = int(0.045*sampling_rate)
-        event_breakpoint = 0
-        event_onsets_initial = []
-        event_offsets_initial = []
-
-        sign_changes = []
-        for i, sample_num in enumerate(events):
-            # deal with multiple events and looping
-            if sample_num <= event_breakpoint:
-                continue
-            nearby_occurrences = events[(events < sample_num + buffer) & (events > sample_num - buffer)]
-            num_events = len(nearby_occurrences)
-            if num_events > 1:
-                avg_sample_num = int(np.median(nearby_occurrences))
-                event_breakpoint = np.max(nearby_occurrences)
-                max_sample_num = int(np.max(nearby_occurrences))
-                min_sample_num = int(np.min(nearby_occurrences))
-                # if max_sample_num - min_sample_num > sample_size:
-                sign_change = (np.average(ph_signal[max_sample_num:min(len(ph_signal)-1,max_sample_num+sample_size)]) -
-                           np.average(ph_signal[max(0, min_sample_num-sample_size):min_sample_num]))
-            else:
-                avg_sample_num = nearby_occurrences[0]
-                sign_change = (np.average(ph_signal[avg_sample_num:min(len(ph_signal)-1, avg_sample_num+sample_size)]) -
-                               np.average(ph_signal[max(0, avg_sample_num-sample_size):avg_sample_num]))
-            # print(sign_change)
-            # plt.plot(ph_signal[avg_sample_num-sample_size:avg_sample_num+sample_size])
-            # plt.show()
-            if sign_change > 0:
-                # positive, event_onset
-                event_onsets_initial.append([avg_sample_num, abs(sign_change)])
-            else:
-                event_offsets_initial.append([avg_sample_num, abs(sign_change)])
-            sign_changes.append(abs(sign_change))
-
-        print(len(sign_changes))
-        plt.hist(sign_changes)
-        plt.title('Histogram of sign changes')
-        # drop_ind only works in cases where there is a clear separation, however it the signal is smeared, it no longer
-        # works
-        # drop_ind = np.argmax(np.diff(np.sort(sign_changes)))
-        sign_change_drop = otsu_threshold(sign_changes)
-        # sign_change_drop = np.sort(sign_changes)[drop_ind+1]
-        event_onsets = np.array(event_onsets_initial)
-        event_offsets = np.array(event_offsets_initial)
-        event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop, 0]
-        event_offsets = event_offsets[event_offsets[:,1] > sign_change_drop, 0]
-        plt.show()
-        # Now we have all onsets and offsets, recreate our binarized signals using this
-        # first check that these are the same length, and that the first event_onset is first
-        if (len(event_onsets) == len(event_offsets)) and (event_onsets[0] < event_offsets[0]):
-            print('Events detected are the same size and make sense')
-            print(len(event_onsets))
-        elif len(event_onsets) != len(event_offsets):
-            print('On events and off events do not have the same size')
-        else:
-            print('Issue with start or stop, check manual timestamping')
-        if len(event_onsets) > len(event_offsets):
-            for i, event_onset in enumerate(event_onsets):
-                possible_offsets = event_offsets[event_offsets>event_onset]
-                best_offset = np.min(possible_offsets)
-                ph_signal_bin[int(event_onset): int(best_offset)] = 1.
-        elif len(event_onsets) < len(event_offsets):
-            for i, event_offset in enumerate(event_offsets):
-                possible_onsets = event_onsets[event_onsets<event_offset]
-                best_onset = np.max(possible_onsets)
-                ph_signal_bin[int(best_onset): int(event_offset)] = 1.
-        else:
-            for i, event_onset in enumerate(event_onsets):
-                possible_offsets = event_offsets[event_offsets>event_onset]
-                best_offset = np.min(possible_offsets)
-                ph_signal_bin[int(event_onset): int(best_offset)] = 1.
-        # midpoint = ((max(ph_signal[0:total_time])-min(ph_signal[0:total_time]))/cutoff_fraction+
-        #             min(ph_signal[0:total_time]))
-        # ph_signal_bin[ph_signal[0:total_time] > midpoint] = 1.
+        print('Issue with start or stop, check manual timestamping')
+    if len(event_onsets) > len(event_offsets):
+        for i, event_onset in enumerate(event_onsets):
+            possible_offsets = event_offsets[event_offsets>event_onset]
+            best_offset = np.min(possible_offsets)
+            ph_signal_bin[int(event_onset): int(best_offset)] = 1.
+    elif len(event_onsets) < len(event_offsets):
+        for i, event_offset in enumerate(event_offsets):
+            possible_onsets = event_onsets[event_onsets<event_offset]
+            best_onset = np.max(possible_onsets)
+            ph_signal_bin[int(best_onset): int(event_offset)] = 1.
+    else:
+        for i, event_onset in enumerate(event_onsets):
+            possible_offsets = event_offsets[event_offsets>event_onset]
+            best_offset = np.min(possible_offsets)
+            ph_signal_bin[int(event_onset): int(best_offset)] = 1.
+    # midpoint = ((max(ph_signal[0:total_time])-min(ph_signal[0:total_time]))/cutoff_fraction+
+    #             min(ph_signal[0:total_time]))
+    # ph_signal_bin[ph_signal[0:total_time] > midpoint] = 1.
     return ph_signal_bin
 
 
