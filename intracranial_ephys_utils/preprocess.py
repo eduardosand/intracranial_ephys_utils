@@ -42,7 +42,7 @@ def otsu_threshold(time_series):
     return otsu_threshold
 
 
-def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau=None, event_threshold=1.7):
+def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
     """
     Binarizes the photodiode signal using the midpoint of the signal. Use local midpoints if given a tau.
     New version of this script uses a high pass filter and then peaks to find timepoints at which the signal changes by
@@ -50,6 +50,7 @@ def binarize_ph(ph_signal, sampling_rate, cutoff_fraction=2, task_time=None, tau
     filter result is away from 0. We find the change in average signal before and after these timepoints to get a
     a sense of whether it's an event onset or offset. Finally, we assume we'll find some noise so we threshold these
     onsets and offsets by the point of greatest difference in changes (heuristic for Otsu threshold)
+    :param event_threshold:
     :param ph_signal: This is the photodiode signal itself (array of floats)
     :param sampling_rate: How many samples per second (float)
     :param cutoff_fraction: What is the cutoff for on times. 2 is the midpoint (midpoint through the process of
