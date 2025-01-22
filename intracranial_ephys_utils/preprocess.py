@@ -84,13 +84,18 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
     plt.hist(detrended_ph)
     plt.title(f'Detrended Photodiode signal distribution')
     plt.show()
+
+    detrended_minmaxnorm_ph = detrended_ph - np.min(detrended_ph) / (np.max(detrended_ph)- np.min(detrended_ph))
+    plt.hist(detrended_minmaxnorm_ph)
+    plt.title(f'Detrended and minmax ph signal distribution')
+    plt.show()
     # step 2: baseline estimation
     baseline = np.percentile(detrended_ph, 15)
 
     # trying out different approaches to filtering
     # 15 hz for ir95
     sos = signal.butter(4, 15, 'hp', fs=sampling_rate, output='sos')
-    filtered = signal.sosfiltfilt(sos, detrended_ph)
+    filtered = signal.sosfiltfilt(sos, detrended_minmaxnorm_ph)
     stdev = np.std(filtered)
     ph_max = np.max(filtered)
     ph_min = np.min(filtered)
@@ -126,12 +131,12 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
             max_sample_num = int(np.max(nearby_occurrences))
             min_sample_num = int(np.min(nearby_occurrences))
             # if max_sample_num - min_sample_num > sample_size:
-            sign_change = (np.average(detrended_ph[max_sample_num:min(len(ph_signal)-1,max_sample_num+sample_size)]) -
-                       np.average(detrended_ph[max(0, min_sample_num-sample_size):min_sample_num]))
+            sign_change = (np.average(detrended_minmaxnorm_ph[max_sample_num:min(len(detrended_minmaxnorm_ph)-1,max_sample_num+sample_size)]) -
+                       np.average(detrended_minmaxnorm_ph[max(0, min_sample_num-sample_size):min_sample_num]))
         else:
             avg_sample_num = nearby_occurrences[0]
-            sign_change = (np.average(detrended_ph[avg_sample_num:min(len(ph_signal)-1, avg_sample_num+sample_size)]) -
-                           np.average(detrended_ph[max(0, avg_sample_num-sample_size):avg_sample_num]))
+            sign_change = (np.average(detrended_minmaxnorm_ph[avg_sample_num:min(len(detrended_minmaxnorm_ph)-1, avg_sample_num+sample_size)]) -
+                           np.average(detrended_minmaxnorm_ph[max(0, avg_sample_num-sample_size):avg_sample_num]))
         # print(sign_change)
         # plt.plot(ph_signal[avg_sample_num-sample_size:avg_sample_num+sample_size])
         # plt.show()
@@ -166,8 +171,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
     # for now take 75 msec before and after each event as our window
     event_onset = event_onsets[0]
     start_idx = int(max(0, event_onset - event_window_samples))
-    end_idx = int(min(len(detrended_ph), event_onset + event_window_samples))
-    segment_to_fit = detrended_ph[start_idx:end_idx]
+    end_idx = int(min(len(detrended_minmaxnorm_ph), event_onset + event_window_samples))
+    segment_to_fit = detrended_minmaxnorm_ph[start_idx:end_idx]
     times = (np.arange(len(segment_to_fit)) + start_idx) / sampling_rate
     print(times)
 
@@ -175,7 +180,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
     ph_inf = np.max(segment_to_fit)
     amplitude = ph_inf - np.min(segment_to_fit)
     tau = (times[-1] - times[0]) / 5  # Guess tau as 1/5 of window
-    t_0 = times[1]
+    t_0 = times[int(len(times)/2)]
     initial_guess = (t_0, amplitude, ph_inf, tau)
 
     popt, _ = optimize.curve_fit(decay_step_model,
