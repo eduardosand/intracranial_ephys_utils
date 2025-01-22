@@ -80,15 +80,17 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
     ph_signal_bin = np.zeros((total_time, ))
 
     # step 1. quick detrend to remove slow drift
-    detrended = signal.detrend(ph_signal)
-
+    detrended_ph = signal.detrend(ph_signal)
+    plt.hist(detrended_ph)
+    plt.title(f'Detrended Photodiode signal distribution')
+    plt.show()
     # step 2: baseline estimation
-    baseline = np.percentile(detrended, 15)
+    baseline = np.percentile(detrended_ph, 15)
 
     # trying out different approaches to filtering
     # 15 hz for ir95
     sos = signal.butter(4, 15, 'hp', fs=sampling_rate, output='sos')
-    filtered = signal.sosfiltfilt(sos, detrended)
+    filtered = signal.sosfiltfilt(sos, detrended_ph)
     stdev = np.std(filtered)
     ph_max = np.max(filtered)
     ph_min = np.min(filtered)
@@ -124,12 +126,12 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
             max_sample_num = int(np.max(nearby_occurrences))
             min_sample_num = int(np.min(nearby_occurrences))
             # if max_sample_num - min_sample_num > sample_size:
-            sign_change = (np.average(ph_signal[max_sample_num:min(len(ph_signal)-1,max_sample_num+sample_size)]) -
-                       np.average(ph_signal[max(0, min_sample_num-sample_size):min_sample_num]))
+            sign_change = (np.average(detrended_ph[max_sample_num:min(len(ph_signal)-1,max_sample_num+sample_size)]) -
+                       np.average(detrended_ph[max(0, min_sample_num-sample_size):min_sample_num]))
         else:
             avg_sample_num = nearby_occurrences[0]
-            sign_change = (np.average(ph_signal[avg_sample_num:min(len(ph_signal)-1, avg_sample_num+sample_size)]) -
-                           np.average(ph_signal[max(0, avg_sample_num-sample_size):avg_sample_num]))
+            sign_change = (np.average(detrended_ph[avg_sample_num:min(len(ph_signal)-1, avg_sample_num+sample_size)]) -
+                           np.average(detrended_ph[max(0, avg_sample_num-sample_size):avg_sample_num]))
         # print(sign_change)
         # plt.plot(ph_signal[avg_sample_num-sample_size:avg_sample_num+sample_size])
         # plt.show()
@@ -164,8 +166,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
     # for now take 75 msec before and after each event as our window
     event_onset = event_onsets[0]
     start_idx = int(max(0, event_onset - event_window_samples))
-    end_idx = int(min(len(ph_signal), event_onset + event_window_samples))
-    segment_to_fit = ph_signal[start_idx:end_idx]
+    end_idx = int(min(len(detrended_ph), event_onset + event_window_samples))
+    segment_to_fit = detrended_ph[start_idx:end_idx]
     times = np.arange(len(segment_to_fit)) / sampling_rate + start_idx
 
     # we want to make this flexible to on or off transitions, but for now we'll focus on on transitions
