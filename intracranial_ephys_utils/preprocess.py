@@ -152,7 +152,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
         num_events = len(nearby_occurrences)
         if num_events > 1:
             avg_sample_num = int(np.median(nearby_occurrences))
-            event_breakpoint = np.max(nearby_occurrences)
+            event_breakpoint = np.max(nearby_occurrences) + buffer
             max_sample_num = int(np.max(nearby_occurrences))
             min_sample_num = int(np.min(nearby_occurrences))
             # if max_sample_num - min_sample_num > sample_size:
