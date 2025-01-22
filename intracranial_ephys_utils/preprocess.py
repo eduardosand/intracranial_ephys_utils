@@ -206,7 +206,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, d
         # we fit the response function, but we only really need the start time
         better_event_onsets.append(popt[0])
 
-    evnet_onsets[0] = better_event_onsets[0]
+    event_onsets[0] = better_event_onsets[0]
     for i , event_offset in enumerate(event_offsets):
         start_idx = int(max(0, event_offset - event_window_samples))
         end_idx = int(min(len(detrended_minmaxnorm_ph), event_offset + event_window_samples))
@@ -219,6 +219,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, d
         # we fit the response function, but we only really need the start time
         better_event_offsets.append(popt[0])
 
+    event_offsets[0] = better_event_offsets[0]
     print(len(better_event_onsets))
     print(len(better_event_offsets))
 
