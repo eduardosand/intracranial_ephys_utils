@@ -83,7 +83,7 @@ def fitting_ph_response(segment_to_fit, times, debug=False):
     return popt
 
 
-def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, debug=True):
+def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, debug=True):
     """
     Binarizes the photodiode signal using the midpoint of the signal. Use local midpoints if given a tau.
     New version of this script uses a high pass filter and then peaks to find timepoints at which the signal changes by
@@ -113,9 +113,10 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, d
         plt.show()
 
     detrended_minmaxnorm_ph = (detrended_ph - np.min(detrended_ph)) / (np.max(detrended_ph)- np.min(detrended_ph))
-    plt.hist(detrended_minmaxnorm_ph)
-    plt.title(f'Detrended and minmax ph signal distribution')
-    plt.show()
+    if debug:
+        plt.hist(detrended_minmaxnorm_ph)
+        plt.title(f'Detrended and minmax ph signal distribution')
+        plt.show()
     # step 2: baseline estimation
     # baseline = np.percentile(detrended_ph, 15)
 
@@ -172,8 +173,6 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, d
             event_offsets_initial.append([avg_sample_num, abs(sign_change)])
         sign_changes.append(abs(sign_change))
 
-    print(len(sign_changes))
-    plt.hist(sign_changes)
     # drop_ind only works in cases where there is a clear separation, however it the signal is smeared, it no longer
     # works
     # drop_ind = np.argmax(np.diff(np.sort(sign_changes)))
@@ -183,11 +182,14 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, d
     event_offsets = np.array(event_offsets_initial)
     event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop, 0]
     event_offsets = event_offsets[event_offsets[:,1] > sign_change_drop, 0]
-    plt.title(f'Histogram of sign changes: Threshold {sign_change_drop}')
-    plt.show()
+    if debug:
+        plt.hist(sign_changes)
+        plt.title(f'Histogram of sign changes: Threshold {sign_change_drop}')
+        plt.show()
     print('Initial passthrough events')
     print(len(event_onsets))
     print(len(event_offsets))
+    print([np.diff(event_onsets)<sample_size])
     # okay so we have some events for onsets and offsets, the next step is to make these times more precise.
     # for each onset, and offset we will fit a radioactive decay with step function to get the precise time that
     # the transition step started, which should make our estimates much more robust.
@@ -204,11 +206,10 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, d
         # print(times)
         popt = fitting_ph_response(segment_to_fit, times)
         print('fitted function')
-        print(popt)
         # we fit the response function, but we only really need the start time
         better_event_onsets.append(popt[0])
 
-    event_onsets[0] = better_event_onsets[0]
+    # event_onsets[0] = better_event_onsets[0]
     for i , event_offset in enumerate(event_offsets):
         start_idx = int(max(0, event_offset - event_window_samples))
         end_idx = int(min(len(detrended_minmaxnorm_ph), event_offset + event_window_samples))
@@ -221,10 +222,12 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, d
         # we fit the response function, but we only really need the start time
         better_event_offsets.append(popt[0])
 
-    event_offsets[0] = better_event_offsets[0]
+    # event_offsets[0] = better_event_offsets[0]
     print(len(better_event_onsets))
     print(len(better_event_offsets))
 
+    event_onsets = better_event_onsets
+    event_offsets = better_event_offsets
     # Now we have all onsets and offsets, recreate our binarized signals using this
     # first check that these are the same length, and that the first event_onset is first
     if (len(event_onsets) == len(event_offsets)) and (event_onsets[0] < event_offsets[0]):
