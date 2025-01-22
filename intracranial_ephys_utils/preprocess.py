@@ -163,8 +163,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
     event_window_samples = 0.075 * sampling_rate
     # for now take 75 msec before and after each event as our window
     event_onset = event_onsets[0]
-    start_idx = max(0, event_onset - event_window_samples)
-    end_idx = min(len(ph_signal), event_onset + event_window_samples)
+    start_idx = int(max(0, event_onset - event_window_samples))
+    end_idx = int(min(len(ph_signal), event_onset + event_window_samples))
     segment_to_fit = ph_signal[start_idx:end_idx]
     times = np.arange(len(segment_to_fit)) / sampling_rate + start_idx
 
