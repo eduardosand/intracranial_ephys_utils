@@ -56,7 +56,7 @@ def decay_step_model(t, t0, initial, ph_inf, tau):
     y[~mask] = initial
     return y
 
-def fitting_ph_response(segment_to_fit, times, debug=False):
+def fitting_ph_response(segment_to_fit, times, debug=True):
     # we want to make this flexible to on or off transitions, but for now we'll focus on on transitions
     ph_inf = np.mean(segment_to_fit[-100:])
     initial = np.mean(segment_to_fit[0:100])
@@ -73,7 +73,6 @@ def fitting_ph_response(segment_to_fit, times, debug=False):
                                  bounds=([times[0], -ph_max, ph_min, 0],
                                          [times[-1], ph_max, ph_max, ph_max])
                                  )
-    print(popt)
     if debug:
         plt.plot(times, segment_to_fit, label='data')
         plt.plot(times, decay_step_model(times, *popt), label='fitted')
@@ -205,7 +204,6 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
         times = (np.arange(len(segment_to_fit)) + start_idx) / sampling_rate
         # print(times)
         popt = fitting_ph_response(segment_to_fit, times)
-        print('fitted function')
         # we fit the response function, but we only really need the start time
         better_event_onsets.append(popt[0])
 
@@ -217,8 +215,6 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
         times = (np.arange(len(segment_to_fit)) + start_idx) / sampling_rate
         # print(times)
         popt = fitting_ph_response(segment_to_fit, times)
-        print('fitted function')
-        print(popt)
         # we fit the response function, but we only really need the start time
         better_event_offsets.append(popt[0])
 
@@ -226,8 +222,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     print(len(better_event_onsets))
     print(len(better_event_offsets))
 
-    event_onsets = better_event_onsets
-    event_offsets = better_event_offsets
+    event_onsets = np.array(better_event_onsets)
+    event_offsets = np.array(better_event_offsets)
     # Now we have all onsets and offsets, recreate our binarized signals using this
     # first check that these are the same length, and that the first event_onset is first
     if (len(event_onsets) == len(event_offsets)) and (event_onsets[0] < event_offsets[0]):
