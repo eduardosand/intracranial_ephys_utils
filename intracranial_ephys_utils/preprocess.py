@@ -171,7 +171,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
         else:
             event_offsets_initial.append([avg_sample_num, abs(sign_change)])
         sign_changes.append(abs(sign_change))
-
+    print(event_onsets_initial[0:2])
     # drop_ind only works in cases where there is a clear separation, however it the signal is smeared, it no longer
     # works
     # drop_ind = np.argmax(np.diff(np.sort(sign_changes)))
