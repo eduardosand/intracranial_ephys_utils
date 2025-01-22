@@ -9,7 +9,7 @@ from scipy import signal
 import matplotlib.pyplot as plt
 import warnings
 import mne
-
+import scipy.optimize as optimize
 
 def otsu_intraclass_variance(time_series, threshold):
     """
@@ -42,19 +42,32 @@ def otsu_threshold(time_series):
     return otsu_threshold
 
 
+def decay_step_model(t, t0, amplitude, ph_inf, tau):
+    """
+    Model a step followed by exponential decay
+    t0: time of step
+    amplitude: size of step
+    baseline: long_run behavior
+    tau: decay time constant
+    """
+    y = np.zeros_like(t, dtype=float)
+    mask = t >= t0
+    y[mask] = amplitude * np.exp(-(t[mask] - t0) / tau) + ph_inf
+    y[~mask] = ph_inf-amplitude
+    return y
+
+
 def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
     """
     Binarizes the photodiode signal using the midpoint of the signal. Use local midpoints if given a tau.
     New version of this script uses a high pass filter and then peaks to find timepoints at which the signal changes by
     a lot and fast. We then try to find the exact timepoints when this happens by localizing runs where the high pass
-    filter result is away from 0. We find the change in average signal before and after these timepoints to get a
+    filter result is away from 0. We find the change in average signal before and after these timepoints to get
     a sense of whether it's an event onset or offset. Finally, we assume we'll find some noise so we threshold these
     onsets and offsets by the point of greatest difference in changes (heuristic for Otsu threshold)
     :param event_threshold:
     :param ph_signal: This is the photodiode signal itself (array of floats)
     :param sampling_rate: How many samples per second (float)
-    :param cutoff_fraction: What is the cutoff for on times. 2 is the midpoint (midpoint through the process of
-    turning off or on)
     :param task_time: This is how long the task took (in minutes). Helpful to zoom in on particular data regions (float)
     :return: ph_signal_bin: Array of event_lengths in seconds, to be plotted with the rts (array of floats)
     """
@@ -75,9 +88,10 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
     # trying out different approaches to filtering
     # 15 hz for ir95
     sos = signal.butter(4, 15, 'hp', fs=sampling_rate, output='sos')
-    filtered = signal.sosfiltfilt(sos, ph_signal)
+    filtered = signal.sosfiltfilt(sos, detrended)
     stdev = np.std(filtered)
-
+    ph_max = np.max(filtered)
+    ph_min = np.min(filtered)
     # The idea with this method of processing, slightly more complicated than midpoint
     # is to take points significantly far away from 4 * stdeviations of the high passed signal
     # Then sequentially take pre and post averages to dictate signs. If sign is positive, then the value after this
@@ -146,6 +160,34 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
     # for each onset, and offset we will fit a radioactive decay with step function to get the precise time that
     # the transition step started, which should make our estimates much more robust.
 
+    event_window_samples = 0.075 * sampling_rate
+    # for now take 75 msec before and after each event as our window
+    event_onset = event_onsets[0]
+    start_idx = max(0, event_onset - event_window_samples)
+    end_idx = min(len(ph_signal), event_onset + event_window_samples)
+    segment_to_fit = ph_signal[start_idx:end_idx]
+    times = np.arange(len(segment_to_fit)) / sampling_rate + start_idx
+
+    # we want to make this flexible to on or off transitions, but for now we'll focus on on transitions
+    ph_inf = np.max(segment_to_fit)
+    amplitude = ph_inf - np.min(segment_to_fit)
+    tau = (times[-1] - times[0]) / 5  # Guess tau as 1/5 of window
+    t_0 = times[1]
+    initial_guess = (t_0, amplitude, ph_inf, tau)
+
+    popt, _ = optimize.curve_fit(decay_step_model,
+        times,
+        segment_to_fit,
+        p0=initial_guess,
+        bounds=([times[0], -ph_max, ph_min, 0],
+                [times[-1], ph_max, ph_max, ph_max])
+    )
+    print('fitted function')
+    print(popt)
+    plt.plot((times, segment_to_fit))
+    plt.plot(decay_step_model(times, *popt))
+    plt.title('First event onset')
+    plt.show()
 
     # Now we have all onsets and offsets, recreate our binarized signals using this
     # first check that these are the same length, and that the first event_onset is first
@@ -171,9 +213,6 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
             possible_offsets = event_offsets[event_offsets>event_onset]
             best_offset = np.min(possible_offsets)
             ph_signal_bin[int(event_onset): int(best_offset)] = 1.
-    # midpoint = ((max(ph_signal[0:total_time])-min(ph_signal[0:total_time]))/cutoff_fraction+
-    #             min(ph_signal[0:total_time]))
-    # ph_signal_bin[ph_signal[0:total_time] > midpoint] = 1.
     return ph_signal_bin
 
 
