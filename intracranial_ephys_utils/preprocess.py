@@ -42,7 +42,7 @@ def otsu_threshold(time_series):
     return otsu_threshold
 
 
-def decay_step_model(t, t0, baseline, ph_inf, tau):
+def decay_step_model(t, t0, initial, ph_inf, tau):
     """
     Model a step followed by exponential decay
     t0: time of step
@@ -52,9 +52,33 @@ def decay_step_model(t, t0, baseline, ph_inf, tau):
     """
     y = np.zeros_like(t, dtype=float)
     mask = t >= t0
-    y[mask] = ph_inf - (ph_inf-baseline) * np.exp(-(t[mask] - t0) / tau)
-    y[~mask] = baseline
+    y[mask] = ph_inf - (ph_inf-initial) * np.exp(-(t[mask] - t0) / tau)
+    y[~mask] = initial
     return y
+
+def fitting_ph_response(segment_to_fit, times):
+    # we want to make this flexible to on or off transitions, but for now we'll focus on on transitions
+    ph_inf = np.mean(segment_to_fit[-100:])
+    initial = np.mean(segment_to_fit[0:100])
+    ph_max = 2*np.max((np.abs(np.max(segment_to_fit),np.abs(np.min(segment_to_fit)))))
+    ph_min = 2*np.min((np.abs(np.max(segment_to_fit),np.abs(np.min(segment_to_fit)))))
+    tau = (times[-1] - times[0]) / 5  # Guess tau as 1/5 of window
+    t_0 = times[int(len(times) / 2)]
+    initial_guess = (t_0, initial, ph_inf, tau)
+    popt, _ = optimize.curve_fit(decay_step_model,
+                                 times,
+                                 segment_to_fit,
+                                 p0=initial_guess,
+                                 bounds=([times[0], -ph_max, ph_min, 0],
+                                         [times[-1], ph_max, ph_max, ph_max])
+                                 )
+    print(popt)
+    plt.plot(times, segment_to_fit, label='data')
+    plt.plot(times, decay_step_model(times, *popt), label='fitted')
+    plt.title('First event onset')
+    plt.legend()
+    plt.show()
+    return popt
 
 
 def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, debug=True):
@@ -98,8 +122,6 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, d
     sos = signal.butter(4, 15, 'hp', fs=sampling_rate, output='sos')
     filtered = signal.sosfiltfilt(sos, detrended_minmaxnorm_ph)
     stdev = np.std(filtered)
-    ph_max = np.max(filtered)
-    ph_min = np.min(filtered)
     # The idea with this method of processing, slightly more complicated than midpoint
     # is to take points significantly far away from 4 * stdeviations of the high passed signal
     # Then sequentially take pre and post averages to dictate signs. If sign is positive, then the value after this
@@ -168,36 +190,37 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, d
     # for each onset, and offset we will fit a radioactive decay with step function to get the precise time that
     # the transition step started, which should make our estimates much more robust.
 
+    better_event_onsets = []
+    better_event_offsets = []
     event_window_samples = 0.075 * sampling_rate
     # for now take 75 msec before and after each event as our window
-    event_onset = event_onsets[0]
-    start_idx = int(max(0, event_onset - event_window_samples))
-    end_idx = int(min(len(detrended_minmaxnorm_ph), event_onset + event_window_samples))
-    segment_to_fit = detrended_minmaxnorm_ph[start_idx:end_idx]
-    times = (np.arange(len(segment_to_fit)) + start_idx) / sampling_rate
-    print(times)
+    for i, event_onset in enumerate(event_onsets):
+        start_idx = int(max(0, event_onset - event_window_samples))
+        end_idx = int(min(len(detrended_minmaxnorm_ph), event_onset + event_window_samples))
+        segment_to_fit = detrended_minmaxnorm_ph[start_idx:end_idx]
+        times = (np.arange(len(segment_to_fit)) + start_idx) / sampling_rate
+        # print(times)
+        popt = fitting_ph_response(segment_to_fit, times)
+        print('fitted function')
+        print(popt)
+        # we fit the response function, but we only really need the start time
+        better_event_onsets.append(popt[0])
 
-    # we want to make this flexible to on or off transitions, but for now we'll focus on on transitions
-    ph_inf = np.max(segment_to_fit)
-    baseline = np.min(segment_to_fit)
-    tau = (times[-1] - times[0]) / 5  # Guess tau as 1/5 of window
-    t_0 = times[int(len(times)/2)]
-    initial_guess = (t_0, baseline, ph_inf, tau)
+    evnet_onsets[0] = better_event_onsets[0]
+    for i , event_offset in enumerate(event_offsets):
+        start_idx = int(max(0, event_offset - event_window_samples))
+        end_idx = int(min(len(detrended_minmaxnorm_ph), event_offset + event_window_samples))
+        segment_to_fit = detrended_minmaxnorm_ph[start_idx:end_idx]
+        times = (np.arange(len(segment_to_fit)) + start_idx) / sampling_rate
+        # print(times)
+        popt = fitting_ph_response(segment_to_fit, times)
+        print('fitted function')
+        print(popt)
+        # we fit the response function, but we only really need the start time
+        better_event_offsets.append(popt[0])
 
-    popt, _ = optimize.curve_fit(decay_step_model,
-        times,
-        segment_to_fit,
-        p0=initial_guess,
-        bounds=([times[0], -ph_max, ph_min, 0],
-                [times[-1], ph_max, ph_max, ph_max])
-    )
-    print('fitted function')
-    print(popt)
-    plt.plot(times, segment_to_fit, label='data')
-    plt.plot(times, decay_step_model(times, *popt), label='fitted')
-    plt.title('First event onset')
-    plt.legend()
-    plt.show()
+    print(len(better_event_onsets))
+    print(len(better_event_offsets))
 
     # Now we have all onsets and offsets, recreate our binarized signals using this
     # first check that these are the same length, and that the first event_onset is first
