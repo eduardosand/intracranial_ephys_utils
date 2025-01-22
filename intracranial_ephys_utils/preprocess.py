@@ -168,7 +168,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
     start_idx = int(max(0, event_onset - event_window_samples))
     end_idx = int(min(len(detrended_ph), event_onset + event_window_samples))
     segment_to_fit = detrended_ph[start_idx:end_idx]
-    times = np.arange(len(segment_to_fit)) / sampling_rate + start_idx
+    times = (np.arange(len(segment_to_fit)) + start_idx) / sampling_rate
+    print(times)
 
     # we want to make this flexible to on or off transitions, but for now we'll focus on on transitions
     ph_inf = np.max(segment_to_fit)
@@ -186,9 +187,10 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
     )
     print('fitted function')
     print(popt)
-    plt.plot((times, segment_to_fit))
-    plt.plot(decay_step_model(times, *popt))
+    plt.plot(times, segment_to_fit, label='data')
+    plt.plot(times, decay_step_model(times, *popt), label='fitted')
     plt.title('First event onset')
+    plt.legend()
     plt.show()
 
     # Now we have all onsets and offsets, recreate our binarized signals using this
