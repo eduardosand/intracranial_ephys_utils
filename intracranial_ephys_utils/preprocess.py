@@ -56,7 +56,7 @@ def decay_step_model(t, t0, initial, ph_inf, tau):
     y[~mask] = initial
     return y
 
-def fitting_ph_response(segment_to_fit, times):
+def fitting_ph_response(segment_to_fit, times, debug=False):
     # we want to make this flexible to on or off transitions, but for now we'll focus on on transitions
     ph_inf = np.mean(segment_to_fit[-100:])
     initial = np.mean(segment_to_fit[0:100])
@@ -73,11 +73,12 @@ def fitting_ph_response(segment_to_fit, times):
                                          [times[-1], ph_max, ph_max, ph_max])
                                  )
     print(popt)
-    plt.plot(times, segment_to_fit, label='data')
-    plt.plot(times, decay_step_model(times, *popt), label='fitted')
-    plt.title('First event onset')
-    plt.legend()
-    plt.show()
+    if debug:
+        plt.plot(times, segment_to_fit, label='data')
+        plt.plot(times, decay_step_model(times, *popt), label='fitted')
+        plt.title('First event onset')
+        plt.legend()
+        plt.show()
     return popt
 
 
