@@ -42,7 +42,7 @@ def otsu_threshold(time_series):
     return otsu_threshold
 
 
-def decay_step_model(t, t0, amplitude, ph_inf, tau):
+def decay_step_model(t, t0, baseline, ph_inf, tau):
     """
     Model a step followed by exponential decay
     t0: time of step
@@ -52,8 +52,8 @@ def decay_step_model(t, t0, amplitude, ph_inf, tau):
     """
     y = np.zeros_like(t, dtype=float)
     mask = t >= t0
-    y[mask] = amplitude * np.exp(-(t[mask] - t0) / tau) + ph_inf
-    y[~mask] = ph_inf-amplitude
+    y[mask] = ph_inf - (ph_inf-baseline) * np.exp(-(t[mask] - t0) / tau)
+    y[~mask] = baseline
     return y
 
 
@@ -91,7 +91,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, d
     plt.title(f'Detrended and minmax ph signal distribution')
     plt.show()
     # step 2: baseline estimation
-    baseline = np.percentile(detrended_ph, 15)
+    # baseline = np.percentile(detrended_ph, 15)
 
     # trying out different approaches to filtering
     # 15 hz for ir95
@@ -179,10 +179,10 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, d
 
     # we want to make this flexible to on or off transitions, but for now we'll focus on on transitions
     ph_inf = np.max(segment_to_fit)
-    amplitude = - (ph_inf - np.min(segment_to_fit))
+    baseline = np.min(segment_to_fit)
     tau = (times[-1] - times[0]) / 5  # Guess tau as 1/5 of window
     t_0 = times[int(len(times)/2)]
-    initial_guess = (t_0, amplitude, ph_inf, tau)
+    initial_guess = (t_0, baseline, ph_inf, tau)
 
     popt, _ = optimize.curve_fit(decay_step_model,
         times,
