@@ -56,7 +56,7 @@ def decay_step_model(t, t0, initial, ph_inf, tau):
     y[~mask] = initial
     return y
 
-def fitting_ph_response(segment_to_fit, times, debug=True):
+def fitting_ph_response(segment_to_fit, times, debug=False):
     # we want to make this flexible to on or off transitions, but for now we'll focus on on transitions
     ph_inf = np.mean(segment_to_fit[-100:])
     initial = np.mean(segment_to_fit[0:100])
@@ -188,8 +188,6 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     print('Initial passthrough events')
     print(len(event_onsets))
     print(len(event_offsets))
-    print([np.diff(event_onsets)<sample_size])
-    print(event_onsets[0:2])
     # okay so we have some events for onsets and offsets, the next step is to make these times more precise.
     # for each onset, and offset we will fit a radioactive decay with step function to get the precise time that
     # the transition step started, which should make our estimates much more robust.
@@ -206,9 +204,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
         # print(times)
         popt = fitting_ph_response(segment_to_fit, times)
         # we fit the response function, but we only really need the start time
-        better_event_onsets.append(popt[0])
+        better_event_onsets.append(int(popt[0]*sampling_rate))
 
-    # event_onsets[0] = better_event_onsets[0]
     for i , event_offset in enumerate(event_offsets):
         start_idx = int(max(0, event_offset - event_window_samples))
         end_idx = int(min(len(detrended_minmaxnorm_ph), event_offset + event_window_samples))
@@ -217,7 +214,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
         # print(times)
         popt = fitting_ph_response(segment_to_fit, times)
         # we fit the response function, but we only really need the start time
-        better_event_offsets.append(popt[0])
+        better_event_offsets.append(int(popt[0]*sampling_rate))
 
     # event_offsets[0] = better_event_offsets[0]
     print(len(better_event_onsets))
@@ -225,7 +222,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
 
     event_onsets = np.array(better_event_onsets)
     event_offsets = np.array(better_event_offsets)
-
+    print(event_onsets[0:2])
+    print(event_offsets[0:2])
 
     # Now we have all onsets and offsets, recreate our binarized signals using this
     # first check that these are the same length, and that the first event_onset is first
