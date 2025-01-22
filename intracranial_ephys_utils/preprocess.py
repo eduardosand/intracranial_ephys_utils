@@ -57,7 +57,7 @@ def decay_step_model(t, t0, amplitude, ph_inf, tau):
     return y
 
 
-def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
+def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7, debug=True):
     """
     Binarizes the photodiode signal using the midpoint of the signal. Use local midpoints if given a tau.
     New version of this script uses a high pass filter and then peaks to find timepoints at which the signal changes by
@@ -81,11 +81,12 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
 
     # step 1. quick detrend to remove slow drift
     detrended_ph = signal.detrend(ph_signal)
-    plt.hist(detrended_ph)
-    plt.title(f'Detrended Photodiode signal distribution')
-    plt.show()
+    if debug:
+        plt.hist(detrended_ph)
+        plt.title(f'Detrended Photodiode signal distribution')
+        plt.show()
 
-    detrended_minmaxnorm_ph = detrended_ph - np.min(detrended_ph) / (np.max(detrended_ph)- np.min(detrended_ph))
+    detrended_minmaxnorm_ph = (detrended_ph - np.min(detrended_ph)) / (np.max(detrended_ph)- np.min(detrended_ph))
     plt.hist(detrended_minmaxnorm_ph)
     plt.title(f'Detrended and minmax ph signal distribution')
     plt.show()
@@ -178,7 +179,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=1.7):
 
     # we want to make this flexible to on or off transitions, but for now we'll focus on on transitions
     ph_inf = np.max(segment_to_fit)
-    amplitude = ph_inf - np.min(segment_to_fit)
+    amplitude = - (ph_inf - np.min(segment_to_fit))
     tau = (times[-1] - times[0]) / 5  # Guess tau as 1/5 of window
     t_0 = times[int(len(times)/2)]
     initial_guess = (t_0, amplitude, ph_inf, tau)
