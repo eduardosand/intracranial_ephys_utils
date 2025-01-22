@@ -189,6 +189,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     print(len(event_onsets))
     print(len(event_offsets))
     print([np.diff(event_onsets)<sample_size])
+    print(event_onsets[0:2])
     # okay so we have some events for onsets and offsets, the next step is to make these times more precise.
     # for each onset, and offset we will fit a radioactive decay with step function to get the precise time that
     # the transition step started, which should make our estimates much more robust.
@@ -224,6 +225,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
 
     event_onsets = np.array(better_event_onsets)
     event_offsets = np.array(better_event_offsets)
+
+
     # Now we have all onsets and offsets, recreate our binarized signals using this
     # first check that these are the same length, and that the first event_onset is first
     if (len(event_onsets) == len(event_offsets)) and (event_onsets[0] < event_offsets[0]):
