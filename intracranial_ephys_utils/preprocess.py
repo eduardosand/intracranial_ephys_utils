@@ -60,8 +60,8 @@ def fitting_ph_response(segment_to_fit, times, debug=False):
     # we want to make this flexible to on or off transitions, but for now we'll focus on on transitions
     ph_inf = np.mean(segment_to_fit[-100:])
     initial = np.mean(segment_to_fit[0:100])
-    ph_max = 2*np.max((np.abs(np.max(segment_to_fit),np.abs(np.min(segment_to_fit)))))
-    ph_min = 2*np.min((np.abs(np.max(segment_to_fit),np.abs(np.min(segment_to_fit)))))
+    ph_max = 2*np.max([np.abs(np.max(segment_to_fit),np.abs(np.min(segment_to_fit)))])
+    ph_min = 2*np.min([np.abs(np.max(segment_to_fit),np.abs(np.min(segment_to_fit)))])
     tau = (times[-1] - times[0]) / 5  # Guess tau as 1/5 of window
     t_0 = times[int(len(times) / 2)]
     initial_guess = (t_0, initial, ph_inf, tau)
