@@ -242,6 +242,9 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
             ph_signal_bin[int(event_onset): int(best_offset)] = 1.
             event_onsets_final.append(event_onset)
             event_offsets_final.append(best_offset)
+
+    event_onsets_final = np.array(event_onsets_final)
+    event_offsets_final = np.array(event_offsets_final)
     return ph_signal_bin, event_onsets_final, event_offsets_final
 
 
