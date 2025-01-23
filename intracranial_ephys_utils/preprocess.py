@@ -66,13 +66,8 @@ def fitting_ph_response(segment_to_fit, times, debug=False):
     tau = (times[-1] - times[0]) / 5  # Guess tau as 1/5 of window
     t_0 = times[int(len(times) / 2)]
     initial_guess = (t_0, initial, ph_inf, tau)
-    popt, _ = optimize.curve_fit(decay_step_model,
-                                 times,
-                                 segment_to_fit,
-                                 p0=initial_guess,
-                                 bounds=([times[0], -ph_max, ph_min, 0],
-                                         [times[-1], ph_max, ph_max, ph_max])
-                                 )
+    popt, _ = optimize.curve_fit(decay_step_model, times, segment_to_fit, p0=initial_guess,
+                                 bounds=([times[0], -ph_max, ph_min, 0], [times[-1], ph_max, ph_max, ph_max]))
     if debug:
         plt.plot(times, segment_to_fit, label='data')
         plt.plot(times, decay_step_model(times, *popt), label='fitted')
@@ -171,12 +166,9 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
         else:
             event_offsets_initial.append([avg_sample_num, abs(sign_change)])
         sign_changes.append(abs(sign_change))
-    print(event_onsets_initial[0:2])
-    # drop_ind only works in cases where there is a clear separation, however it the signal is smeared, it no longer
-    # works
-    # drop_ind = np.argmax(np.diff(np.sort(sign_changes)))
+
+    # find a threshold to use for marking events that depends on the difference in mean signal before or after an event
     sign_change_drop = otsu_threshold(sign_changes)
-    # sign_change_drop = np.sort(sign_changes)[drop_ind+1]
     event_onsets = np.array(event_onsets_initial)
     event_offsets = np.array(event_offsets_initial)
     event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop, 0]
@@ -216,15 +208,10 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
         # we fit the response function, but we only really need the start time
         better_event_offsets.append(int(popt[0]*sampling_rate))
 
-    # event_offsets[0] = better_event_offsets[0]
-    print(len(better_event_onsets))
-    print(len(better_event_offsets))
-
     event_onsets = np.array(better_event_onsets)
     event_offsets = np.array(better_event_offsets)
-    print(event_onsets[0:2])
-    print(event_offsets[0:2])
-
+    event_onsets_final = []
+    event_offsets_final = []
     # Now we have all onsets and offsets, recreate our binarized signals using this
     # first check that these are the same length, and that the first event_onset is first
     if (len(event_onsets) == len(event_offsets)) and (event_onsets[0] < event_offsets[0]):
@@ -239,17 +226,23 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
             possible_offsets = event_offsets[event_offsets>event_onset]
             best_offset = np.min(possible_offsets)
             ph_signal_bin[int(event_onset): int(best_offset)] = 1.
+            event_onsets_final.append(event_onset)
+            event_offsets_final.append(best_offset)
     elif len(event_onsets) < len(event_offsets):
         for i, event_offset in enumerate(event_offsets):
             possible_onsets = event_onsets[event_onsets<event_offset]
             best_onset = np.max(possible_onsets)
             ph_signal_bin[int(best_onset): int(event_offset)] = 1.
+            event_onsets_final.append(best_onset)
+            event_offsets_final.append(event_offset)
     else:
         for i, event_onset in enumerate(event_onsets):
             possible_offsets = event_offsets[event_offsets>event_onset]
             best_offset = np.min(possible_offsets)
             ph_signal_bin[int(event_onset): int(best_offset)] = 1.
-    return ph_signal_bin
+            event_onsets_final.append(event_onset)
+            event_offsets_final.append(best_offset)
+    return ph_signal_bin, event_onsets_final, event_offsets_final
 
 
 def BCI_LFP_processing(lfp_signals, sampling_rate):
