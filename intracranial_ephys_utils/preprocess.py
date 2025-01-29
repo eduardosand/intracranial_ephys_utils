@@ -168,7 +168,21 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
         sign_changes.append(abs(sign_change))
 
     # find a threshold to use for marking events that depends on the difference in mean signal before or after an event
-    sign_change_drop = otsu_threshold(sign_changes)
+    # this depends on having multiple peaks in our resulting distribution, which may not be true, in which case we'll
+    # run into issues
+    # Create a histogram
+    hist, bins = np.histogram(sign_changes)
+
+    # Find peaks
+    peaks, _ = signal.find_peaks(hist)
+    if len(peaks) > 1:
+        print(f'Found {len(peaks)} peaks: Assuming at least bimodal distribution, otsu threshold will select for'
+              f'events')
+        sign_change_drop = otsu_threshold(sign_changes)
+    else:
+        print(f'Data looks clean. Will not run otsu threshold. Instead grabbing all '
+              f'surviving events from bandpass filter past {event_breakpoint} standard deviations from mean.')
+        sign_change_drop = min(sign_changes) - 0.0000001
     event_onsets = np.array(event_onsets_initial)
     event_offsets = np.array(event_offsets_initial)
     event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop, 0]
