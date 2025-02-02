@@ -85,7 +85,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     filter result is away from 0. We find the change in average signal before and after these timepoints to get
     a sense of whether it's an event onset or offset. Finally, we assume we'll find some noise so we threshold these
     onsets and offsets by the point of greatest difference in changes (heuristic for Otsu threshold)
-    :param event_threshold:
+    :param event_threshold: (float) - tells us how many standard deviations away from the mean to look for events after
+    bandpass filtering for events
     :param ph_signal: This is the photodiode signal itself (array of floats)
     :param sampling_rate: How many samples per second (float)
     :param task_time: This is how long the task took (in minutes). Helpful to zoom in on particular data regions (float)
