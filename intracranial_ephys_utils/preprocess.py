@@ -89,7 +89,9 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     :param ph_signal: This is the photodiode signal itself (array of floats)
     :param sampling_rate: How many samples per second (float)
     :param task_time: This is how long the task took (in minutes). Helpful to zoom in on particular data regions (float)
-    :return: ph_signal_bin: Array of event_lengths in seconds, to be plotted with the rts (array of floats)
+    :return: ph_signal_bin: np.array (same length signal as the input) only now the values should only be 1 and 0.
+    :return: event_onsets_final: Array of event onsets - this gives the indices of each run in ph_signal_bin where a series of 1s will start
+    :return: event_offsets_final np.array - same as above but telling the indices of when each run of 1s ends.
     """
 
     if task_time is not None:
