@@ -173,16 +173,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     # Create a histogram
     hist, bins = np.histogram(sign_changes)
 
-    # Find peaks
-    peaks, _ = signal.find_peaks(hist)
-    if len(peaks) > 1:
-        print(f'Found {len(peaks)} peaks: Assuming at least bimodal distribution, otsu threshold will select for'
-              f'events')
-        sign_change_drop = otsu_threshold(sign_changes)
-    else:
-        print(f'Data looks clean. Will not run otsu threshold. Instead grabbing all '
-              f'surviving events from bandpass filter past {event_breakpoint} standard deviations from mean.')
-        sign_change_drop = min(sign_changes) - 0.0000001
+    sign_change_drop = otsu_threshold(sign_changes)
     event_onsets = np.array(event_onsets_initial)
     event_offsets = np.array(event_offsets_initial)
     event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop, 0]
@@ -194,6 +185,11 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     print('Initial passthrough events')
     print(len(event_onsets))
     print(len(event_offsets))
+    if len(event_onsets) < 100 or len(event_offsets) < 100:
+        event_onsets = np.array(event_onsets_initial)
+        event_offsets = np.array(event_offsets_initial)
+        event_onsets = event_onsets[:, 0]
+        event_offsets = event_offsets[:, 0]
     # okay so we have some events for onsets and offsets, the next step is to make these times more precise.
     # for each onset, and offset we will fit a radioactive decay with step function to get the precise time that
     # the transition step started, which should make our estimates much more robust.
