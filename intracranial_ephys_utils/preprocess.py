@@ -188,7 +188,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     print('Initial passthrough events')
     print(len(event_onsets))
     print(len(event_offsets))
-    if len(event_onsets) < 100 or len(event_offsets) < 100:
+    if len(event_onsets) < 250 or len(event_offsets) < 250:
         event_onsets = np.array(event_onsets_initial)
         event_offsets = np.array(event_offsets_initial)
         event_onsets = event_onsets[:, 0]
