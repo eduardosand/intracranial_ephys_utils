@@ -83,7 +83,7 @@ def get_event_times(folder, extension=None):
         event_reader = read_file(os.path.join(folder, events_file))
         event_reader.parse_header()
         ph_file = events_file.replace(".nev", ".ncs")
-        ph_file = ph_file.replace("Events", "photo")
+        ph_file = ph_file.replace("Events", "photo1")
         ph_reader = read_file(os.path.join(folder, ph_file))
         ph_reader.parse_header()
         global_start = ph_reader.global_t_start
