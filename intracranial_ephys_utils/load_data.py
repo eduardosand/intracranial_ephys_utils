@@ -79,13 +79,15 @@ def get_event_times(folder, extension=None):
         global_start = ph_reader.global_t_start
         events_file = None
     else:
-        event_reader = read_file(os.path.join(folder, events_file[0]))
+        events_file = events_file[0]
+        event_reader = read_file(os.path.join(folder, events_file))
         event_reader.parse_header()
-        ph_reader = read_file(os.path.join(folder, events_file[0]))
+        ph_file = events_file.replace(".nev", ".ncs")
+        ph_file = ph_file.replace("Events", "photo")
+        ph_reader = read_file(os.path.join(folder, ph_file))
         ph_reader.parse_header()
         global_start = ph_reader.global_t_start
         # global_start_event_reader = event_reader.global_t_start
-        events_file = events_file[0]
         try:
             event_times, _, event_labels = event_reader.get_event_timestamps()
         except IndexError:

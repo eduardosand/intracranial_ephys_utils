@@ -262,7 +262,7 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     start_time_machine = (start_time_sec + global_start) * sec_microsec
     end_time_machine = (end_time_sec + global_start) * sec_microsec
     timestamps_file = local_data_directory / f"timestampsInclude.txt"
-    specified_file = local_data_directory / f"which_files.txt"
+    specified_file = annotations_directory / f"which_files.txt"
     # generate directory if it doesn't exist
     if not os.path.exists(local_data_directory):
         os.mkdir(local_data_directory)
