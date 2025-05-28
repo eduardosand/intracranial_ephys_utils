@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import warnings
 import mne
 import scipy.optimize as optimize
+from ephyviewer import mkQApp, MainViewer, TraceViewer, CsvEpochSource, EpochEncoder
 
 def otsu_intraclass_variance(time_series, threshold):
     """
@@ -69,10 +70,23 @@ def fitting_ph_response(segment_to_fit, times, debug=False):
     popt, _ = optimize.curve_fit(decay_step_model, times, segment_to_fit, p0=initial_guess,
                                  bounds=([times[0], -ph_max, ph_min, 0], [times[-1], ph_max, ph_max, ph_max]))
     if debug:
-        plt.plot(times, segment_to_fit, label='data')
-        plt.plot(times, decay_step_model(times, *popt), label='fitted')
-        plt.title('First event onset')
-        plt.legend()
+        print(popt)
+        fig, ax = plt.subplots(figsize=(8,4))
+        plt.plot(times, segment_to_fit, label='Min-max Detrended Normalized Photodiode Signal', color="tab:pink")
+        fitted_label = r"$\text{ph}_{0} + \mathbb{1}_{t \geq t_0} \cdot \left[\text{ph}_{\infty} - (\text{ph}_{\infty} - \text{ph}_{0})(e^{-\frac{t-t_0}{\tau}})\right]$"
+        plt.plot(times, decay_step_model(times, *popt), label=fitted_label, color='purple')
+        if popt[2] - popt[1] > 0:
+            event_lock = "onset"
+            plt.title('Fitting event onsets')
+        else:
+            event_lock="offset"
+            plt.title('Fitting event offsets')
+        plt.ylim([min(segment_to_fit)*0.95, max(segment_to_fit)*1.2])
+        plt.legend(loc='upper right')
+        plt.xlabel('Time (s)')
+        plt.ylabel("Normalized Amplitude")
+        plt.tight_layout()
+        plt.savefig(f"{os.pardir}/results/sample_{event_lock}_photodiode_fitting.svg")
         plt.show()
     return popt
 
@@ -179,11 +193,25 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     sign_change_drop = otsu_threshold(sign_changes)
     event_onsets = np.array(event_onsets_initial)
     event_offsets = np.array(event_offsets_initial)
+
+    event_detection_signal = np.zeros(filtered.shape)
+    event_detection_signal[event_onsets[:,0].astype(int)] = 1
+    event_detection_signal[event_offsets[:,0].astype(int)] = -1
+
     event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop, 0]
     event_offsets = event_offsets[event_offsets[:,1] > sign_change_drop, 0]
     if debug:
-        plt.hist(sign_changes)
-        plt.title(f'Histogram of sign changes: Threshold {sign_change_drop}')
+        fig, ax = plt.subplots()
+        ax.hist(sign_changes, bins=100, color="tab:pink")
+        ax.set_title(f'Histogram of sign changes \nThreshold {sign_change_drop}')# Add another vertical line at a specific value using plt.vlines
+        # Force matplotlib to calculate the plot layout
+        plt.draw()
+        ymax = ax.get_ylim()[1]
+        ax.vlines(x=sign_change_drop, ymin=0, ymax=ymax*1.2, color='black', linestyle='dashed', linewidth=1, label='Otsu Threshold')
+        ax.legend()
+        plt.ylim([0, ymax])
+        # plt.tight_layout()
+        plt.savefig(f"{os.pardir}/results/Otsu_thresholding_sample.svg")
         plt.show()
     print('Initial passthrough events')
     print(len(event_onsets))
@@ -202,22 +230,32 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     event_window_samples = 0.075 * sampling_rate
     # for now take 75 msec before and after each event as our window
     for i, event_onset in enumerate(event_onsets):
+        print(i)
         start_idx = int(max(0, event_onset - event_window_samples))
         end_idx = int(min(len(detrended_minmaxnorm_ph), event_onset + event_window_samples))
         segment_to_fit = detrended_minmaxnorm_ph[start_idx:end_idx]
         times = (np.arange(len(segment_to_fit)) + start_idx) / sampling_rate
         # print(times)
-        popt = fitting_ph_response(segment_to_fit, times)
+        if i ==0:
+            debug_2=debug
+        else:
+            debug_2=False
+        popt = fitting_ph_response(segment_to_fit, times, debug=debug_2)
         # we fit the response function, but we only really need the start time
         better_event_onsets.append(int(popt[0]*sampling_rate))
 
     for i , event_offset in enumerate(event_offsets):
+        print(i)
         start_idx = int(max(0, event_offset - event_window_samples))
         end_idx = int(min(len(detrended_minmaxnorm_ph), event_offset + event_window_samples))
         segment_to_fit = detrended_minmaxnorm_ph[start_idx:end_idx]
         times = (np.arange(len(segment_to_fit)) + start_idx) / sampling_rate
         # print(times)
-        popt = fitting_ph_response(segment_to_fit, times)
+        if i ==0:
+            debug_2=debug
+        else:
+            debug_2=False
+        popt = fitting_ph_response(segment_to_fit, times, debug=debug_2)
         # we fit the response function, but we only really need the start time
         better_event_offsets.append(int(popt[0]*sampling_rate))
 
@@ -258,6 +296,38 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
 
     event_onsets_final = np.array(event_onsets_final)
     event_offsets_final = np.array(event_offsets_final)
+
+    if debug:
+        print('huh')
+        # code here to visualize
+
+        app = mkQApp()
+
+        # Create main window that can contain several viewers
+        win = MainViewer(debug=True, show_auto_scale=True)
+
+        dataset = np.vstack((ph_signal, detrended_minmaxnorm_ph, filtered, event_detection_signal,
+                                 event_threshold * stdev*np.ones(filtered.shape), -event_threshold * stdev*np.ones(filtered.shape))).T
+        print(dataset.shape)
+        t_start = 0.
+        labels = ['Raw Photodiode','Min-max + Detrended Photodiode signal', 'Band pass filtered Photodiode signal',
+                  'Events Detected after bubbling procedure', 'std dev', 'std dev 2']
+        # Create a viewer for signal
+        # T_start essentially rereferences the start time of the dataset, but leaves the annotations alone
+        # be wary of this
+        view1 = TraceViewer.from_numpy(dataset, sampling_rate, t_start, 'Photodiode', channel_names=labels)
+
+        # TO DO
+        # Figure out a better way to scale the different signals when presented
+        # view1.params['scale_mode'] = 'same_for_all'
+        view1.auto_scale()
+        win.add_view(view1)
+
+        # show main window and run Qapp
+        win.show()
+        app.exec()
+    print('wait')
+
     return ph_signal_bin, event_onsets_final, event_offsets_final
 
 
