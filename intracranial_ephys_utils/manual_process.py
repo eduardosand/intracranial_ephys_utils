@@ -193,7 +193,7 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
     :param subject: (string) subject id
     :param session: (string) session id
     :param task: (string) task id
-    :param annotations_directory:
+    :param annotations_directory: (Path) path object
     :param electrode_names: (1d array)
     :param dataset: (n_electrodes, n_timepoints)
     :param fs: (int)

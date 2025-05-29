@@ -84,7 +84,14 @@ def get_event_times(folder, extension=None):
         event_reader.parse_header()
         ph_file = events_file.replace(".nev", ".ncs")
         ph_file = ph_file.replace("Events", "photo1")
-        ph_reader = read_file(os.path.join(folder, ph_file))
+        if os.path.exists(os.path.join(folder, ph_file)):
+            ph_reader = read_file(os.path.join(folder, ph_file))
+        else:
+            # pick other file by random
+            file_list = os.listdir(folder)
+            better_file_list = [file for file in file_list if file.endswith('.ncs')]
+            ph_reader = read_file(os.path.join(folder, better_file_list[0]))
+            warnings.warn(f"No photodiode file found. Using {better_file_list[0]}")
         ph_reader.parse_header()
         global_start = ph_reader.global_t_start
         # global_start_event_reader = event_reader.global_t_start
