@@ -513,18 +513,19 @@ def preprocess_dataset(file_paths, neuro_folder_name, low_pass=1000, task=None, 
     return dataset, eff_fs, electrode_names
 
 
-def save_small_dataset(subject, session, task_name, events_file, low_pass=1000):
+def save_small_dataset(subject, session, task_name, events_file, low_pass=1000, data_directory=None):
     """
     Load, process, and savedata.
     :param subject: (string) subject identifier
     :param session: (string) subject session
     :param task_name: (string) task name, used to select only part of entire ncs file, assuming annotations file exists
     :param events_file: (Path) path to where events annotation file is located
-    :param low_pass: (int) specify
+    :param low_pass: (int) specify low pass frequency, usually
+    :param data_directory: (path) specify where data directory is
     :return:
     """
-    # Hopefully your file structure is like mine
-    data_directory = Path(f"{os.pardir}/data/{subject}/{session}/raw")
+    if data_directory is None:
+        data_directory = Path(f"{os.pardir}/data/{subject}/{session}/raw")
     results_directory = data_directory.parent.absolute() / "preprocessed"
     print(results_directory)
     if results_directory.exists():
