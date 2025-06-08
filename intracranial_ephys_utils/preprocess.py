@@ -433,6 +433,7 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, high_freq):
         downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
         effective_fs = sampling_rate / second_factor
     else:
+        print(sampling_rate)
         raise Exception('Invalid sampling rate')
 
     f0 = 60.
