@@ -390,7 +390,7 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, high_freq):
     :return: processed_signals: numpy array shape (1, n_samples)
     :return: effective_fs: (int) Final sampling rate after processing
     """
-    if sampling_rate == 32000:
+    if (sampling_rate > 32000) and (sampling_rate < 33000):
         if high_freq == 1000:
             second_factor = 8
         elif high_freq == 2000:
@@ -433,8 +433,7 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, high_freq):
         downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
         effective_fs = sampling_rate / second_factor
     else:
-        print(sampling_rate)
-        raise Exception('Invalid sampling rate')
+        raise Exception(f'Invalid sampling rate {sampling_rate}')
 
     f0 = 60.
     q = 30.0  # Quality Factor
