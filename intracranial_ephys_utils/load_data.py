@@ -60,7 +60,7 @@ def get_event_times(folder, extension=None):
     # Obtained in seconds and assumes that the start of the file (not necessarily the task) is 0.
     all_files = os.listdir(folder)
     if extension is None:
-        events_file = [file_path for file_path in all_files if file_path.startswith('Events')]
+        events_file = [file_path for file_path in all_files if file_path.startswith('Events') or file_path.endswith('.nev')]
     else:
         events_file = [file_path for file_path in all_files if (file_path.startswith('Events') and
                                                                 file_path.endswith(extension))]
