@@ -59,6 +59,9 @@ def get_event_times(folder, extension=None):
     """
     # Obtained in seconds and assumes that the start of the file (not necessarily the task) is 0.
     all_files = os.listdir(folder)
+
+    # first try to automatically find the Events file. Without extension, look for the .nev file
+    # with extension, look for a specific file, also the photodiode file
     if extension is None:
         events_file = [file_path for file_path in all_files if file_path.startswith('Events') or file_path.endswith('.nev')]
     else:
@@ -92,8 +95,11 @@ def get_event_times(folder, extension=None):
             better_file_list = [file for file in file_list if file.endswith('.ncs')]
             ph_reader = read_file(os.path.join(folder, better_file_list[0]))
             warnings.warn(f"No photodiode file found. Using {better_file_list[0]}")
-        ph_reader.parse_header()
-        global_start = ph_reader.global_t_start
+        try:
+            ph_reader.parse_header()
+            global_start = ph_reader.global_t_start
+        except OSError:
+            warnings.warn("OSError. Inquire further. Previous errors were from a header missing information.")
         # global_start_event_reader = event_reader.global_t_start
         try:
             event_times, _, event_labels = event_reader.get_event_timestamps()

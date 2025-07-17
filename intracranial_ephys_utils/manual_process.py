@@ -244,7 +244,7 @@ def write_timestamps(subject, session, task, event_folder, annotations_directory
     :param annotations_directory: This is the folder where manual annotations are found
     :param event_folder: This is the folder where events live (helpful to get global machine time)
     :param local_data_directory:  This is where the microwire data to be sorted is
-    :param events_filename: optional. If multiple events
+    :param events_filename: If multiple events exist
     :return: None. A txt file is generated with relative timestamps if needed, or not if not needed.
     """
     file_root, _ = os.path.splitext(events_filename)
