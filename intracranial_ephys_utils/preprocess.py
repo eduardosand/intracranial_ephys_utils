@@ -390,7 +390,9 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, high_freq):
     :return: processed_signals: numpy array shape (1, n_samples)
     :return: effective_fs: (int) Final sampling rate after processing
     """
-    if (sampling_rate > 32000) and (sampling_rate < 33000):
+    # realizing now that this first line is tricky, think a little bit more about how this will work
+    # with sigurd's data
+    if (sampling_rate >= 32000) and (sampling_rate < 33000):
         if high_freq == 1000:
             second_factor = 8
         elif high_freq == 2000:
