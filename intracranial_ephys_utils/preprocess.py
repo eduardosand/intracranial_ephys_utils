@@ -403,7 +403,7 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, high_freq):
         effective_fs = sampling_rate/first_factor
         butterworth_bandpass = signal.butter(4, (lowfreq, high_freq), 'bp', fs=effective_fs, output='sos')
         bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, downsampled_signal)
-        # for microLFP, this brings us down to 1 Khz
+        # for microLFP, this brings us down to 1/2 Khz
         downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
         effective_fs /= second_factor
     elif sampling_rate == 8000:
@@ -425,13 +425,27 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, high_freq):
         elif high_freq == 2000:
             second_factor = 2
         else:
-            second_factor = 4
+            raise Exception(f'Figure out better downsampling scheme')
         # first_factor = 1
         butterworth_bandpass = signal.butter(4, (lowfreq, high_freq), 'bp', fs=sampling_rate, output='sos')
         bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, lfp_signals)
         # for macroLFP, this brings us down to 1 Khz
         downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
         effective_fs = sampling_rate / second_factor
+    elif sampling_rate == 2000:
+        if high_freq == 1000:
+            second_factor = 2
+            butterworth_bandpass = signal.butter(4, (lowfreq, high_freq), 'bp', fs=sampling_rate, output='sos')
+            bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, lfp_signals)
+            # for macroLFP, this brings us down to 1 Khz
+            downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
+            effective_fs = sampling_rate / second_factor
+        elif high_freq == 2000:
+            # don't need to do anything
+            downsampled_signal_2 = lfp_signals
+            effective_fs = sampling_rate
+        else:
+            raise Exception(f'Figure out better downsampling scheme')
     else:
         raise Exception(f'Invalid sampling rate {sampling_rate}')
 
