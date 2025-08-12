@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "intracranial_ephys_utils"
-version = "0.0.1"
+version = "0.0.2"
 description = "This is a simple package of functions that could be used in the situation where you have neuralynx data"
 readme = "README.md"
 # what style of license
 license = "MIT"
 # create and ship the license file
-license-files = "LICENSE.txt"
+license-files = ["LICENSE.txt"]
 authors = [
     {name = "Eduardo Sandoval", email = "esandoval@berkeley.edu"},
 ]
