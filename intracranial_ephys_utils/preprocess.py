@@ -58,6 +58,7 @@ def decay_step_model(t, t0, initial, ph_inf, tau):
     return y
 
 def fitting_ph_response(segment_to_fit, times, debug=False):
+    primary_color='mediumblue'
     # we want to make this flexible to on or off transitions, but for now we'll focus on on transitions
     ph_inf = np.mean(segment_to_fit[-100:])
     initial = np.mean(segment_to_fit[0:100])
@@ -74,7 +75,7 @@ def fitting_ph_response(segment_to_fit, times, debug=False):
         fig, ax = plt.subplots(figsize=(8,4))
         plt.plot(times, segment_to_fit, label='Min-max Detrended Normalized Photodiode Signal', color="tab:pink")
         fitted_label = r"$\text{ph}_{0} + \mathbb{1}_{t \geq t_0} \cdot \left[\text{ph}_{\infty} - (\text{ph}_{\infty} - \text{ph}_{0})(e^{-\frac{t-t_0}{\tau}})\right]$"
-        plt.plot(times, decay_step_model(times, *popt), label=fitted_label, color='purple')
+        plt.plot(times, decay_step_model(times, *popt), label=fitted_label, color=primary_color)
         if popt[2] - popt[1] > 0:
             event_lock = "onset"
             plt.title('Fitting event onsets')
@@ -108,7 +109,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     :return: event_onsets_final: Array of event onsets - this gives the indices of each run in ph_signal_bin where a series of 1s will start
     :return: event_offsets_final np.array - same as above but telling the indices of when each run of 1s ends.
     """
-
+    primary_color = "mediumblue"
     if task_time is not None:
         total_time = int(task_time*sampling_rate*60)
     else:
@@ -202,7 +203,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     event_offsets = event_offsets[event_offsets[:,1] > sign_change_drop, 0]
     if debug:
         fig, ax = plt.subplots()
-        ax.hist(sign_changes, bins=100, color="tab:pink")
+        ax.hist(sign_changes, bins=100, color=primary_color)
         ax.set_title(f'Histogram of sign changes \nThreshold {sign_change_drop}')# Add another vertical line at a specific value using plt.vlines
         # Force matplotlib to calculate the plot layout
         plt.draw()
