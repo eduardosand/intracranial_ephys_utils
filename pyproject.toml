@@ -6,7 +6,16 @@ build-backend = "setuptools.build_meta"
 name = "intracranial_ephys_utils"
 version = "0.0.1"
 description = "This is a simple package of functions that could be used in the situation where you have neuralynx data"
+readme = "README.md"
+# what style of license
+license = "MIT"
+# create and ship the license file
+license-files = "LICENSE.txt"
 authors = [
+    {name = "Eduardo Sandoval", email = "esandoval@berkeley.edu"},
+]
+# who is maintaining it now? and how do we contact them?
+maintainers = [
     {name = "Eduardo Sandoval", email = "esandoval@berkeley.edu"},
 ]
 requires-python = ">=3.11.3"
