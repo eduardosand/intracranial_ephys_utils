@@ -21,6 +21,11 @@ maintainers = [
 requires-python = ">=3.11.3"
 dynamic = ["dependencies"]
 
+[project.optional-dependencies]
+docs = [
+    "mkdocs-material",
+]
+
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
