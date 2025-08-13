@@ -25,4 +25,4 @@ jobs:
 
       - name: Deploy docs to GitHub Pages
         if: github.event_name == 'push'
-        run: uv pip install --system | uv pip install ".[docs]" | mkdocs build --strict
+        run: uv pip install --system | uv pip install ".[docs]" | uv pip install mkdocs | mkdocs build --strict
