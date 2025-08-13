@@ -12,7 +12,7 @@ def get_file_info(directory, start, file_extension):
     Look in the directory for files that start and end with something
 
     Args:
-        directory: (Path) object
+        directory (Path):  object
         start: (string) start prefix
         file_extension: (string) end suffix
     Returns:
