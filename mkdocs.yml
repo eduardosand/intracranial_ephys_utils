@@ -1,4 +1,5 @@
 site_name: intracranial_ephys_utils
+docs_dir: docs/
 theme:
   name: material
 
