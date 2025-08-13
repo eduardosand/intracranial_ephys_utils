@@ -8,4 +8,4 @@ plugins:
 
 nav:
   - Intracranial_Ephys_Utils: index.md
-  - reference.md
+  - References: reference.md
