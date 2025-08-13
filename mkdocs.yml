@@ -1,3 +1,6 @@
 site_name: intracranial_ephys_utils
 theme:
   name: material
+
+nav:
+  - Intracranial_Ephys_Utils: index.md
