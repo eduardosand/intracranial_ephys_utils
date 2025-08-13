@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Jun  5 13:10:02 2023
-
-@author: sandoval
-"""
-
 # from neo.io import NeuralynxIO
 from neo.rawio import NeuralynxRawIO
 import numpy as np
@@ -18,10 +10,13 @@ import pandas as pd
 def get_file_info(directory, start, file_extension):
     """
     Look in the directory for files that start and end with something
-    :param directory: (Path) object
-    :param start: (string) start prefix
-    :param file_extension: (string) end suffix
-    :return: first file path that matches (if there's multiple, oh no)
+
+    Args:
+        directory: (Path) object
+        start: (string) start prefix
+        file_extension: (string) end suffix
+    Returns:
+        first file path that matches (if there's multiple, oh no)
     """
     files_list = os.listdir(directory)
     files = [file_path for file_path in files_list if file_path.endswith(file_extension) and
