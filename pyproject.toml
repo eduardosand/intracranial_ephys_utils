@@ -23,7 +23,7 @@ dynamic = ["dependencies"]
 
 [project.optional-dependencies]
 docs = [
-    "mkdocs-material", "mkdocstrings"
+    "mkdocs-material", "mkdocstrings-python"
 ]
 
 [tool.setuptools.dynamic]
