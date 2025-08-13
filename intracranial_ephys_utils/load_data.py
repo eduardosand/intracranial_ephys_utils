@@ -13,8 +13,8 @@ def get_file_info(directory, start, file_extension):
 
     Args:
         directory (Path):  object
-        start: (string) start prefix
-        file_extension: (string) end suffix
+        start (string):  start prefix
+        file_extension (string):  end suffix
     Returns:
         first file path that matches (if there's multiple, oh no)
     """
