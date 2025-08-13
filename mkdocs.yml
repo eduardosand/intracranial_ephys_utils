@@ -3,5 +3,9 @@ docs_dir: docs
 theme:
   name: material
 
+plugins:
+  - mkdocstrings
+
 nav:
   - Intracranial_Ephys_Utils: index.md
+  - reference.md
