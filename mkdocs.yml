@@ -11,7 +11,8 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          members_order: source
+          rendering:
+            members_order: source
   - search
 
 nav:
