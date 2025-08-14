@@ -2,8 +2,10 @@ site_name: intracranial_ephys_utils
 docs_dir: docs
 theme:
   name: material
-  logo: assets/logo_2.png
-  favicon: assets/favicon_2.ico
+  logo: assets/logo_3.png
+  favicon: assets/favicon_3.ico
+  palette:
+    primary: red
 
 plugins:
   - mkdocstrings
