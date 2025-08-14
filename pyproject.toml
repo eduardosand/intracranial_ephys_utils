@@ -25,6 +25,10 @@ dynamic = ["dependencies"]
 docs = [
     "mkdocs-material", "mkdocstrings-python",
 ]
+tests = ["pytest"]
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}

@@ -1,13 +1,12 @@
-# from neo.io import NeuralynxIO
 from neo.rawio import NeuralynxRawIO
 import numpy as np
 import os
 from scipy.interpolate import CubicSpline
 import warnings
 import pandas as pd
+from pathlib import Path
 
-
-def get_file_info(directory, start, file_extension):
+def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
     """
     Look in the directory for files that start and end with something
 
@@ -15,8 +14,13 @@ def get_file_info(directory, start, file_extension):
         directory (Path):  object
         start (string):  start prefix
         file_extension (string):  end suffix
+
     Returns:
-        first file path that matches (if there's multiple, oh no)
+        Path: first file path that matches (if there's multiple, oh no)
+
+    Examples:
+        >>> get_file_info(Path(os.getcwd()), 'L', '.txt') # grab the license from this repo
+        LICENSE.txt
     """
     files_list = os.listdir(directory)
     files = [file_path for file_path in files_list if file_path.endswith(file_extension) and
