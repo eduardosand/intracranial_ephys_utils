@@ -15,6 +15,7 @@ mne==1.7.0
 neo>=0.13.3
 nibabel==5.2.1
 numexpr==2.10.0
+pandas>=2.0.0
 ply==3.11
 pooch==1.8.1
 PyQt5==5.15.10
