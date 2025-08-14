@@ -2,7 +2,7 @@ site_name: intracranial_ephys_utils
 docs_dir: docs
 theme:
   name: material
-  logo: assets/logo_2.jpg
+  logo: assets/logo_2.png
   favicon: assets/favicon_2.ico
 
 plugins:
