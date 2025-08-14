@@ -9,6 +9,7 @@ theme:
 
 plugins:
   - mkdocstrings
+  - search
 
 nav:
   - Intracranial_Ephys_Utils: index.md
