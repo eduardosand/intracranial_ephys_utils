@@ -8,7 +8,12 @@ theme:
     primary: red
 
 plugins:
-  - mkdocstrings
+  - mkdocstrings:
+      handlers:
+        python:
+          selection:
+            members:
+              - source
   - search
 
 nav:
