@@ -20,7 +20,7 @@ def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
 
     Examples:
         >>> get_file_info(Path(os.getcwd()), 'L', '.txt') # grab the license from this repo
-        LICENSE.txt
+        PosixPath('/home/runner/work/intracranial_ephys_utils/intracranial_ephys_utils/LICENSE.txt')
     """
     files_list = os.listdir(directory)
     files = [file_path for file_path in files_list if file_path.endswith(file_extension) and
