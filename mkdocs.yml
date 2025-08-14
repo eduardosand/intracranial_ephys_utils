@@ -3,7 +3,7 @@ docs_dir: docs
 theme:
   name: material
   logo: assets/logo.jpg
-  favicon: assets/logo.jpg
+  favicon: assets/favicon.ico
 
 plugins:
   - mkdocstrings
