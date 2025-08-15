@@ -59,12 +59,11 @@ def get_event_times(folder: str, extension: Optional[str] = None) -> tuple[list,
         extension: optional(default None). If there are multiple .nev file, can specify the desired .nev by the end of the filename
 
     Returns:
-        tuple: A tuple containing:
-            event_times : machine time in microseconds. To convert this to seconds relative to recording start, convert
+        event_times : machine time in microseconds. To convert this to seconds relative to recording start, convert
     to seconds and subtract from global_start
-            event_labels : Whatever the annotation was for each event.
-            global_start : Machine code time beginning of recording(seconds)
-            event_file : File name for events file (useful in case there are two events files)
+        event_labels : Whatever the annotation was for each event.
+        global_start : Machine code time beginning of recording(seconds)
+        event_file : File name for events file (useful in case there are two events files)
     """
     # Obtained in seconds and assumes that the start of the file (not necessarily the task) is 0.
     all_files = os.listdir(folder)
@@ -165,26 +164,31 @@ def missing_samples_check(file_path: Path) -> tuple[list, list, list]:
     return skipped_samples, t_starts, seg_sizes
 
 
-def read_task_ncs(folder_name, file, task=None, events_file=None, interp_type='linear'):
+def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events_file: Optional[Path]=None,
+                  interp_type: Optional[str]='linear') -> tuple[np.array, float, np.array, np.array]:
     """
     Read neuralynx data into an array, with sampling rate, and start time of the task.
     To deal with discontinuities and dropped samples, we take a pragmatic approach. We assume continuous sampling, and
     if there are inconsistencies between the number of samples in segments and the array itself, we fill in samples by
     interpolating.
     Ideally this spits out neuralynx data in the form of an array, with the sampling rate, and the start time of the task
-    :param folder_name: Path object that tells the path of the structure
-    :param file: filename we want to read currently
-    :param task: (string, optional) that matches the event label in the actual events file. Ideally it matches the name
+
+    Args:
+        folder_name: Path object that tells the path of the structure
+        file: filename we want to read currently
+        task: (string, optional) that matches the event label in the actual events file. Ideally it matches the name
     of the task
-    :param events_file: (path, optional) needed if task argument is provided, this used to be the .nev file but I
+        events_file: (path, optional) needed if task argument is provided, this used to be the .nev file but I
     found it useless so now it's a csv file that I generate via the scripts in manual_process
-    :param interp_type: (string, optional) what type of interpolation to do in the case of missing data, choices are
+        interp_type: (string, optional) what type of interpolation to do in the case of missing data, choices are
     linear or cubic, default is linear
-    :return: ncs_signal: ndarray - signal in the file in np array format
-    :return: sampling_rate: sampling rate for signal
-    :return: interp: ndarray - same size as ncs_signal and timestamps, tells you whether data was interpolated in that
+
+    Returns:
+        ncs_signal: ndarray - signal in the file in np array format
+        sampling_rate: sampling rate for signal
+        interp: ndarray - same size as ncs_signal and timestamps, tells you whether data was interpolated in that
     point, useful if finding weird things in data
-    :return: timestamps: an array that gives the timestamps from the ncs file using the start and stop task segments,
+        timestamps: an array that gives the timestamps from the ncs file using the start and stop task segments,
     this is in seconds, from the start of the .ncs file recording
     """
 
