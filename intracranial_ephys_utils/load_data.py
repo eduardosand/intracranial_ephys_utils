@@ -5,6 +5,7 @@ from scipy.interpolate import CubicSpline
 import warnings
 import pandas as pd
 from pathlib import Path
+from typing import Optional, Tuple
 
 def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
     """
