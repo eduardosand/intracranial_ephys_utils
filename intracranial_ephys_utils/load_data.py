@@ -8,7 +8,7 @@ from pathlib import Path
 
 def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
     """
-    Look in the directory for files that start and end with something
+    Look in the directory for files that start and end with something. Raise error if more than one match is found
 
     Args:
         directory (Path):  object
@@ -27,7 +27,7 @@ def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
              file_path.startswith(start)]
 
     if len(files) > 1:
-        print('Multiple files with the same start and end')
+        raise ValueError(f"More than one file matching {start}*{file_extension}, consider a more specific function call.")
     file_path = directory / files[0]
     return file_path
 
@@ -35,8 +35,11 @@ def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
 def read_file(file_path):
     """
     Lazy reader of specific Neuralynx files. Will probably be removed eventually
-    :param file_path:
-    :return: reader
+    Args:
+        file_path (Path):  Absolute path to a neuralynx .ncs file.
+
+    Returns:
+        Reader: neo reader object
     """
     stems = os.path.split(file_path)
     reader = NeuralynxRawIO(dirname=stems[0], include_filenames=stems[1])

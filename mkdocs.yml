@@ -22,3 +22,5 @@ nav:
   - Documentation:
     - 'Loading data': documentation/load_data.md
     - 'Look at data': documentation/manual_process.md
+    - 'Preprocessing data': documentation/preprocess.md
+    - 'Plot data (left over)': documentation/plot_data.md
