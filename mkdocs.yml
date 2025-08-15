@@ -20,5 +20,5 @@ plugins:
 nav:
   - Intracranial_Ephys_Utils: index.md
   - Documentation:
-    - 'Loading data': '/documentation/load_data.md'
-    - 'Look at data': '/documentation/manual_process.md'
+    - 'Loading data': 'documentation/load_data.md'
+    - 'Look at data': 'documentation/manual_process.md'
