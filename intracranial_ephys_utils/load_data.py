@@ -176,18 +176,15 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
     Args:
         folder_name: Path object that tells the path of the structure
         file: filename we want to read currently
-        task: (string, optional) that matches the event label in the actual events file. Ideally it matches the name
-    of the task
-        events_file: (path, optional) needed if task argument is provided, this used to be the .nev file but I
-    found it useless so now it's a csv file that I generate via the scripts in manual_process
+        task: (string, optional) that matches the event label in the actual events file. Ideally it matches the name of the task
+        events_file: (path, optional) needed if task argument is provided, this used to be the .nev file, but I found it useless so now it's a csv file that I generate via the scripts in manual_process
         interp_type: (string, optional) what type of interpolation to do in the case of missing data, choices are
     linear or cubic, default is linear
 
     Returns:
         ncs_signal: ndarray - signal in the file in np array format
         sampling_rate: sampling rate for signal
-        interp: ndarray - same size as ncs_signal and timestamps, tells you whether data was interpolated in that
-    point, useful if finding weird things in data
+        interp: ndarray - same size as ncs_signal and timestamps, tells you whether data was interpolated in that point, useful if finding weird things in data
         timestamps: an array that gives the timestamps from the ncs file using the start and stop task segments,
     this is in seconds, from the start of the .ncs file recording
     """
