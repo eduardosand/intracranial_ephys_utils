@@ -26,6 +26,6 @@ QtPy==2.4.1
 requests==2.31.0
 scooby==0.10.0
 tqdm==4.66.4
-urllib3==2.2.1
+urllib3>=2.2.1
 vtk>=9.3.1
 webencodings==0.5.1

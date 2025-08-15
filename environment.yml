@@ -10,9 +10,5 @@ dependencies:
   - pandas
   - scikit-learn
   - openpyxl
-  - python-neo
   - pip
-  - pip:
-      - ephyviewer
-      - PyQT5
 prefix: /home/eduardo/anaconda3/envs/intracranial_ephys_utils
