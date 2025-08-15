@@ -9,8 +9,8 @@ from typing import Optional, Tuple
 
 def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
     """
-    Look in the directory for files that start and end with something. Raise error if more than one match is found
-    Useful for neuralynx file, where they may be multiple session identifiers.
+    Look in directory for files that start and end with something. Raise error if more than one match is found
+    Useful for neuralynx files where they may be multiple session, and file identifiers.
 
     Args:
         directory (Path):  Path to the directory we want to look through.
@@ -29,6 +29,7 @@ def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
              file_path.startswith(start)]
 
     if len(files) > 1:
+        print(f'Found files: {files}')
         raise ValueError(f"More than one file matching {start}*{file_extension}, consider a more specific function call.")
     file_path = directory / files[0]
     return file_path
@@ -49,13 +50,14 @@ def read_file(file_path: Path) -> NeuralynxRawIO:
     return reader
 
 
-def get_event_times(folder: str, extension: Optional[str] = None) -> tuple[list, list, float, str]:
+def get_event_times(neuralynx_data_directory: Path, extension: Optional[str] = None) -> tuple[list, list, float, str]:
     """
     Looks at just the events file for a Neuralynx data directory to get timestamps(default is seconds) and labels
-    for recording events
+    for recording events. This is useful if researcher of clinician manually annotated events while recording. Keep in
+    mind however, that the events file is sometimes not in accordance with the data itself, due to a referencing issue.
 
     Args:
-        folder (string): Directory of Neuralynx data, that stores at least one .nev file
+        neuralynx_data_directory (Path): Directory of Neuralynx data, that stores at least one .nev file
         extension: optional(default None). If there are multiple .nev file, can specify the desired .nev by the end of the filename
 
     Returns:
@@ -66,42 +68,35 @@ def get_event_times(folder: str, extension: Optional[str] = None) -> tuple[list,
         event_file : File name for events file (useful in case there are two events files)
     """
     # Obtained in seconds and assumes that the start of the file (not necessarily the task) is 0.
-    all_files = os.listdir(folder)
 
-    # first try to automatically find the Events file. Without extension, look for the .nev file
-    # with extension, look for a specific file, also the photodiode file
+    all_files = os.listdir(neuralynx_data_directory)
+
+    # Find the events file, note just the filename, not the full path
     if extension is None:
-        events_file = [file_path for file_path in all_files if file_path.startswith('Events') or file_path.endswith('.nev')]
+        events_files = [file_path for file_path in all_files if file_path.startswith('Events') or file_path.endswith('.nev')]
+        # full_events_filepath = get_file_info(neuralynx_data_directory, 'Events', '.nev')
+        # events_file = full_events_filepath.name
     else:
-        events_file = [file_path for file_path in all_files if (file_path.startswith('Events') and
+        events_files = [file_path for file_path in all_files if (file_path.startswith('Events') and
                                                                 file_path.endswith(extension))]
-        lfp_extension = extension.replace('.nev', '.ncs')
-        photo_file = [file_path for file_path in all_files if (file_path.startswith('photo') and
-                                                               file_path.endswith(lfp_extension))]
-    if len(events_file) > 1:
-        warnings.warn("More than one event file found.")
-        event_times, event_labels, global_start = None, None, None
-    elif len(events_file) == 0:
-        warnings.warn("No events file found, Using Photodiode file to get global machine time start")
-        event_times, event_labels = [], []
-        ph_path = get_file_info(folder, "photo", ".ncs")
-        ph_reader = read_file(ph_path)
-        ph_reader.parse_header()
-        global_start = ph_reader.global_t_start
-        events_file = None
-    else:
-        events_file = events_file[0]
-        event_reader = read_file(os.path.join(folder, events_file))
+        # full_events_filepath = get_file_info(neuralynx_data_directory, 'Events', extension)
+        # events_file = full_events_filepath.name
+
+    if len(events_files) == 1:
+        # with one events file, read in the photodiode file
+        events_file = events_files[0]
+        event_reader = read_file(neuralynx_data_directory / events_file)
         event_reader.parse_header()
+
         ph_file = events_file.replace(".nev", ".ncs")
         ph_file = ph_file.replace("Events", "photo1")
-        if os.path.exists(os.path.join(folder, ph_file)):
-            ph_reader = read_file(os.path.join(folder, ph_file))
+        if os.path.exists(neuralynx_data_directory / ph_file):
+            ph_reader = read_file(neuralynx_data_directory / ph_file)
         else:
             # pick other file by random
-            file_list = os.listdir(folder)
+            file_list = os.listdir(neuralynx_data_directory)
             better_file_list = [file for file in file_list if file.endswith('.ncs')]
-            ph_reader = read_file(os.path.join(folder, better_file_list[0]))
+            ph_reader = read_file(neuralynx_data_directory / better_file_list[0])
             warnings.warn(f"No photodiode file found. Using {better_file_list[0]}")
         try:
             ph_reader.parse_header()
@@ -111,13 +106,27 @@ def get_event_times(folder: str, extension: Optional[str] = None) -> tuple[list,
         # global_start_event_reader = event_reader.global_t_start
         try:
             event_times, _, event_labels = event_reader.get_event_timestamps()
+            if 'global_start' not in locals():
+                global_start = event_times[0]
+                warnings.warn("No files to choose from. Is there neuralynx data in this folder?")
         except IndexError:
             warnings.warn("No events found")
             event_times, event_labels = [], []
-            ph_path = get_file_info(folder, "photo", ".ncs")
+            ph_path = get_file_info(neuralynx_data_directory, "photo", ".ncs")
             ph_reader = read_file(ph_path)
             ph_reader.parse_header()
             global_start = ph_reader.global_t_start
+    elif len(events_files) == 0:
+        warnings.warn("No events file found, Using Photodiode file to get global machine time start")
+        event_times, event_labels = [], []
+        ph_path = get_file_info(neuralynx_data_directory, "photo", ".ncs")
+        ph_reader = read_file(ph_path)
+        ph_reader.parse_header()
+        global_start = ph_reader.global_t_start
+        events_file = None
+    else:
+        print(f'Found files: {events_files}')
+        raise ValueError(f"More than one file matching {events_files}, consider a more specific function call.")
     return event_times, event_labels, global_start, events_file
 
 
@@ -322,6 +331,8 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                     data_x_interp = cs(interp_data_t)
                 elif interp_type == 'linear':
                     data_x_interp = np.interp(interp_data_t, local_data_t, local_data_y)
+                else:
+                    raise NotImplementedError('Interpolation not found.')
 
                 # data fill in
                 ncs_signal[start_index-missing_samples:start_index] = data_x_interp[:missing_samples]
