@@ -38,8 +38,6 @@ def read_file(file_path):
     Args:
         file_path (Path):  Absolute path to a neuralynx .ncs file.
 
-    Returns:
-        neo.NeuralynxRawIO: neo reader object for neuralynx data
     """
     stems = os.path.split(file_path)
     reader = NeuralynxRawIO(dirname=stems[0], include_filenames=stems[1])
