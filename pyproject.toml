@@ -19,7 +19,7 @@ maintainers = [
     {name = "Eduardo Sandoval", email = "esandoval@berkeley.edu"},
 ]
 requires-python = ">=3.11.3"
-dynamic = ["version", "dependencies"]
+dynamic = ["dependencies"]
 
 [project.optional-dependencies]
 docs = [
