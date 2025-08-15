@@ -9,11 +9,12 @@ from pathlib import Path
 def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
     """
     Look in the directory for files that start and end with something. Raise error if more than one match is found
+    Useful for neuralynx file, where they may be multiple session identifiers.
 
     Args:
-        directory (Path):  object
-        start (string):  start prefix
-        file_extension (string):  end suffix
+        directory (Path):  Path to the directory we want to look through.
+        start (string):  start prefix of desired file
+        file_extension (string):  end suffix of desired file
 
     Returns:
         File_path: first file path that matches
@@ -35,6 +36,7 @@ def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
 def read_file(file_path: Path) -> NeuralynxRawIO:
     """
     Lazy reader of specific Neuralynx files. Will probably be removed eventually
+
     Args:
         file_path (Path):  Absolute path to a neuralynx .ncs file.
 
@@ -46,18 +48,22 @@ def read_file(file_path: Path) -> NeuralynxRawIO:
     return reader
 
 
-def get_event_times(folder, extension=None):
+def get_event_times(folder: str, extension: Optional[str] = None) -> Tuple[list, list, float, str]:
     """
     Looks at just the events file for a Neuralynx data directory to get timestamps(default is seconds) and labels
     for recording events
-    :param folder: string path
-    :param extension: optional(default None). In case there are multiple files, use extension to prespecify
+
+    Args:
+        folder: string path
+        extension: optional(default None). In case there are multiple files, use extension to prespecify
     the right events file by just taking the last 6 characters of the file name.
-    :return: event_times : machine time in microseconds. To convert this to seconds relative to recording start, convert
+
+    Returns:
+        event_times : machine time in microseconds. To convert this to seconds relative to recording start, convert
     to seconds and subtract from global_start
-    :return: event_labels : Whatever the annotation was for each event.
-    :return: global_start : Machine code time beginning of recording(seconds) (only return if rescale=False)
-    :return: event_file : File name for events file (useful in case there are two events files)
+        event_labels : Whatever the annotation was for each event.
+        global_start : Machine code time beginning of recording(seconds) (only return if rescale=False)
+        event_file : File name for events file (useful in case there are two events files)
     """
     # Obtained in seconds and assumes that the start of the file (not necessarily the task) is 0.
     all_files = os.listdir(folder)
