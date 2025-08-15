@@ -16,7 +16,7 @@ def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
         file_extension (string):  end suffix
 
     Returns:
-        Path: first file path that matches (if there's multiple, oh no)
+        File_path: first file path that matches
 
     Examples:
         >>> get_file_info(Path(os.getcwd()), 'L', '.txt') # grab the license from this repo
@@ -32,12 +32,14 @@ def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
     return file_path
 
 
-def read_file(file_path):
+def read_file(file_path: Path) -> NeuralynxRawIO:
     """
     Lazy reader of specific Neuralynx files. Will probably be removed eventually
     Args:
         file_path (Path):  Absolute path to a neuralynx .ncs file.
 
+    Returns:
+        reader_object: neo reader object for neuralynx data
     """
     stems = os.path.split(file_path)
     reader = NeuralynxRawIO(dirname=stems[0], include_filenames=stems[1])
