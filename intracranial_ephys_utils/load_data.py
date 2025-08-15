@@ -57,6 +57,7 @@ def get_event_times(folder: str, extension: Optional[str] = None) -> tuple[list,
     Args:
         folder (string): Directory of Neuralynx data, that stores at least one .nev file
         extension: optional(default None). If there are multiple .nev file, can specify the desired .nev by the end of the filename
+
     Returns:
         tuple: A tuple containing:
             event_times : machine time in microseconds. To convert this to seconds relative to recording start, convert
@@ -121,13 +122,17 @@ def get_event_times(folder: str, extension: Optional[str] = None) -> tuple[list,
     return event_times, event_labels, global_start, events_file
 
 
-def missing_samples_check(file_path):
+def missing_samples_check(file_path: Path) -> tuple[list, list, list]:
     """
     This script checks for missing samples in neuralynx files.
-    :param file_path: Path object where data file is.
-    :return: skipped_samples. integer number of skipped samples
-    :return: t_starts. The start times for each segment
-    :return: seg_sizes. The lengths of each Neo segment
+
+    Args:
+        file_path: Path object where data file is.
+
+    Returns:
+        skipped_samples: integer number of skipped samples
+        t_starts: The start times for each segment
+        seg_sizes: The lengths of each Neo segment
     """
     file_reader = read_file(file_path)
     file_reader.parse_header()
