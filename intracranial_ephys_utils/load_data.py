@@ -58,11 +58,12 @@ def get_event_times(folder: str, extension: Optional[str] = None) -> tuple[list,
         folder (string): Directory of Neuralynx data, that stores at least one .nev file
         extension: optional(default None). If there are multiple .nev file, can specify the desired .nev by the end of the filename
     Returns:
-        event_times : machine time in microseconds. To convert this to seconds relative to recording start, convert
+        tuple: A tuple containing:
+            event_times : machine time in microseconds. To convert this to seconds relative to recording start, convert
     to seconds and subtract from global_start
-        event_labels : Whatever the annotation was for each event.
-        global_start : Machine code time beginning of recording(seconds)
-        event_file : File name for events file (useful in case there are two events files)
+            event_labels : Whatever the annotation was for each event.
+            global_start : Machine code time beginning of recording(seconds)
+            event_file : File name for events file (useful in case there are two events files)
     """
     # Obtained in seconds and assumes that the start of the file (not necessarily the task) is 0.
     all_files = os.listdir(folder)
