@@ -6,6 +6,8 @@ theme:
   favicon: assets/favicon_3.ico
   palette:
     primary: red
+  features:
+    - toc.integrate
 
 plugins:
   - mkdocstrings:
@@ -17,4 +19,6 @@ plugins:
 
 nav:
   - Intracranial_Ephys_Utils: index.md
-  - References: reference.md
+  - Documentation:
+    - 'Loading data': 'load_data.md'
+    - 'Look at data': 'manual_process.md'
