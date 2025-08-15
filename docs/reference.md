@@ -1,12 +1,9 @@
 Here is some sample documentation. Let's start with the loading data script.
 
 
+# Data Loading functions
 
+::: intracranial_ephys_utils.load_data
 
-::: intracranial_ephys_utils.load_data.get_file_info
-
-
-
-::: intracranial_ephys_utils.load_data.get_event_times
-
+# Manual Processing tools
 ::: intracranial_ephys_utils.manual_process
