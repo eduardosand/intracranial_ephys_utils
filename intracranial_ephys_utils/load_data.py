@@ -49,21 +49,19 @@ def read_file(file_path: Path) -> NeuralynxRawIO:
     return reader
 
 
-def get_event_times(folder: str, extension: Optional[str] = None) -> Tuple[list, list, float, str]:
+def get_event_times(folder: str, extension: Optional[str] = None) -> tuple[list, list, float, str]:
     """
     Looks at just the events file for a Neuralynx data directory to get timestamps(default is seconds) and labels
     for recording events
 
     Args:
-        folder: string path
-        extension: optional(default None). In case there are multiple files, use extension to prespecify
-    the right events file by just taking the last 6 characters of the file name.
-
+        folder (string): Directory of Neuralynx data, that stores at least one .nev file
+        extension: optional(default None). If there are multiple .nev file, can specify the desired .nev by the end of the filename
     Returns:
         event_times : machine time in microseconds. To convert this to seconds relative to recording start, convert
     to seconds and subtract from global_start
         event_labels : Whatever the annotation was for each event.
-        global_start : Machine code time beginning of recording(seconds) (only return if rescale=False)
+        global_start : Machine code time beginning of recording(seconds)
         event_file : File name for events file (useful in case there are two events files)
     """
     # Obtained in seconds and assumes that the start of the file (not necessarily the task) is 0.
