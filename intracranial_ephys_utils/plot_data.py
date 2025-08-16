@@ -6,14 +6,17 @@ def diagnostic_time_series_plot(lfp_signal, freq, total_time=None, output_folder
                                 subject=None, session=None):
     """
     Plot time series given a sampling rate to check for any weird idiosyncracies in data.
-    :param lfp_signal: (numpy array). The time series signal, ideal n_timepoints x 1.
-    :param freq: (int). The sampling rate of the signal. To get a good estimate of time
-    :param total_time: (float) (optional) Definite positive, used to limit the amount of time visualized.
-    :param output_folder: (Path) (optional) Folder where to keep data.
-    :param electrode_name: (string) (optional) Name of electrode if saving, or want a title
-    :param subject:  (string) (optional) Name of subject if saving
-    :param session: (string) (optional) Name of session if saving
-    :return:
+    Args:
+        lfp_signal: (numpy array). The time series signal, ideal n_timepoints x 1.
+        freq: (int). The sampling rate of the signal. To get a good estimate of time
+        total_time: (float) (optional) Definite positive, used to limit the amount of time visualized.
+        output_folder: (Path) (optional) Folder where to keep data.
+        electrode_name: (string) (optional) Name of electrode if saving, or want a title
+        subject: (string) (optional) Name of subject if saving
+        session: (string) (optional) Name of session if saving
+
+    Returns:
+
     """
     fig2, ax = plt.subplots(4, 1)
 

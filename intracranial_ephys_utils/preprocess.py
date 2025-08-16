@@ -73,7 +73,7 @@ def fitting_ph_response(segment_to_fit, times, debug=False):
     if debug:
         print(popt)
         fig, ax = plt.subplots(figsize=(8,4))
-        plt.plot(times, segment_to_fit, label='Min-max Detrended Normalized Photodiode Signal', color="tab:pink")
+        plt.plot(times, segment_to_fit, label='Min-max Detrended Normalized Photodiode Signal', color='cornflowerblue')
         fitted_label = r"$\text{ph}_{0} + \mathbb{1}_{t \geq t_0} \cdot \left[\text{ph}_{\infty} - (\text{ph}_{\infty} - \text{ph}_{0})(e^{-\frac{t-t_0}{\tau}})\right]$"
         plt.plot(times, decay_step_model(times, *popt), label=fitted_label, color=primary_color)
         if popt[2] - popt[1] > 0:

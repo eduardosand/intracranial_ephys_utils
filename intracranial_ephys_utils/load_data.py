@@ -61,8 +61,7 @@ def get_event_times(neuralynx_data_directory: Path, extension: Optional[str] = N
         extension: optional(default None). If there are multiple .nev file, can specify the desired .nev by the end of the filename
 
     Returns:
-        event_times : machine time in microseconds. To convert this to seconds relative to recording start, convert
-    to seconds and subtract from global_start
+        event_times : machine time in microseconds. To convert this to seconds relative to recording start, convert to seconds and subtract from global_start
         event_labels : Whatever the annotation was for each event.
         global_start : Machine code time beginning of recording(seconds)
         event_file : File name for events file (useful in case there are two events files)
