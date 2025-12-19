@@ -30,7 +30,9 @@ def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
 
     if len(files) > 1:
         print(f'Found files: {files}')
-        raise ValueError(f"More than one file matching {start}*{file_extension}, consider a more specific function call.")
+        warnings.warn(f"More than one file matching {start}*{file_extension}, consider a more specific function call.")
+        return files
+        #raise ValueError(f"More than one file matching {start}*{file_extension}, consider a more specific function call.")
     file_path = directory / files[0]
     return file_path
 
