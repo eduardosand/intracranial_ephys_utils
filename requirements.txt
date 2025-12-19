@@ -5,7 +5,6 @@ Cython==3.0.10
 darkdetect==0.8.0
 ephyviewer==1.7.0
 et-xmlfile==1.1.0
-fooof==1.1.0
 future==1.0.0
 h5io==0.2.4
 h5py>=3.11.0
