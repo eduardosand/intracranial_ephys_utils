@@ -16,13 +16,6 @@ def otsu_intraclass_variance(time_series, threshold):
     """
     Otsu's intra-class variance.
     If all datapoints are above or below the threshold, this will throw a warning that can safely be ignored.
-
-    Args:
-        time_series: (np.array) This is a time series.
-        threshold: (float) This helps with binarizing the signal
-
-    Returns:
-
     """
     return np.nansum(
         [
