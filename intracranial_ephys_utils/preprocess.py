@@ -12,14 +12,14 @@ import mne
 import scipy.optimize as optimize
 from ephyviewer import mkQApp, MainViewer, TraceViewer, CsvEpochSource, EpochEncoder
 
-def otsu_intraclass_variance(time_series, threshold):
+def otsu_intraclass_variance(time_series: np.array, threshold: float):
     """
     Otsu's intra-class variance.
     If all datapoints are above or below the threshold, this will throw a warning that can safely be ignored.
 
     Args:
-        time_series: (np.array) This is a time series.
-        threshold: (float) This helps with binarizing the signal
+        time_series (np.array): needs to be 1D.
+        threshold (float): This helps with binarizing the signal
 
     Returns:
 
@@ -34,13 +34,17 @@ def otsu_intraclass_variance(time_series, threshold):
     # NaNs only arise if the class is empty, in which case the contribution should be zero, which `nansum` accomplishes.
 
 
-def otsu_threshold(time_series):
+def otsu_threshold(time_series: np.array):
     """
     Otsu thresholding. I know it's for an image, but it should get the job done here in this time series signal, since
     it quite literally is two classes with noise. What difference does it make it if the variation in foreground and
     background happen in time than space.
-    :param time_series:
-    :return:
+
+    Args:
+        time_series (np.array): needs to be 1D.
+
+    Returns:
+
     """
     change = np.min(np.abs(np.diff(time_series))[np.nonzero(np.diff(time_series))])
     otsu_threshold = min(np.linspace(np.min(time_series)+5*change,
