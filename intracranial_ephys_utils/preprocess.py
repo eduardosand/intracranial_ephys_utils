@@ -403,7 +403,6 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, high_freq):
     :return: effective_fs: (int) Final sampling rate after processing
     """
     # realizing now that this first line is tricky, think a little bit more about how this will work
-    # with sigurd's data
     if (sampling_rate >= 32000) and (sampling_rate < 33000):
         if high_freq == 1000:
             second_factor = 8
@@ -441,7 +440,8 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, high_freq):
         else:
             raise Exception(f'Figure out better downsampling scheme')
         # first_factor = 1
-        butterworth_bandpass = signal.butter(4, (lowfreq, high_freq), 'bp', fs=sampling_rate, output='sos')
+        bp_freq = 2000
+        butterworth_bandpass = signal.butter(4, (lowfreq, bp_freq), 'bp', fs=sampling_rate, output='sos')
         bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, lfp_signals)
         # for macroLFP, this brings us down to 1 Khz
         downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
