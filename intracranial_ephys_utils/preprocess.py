@@ -440,7 +440,7 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, high_freq):
         else:
             raise Exception(f'Figure out better downsampling scheme')
         # first_factor = 1
-        bp_freq = 2000
+        bp_freq = 1999
         butterworth_bandpass = signal.butter(4, (lowfreq, bp_freq), 'bp', fs=sampling_rate, output='sos')
         bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, lfp_signals)
         # for macroLFP, this brings us down to 1 Khz
