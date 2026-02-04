@@ -52,7 +52,7 @@ def read_file(file_path: Path) -> NeuralynxRawIO:
     return reader
 
 
-def get_event_times(neuralynx_data_directory: Path, extension: Optional[str] = None) -> tuple[list, list, float, str]:
+def get_event_times(neuralynx_data_directory: Path, extension: Optional[str] = None) -> tuple[list, list, float, list]:
     """
     Looks at just the events file for a Neuralynx data directory to get timestamps(default is seconds) and labels
     for recording events. This is useful if researcher of clinician manually annotated events while recording. Keep in
@@ -66,7 +66,7 @@ def get_event_times(neuralynx_data_directory: Path, extension: Optional[str] = N
         event_times : machine time in microseconds. To convert this to seconds relative to recording start, convert to seconds and subtract from global_start
         event_labels : Whatever the annotation was for each event.
         global_start : Machine code time beginning of recording(seconds)
-        event_file : File name for events file (useful in case there are two events files)
+        event_files : File names for events file (useful in case there are two events files)
     """
     # Obtained in seconds and assumes that the start of the file (not necessarily the task) is 0.
 
@@ -117,6 +117,7 @@ def get_event_times(neuralynx_data_directory: Path, extension: Optional[str] = N
             ph_reader = read_file(ph_path)
             ph_reader.parse_header()
             global_start = ph_reader.global_t_start
+        events_files = [events_file]
     elif len(events_files) == 0:
         warnings.warn("No events file found, Using Photodiode file to get global machine time start")
         event_times, event_labels = [], []
@@ -127,8 +128,7 @@ def get_event_times(neuralynx_data_directory: Path, extension: Optional[str] = N
         events_file = None
     else:
         print(f'Found files: {events_files}')
-        raise ValueError(f"More than one file matching {events_files}, consider a more specific function call.")
-    return event_times, event_labels, global_start, events_file
+    return event_times, event_labels, global_start, events_files
 
 
 def missing_samples_check(file_path: Path) -> tuple[list, list, list]:
