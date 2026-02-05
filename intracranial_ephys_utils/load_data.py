@@ -27,11 +27,13 @@ def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
     files_list = os.listdir(directory)
     files = [file_path for file_path in files_list if file_path.endswith(file_extension) and
              file_path.startswith(start)]
-
+    print(files)
+    print(files_list)
     if len(files) > 1:
         print(f'Found files: {files}')
         warnings.warn(f"More than one file matching {start}*{file_extension}, consider a more specific function call.")
-        return files
+        file_path = directory / files[0]
+        return file_path
         #raise ValueError(f"More than one file matching {start}*{file_extension}, consider a more specific function call.")
     file_path = directory / files[0]
     return file_path
