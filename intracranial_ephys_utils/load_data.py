@@ -232,11 +232,17 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                     # and this is looking from below, so overlap is with previous segment
                     task_start_segment_index = max(i - 1, 0)
             elif time_segment_start > task_end:
+                if task_start_search:
+                    task_start_search = False
+                    task_start_segment_index = max(i - 1, 0)
                 # The end isn't as important if we overshoot
                 task_end_segment_index = i-1
                 break
             if i == n_segments-1:
                 task_end_segment_index = n_segments-1
+                if task_start_search:
+                    task_start_search = False
+                    raise ValueError("Task starts after the whole recording? Check timestamps of task and recording.")
     else:
         task_start_segment_index = 0
         task_end_segment_index = n_segments-1
