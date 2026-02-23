@@ -236,7 +236,7 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                     task_start_search = False
                     task_start_segment_index = max(i - 1, 0)
                 # The end isn't as important if we overshoot
-                task_end_segment_index = i-1
+                task_end_segment_index = i - 1
                 break
             if i == n_segments-1:
                 task_end_segment_index = n_segments-1
@@ -252,6 +252,9 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
     # I believe this is in number of seconds till start(if theoretically correct), the problem is that the sampling
     # rate is an average given to us by neuralynx
     print(f'task_start_segment_index: {task_start_segment_index}')
+    print(f'task_end_segment_index: {task_end_segment_index}')
+    print(task_start, task_end)
+    print(i)
     task_start_segment_time = round(ncs_reader.get_signal_t_start(block_index=0,
                                                                   seg_index=task_start_segment_index), 4) # seconds
     # to be precise ignore a certain number of samples from task_start_segment_time
