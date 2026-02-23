@@ -255,6 +255,8 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
     print(f'task_end_segment_index: {task_end_segment_index}')
     print(task_start, task_end)
     print(i)
+    print(ncs_reader.get_signal_t_start(block_index=0, seg_index=0))
+    print(ncs_reader.get_signal_t_start(block_index=0, seg_index=n_segments-1))
     task_start_segment_time = round(ncs_reader.get_signal_t_start(block_index=0,
                                                                   seg_index=task_start_segment_index), 4) # seconds
     # to be precise ignore a certain number of samples from task_start_segment_time
