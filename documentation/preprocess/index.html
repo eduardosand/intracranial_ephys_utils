@@ -1,0 +1,2413 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../manual_process/">
+      
+      
+        <link rel="next" href="../plot_data/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon_3.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Preprocessing data - intracranial_ephys_utils</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#preprocessing-tools" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="intracranial_ephys_utils" class="md-header__button md-logo" aria-label="intracranial_ephys_utils" data-md-component="logo">
+      
+  <img src="../../assets/logo_3.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            intracranial_ephys_utils
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Preprocessing data
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="intracranial_ephys_utils" class="md-nav__button md-logo" aria-label="intracranial_ephys_utils" data-md-component="logo">
+      
+  <img src="../../assets/logo_3.png" alt="logo">
+
+    </a>
+    intracranial_ephys_utils
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intracranial_Ephys_Utils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Documentation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../load_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loading data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../manual_process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Look at data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preprocessing data
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preprocessing data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.preprocess" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        preprocess
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.preprocess.otsu_intraclass_variance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        otsu_intraclass_variance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.preprocess.otsu_threshold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        otsu_threshold
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.preprocess.decay_step_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        decay_step_model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.preprocess.binarize_ph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        binarize_ph
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.preprocess.BCI_LFP_processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BCI_LFP_processing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.preprocess.broadband_seeg_processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        broadband_seeg_processing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.preprocess.preprocess_dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        preprocess_dataset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.preprocess.save_small_dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        save_small_dataset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.preprocess.save_as_npy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        save_as_npy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.preprocess.make_trialwise_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        make_trialwise_data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.preprocess.smooth_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        smooth_data
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plot_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plot data (left over)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="preprocessing-tools">Preprocessing tools</h1>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="intracranial_ephys_utils.preprocess"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.preprocess.otsu_intraclass_variance" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">otsu_intraclass_variance</span><span class="p">(</span><span class="n">time_series</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Otsu's intra-class variance.
+If all datapoints are above or below the threshold, this will throw a warning that can safely be ignored.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>time_series</code>
+            </td>
+            <td>
+                  <code><span title="numpy.array">array</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>needs to be 1D.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>threshold</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>This helps with binarizing the signal</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+        <p>Returns:</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/preprocess.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">otsu_intraclass_variance</span><span class="p">(</span><span class="n">time_series</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Otsu&#39;s intra-class variance.</span>
+<span class="sd">    If all datapoints are above or below the threshold, this will throw a warning that can safely be ignored.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        time_series (np.array): needs to be 1D.</span>
+<span class="sd">        threshold (float): This helps with binarizing the signal</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">time_series</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="c1">#   weight   ·  intra-class variance</span>
+            <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="p">[</span><span class="n">time_series</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">time_series</span> <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">]</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.preprocess.otsu_threshold" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">otsu_threshold</span><span class="p">(</span><span class="n">time_series</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Otsu thresholding. I know it's for an image, but it should get the job done here in this time series signal, since
+it quite literally is two classes with noise. What difference does it make it if the variation in foreground and
+background happen in time than space.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>time_series</code>
+            </td>
+            <td>
+                  <code><span title="numpy.array">array</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>needs to be 1D.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+        <p>Returns:</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/preprocess.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">otsu_threshold</span><span class="p">(</span><span class="n">time_series</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Otsu thresholding. I know it&#39;s for an image, but it should get the job done here in this time series signal, since</span>
+<span class="sd">    it quite literally is two classes with noise. What difference does it make it if the variation in foreground and</span>
+<span class="sd">    background happen in time than space.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        time_series (np.array): needs to be 1D.</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">change</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">time_series</span><span class="p">))[</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">time_series</span><span class="p">))])</span>
+    <span class="n">otsu_threshold</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time_series</span><span class="p">)</span><span class="o">+</span><span class="mi">5</span><span class="o">*</span><span class="n">change</span><span class="p">,</span>
+                                     <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">time_series</span><span class="p">)</span><span class="o">-</span><span class="mi">5</span><span class="o">*</span><span class="n">change</span><span class="p">,</span><span class="mi">100</span><span class="p">),</span>
+        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">th</span><span class="p">:</span> <span class="n">otsu_intraclass_variance</span><span class="p">(</span><span class="n">time_series</span><span class="p">,</span> <span class="n">th</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">otsu_threshold</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.preprocess.decay_step_model" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">decay_step_model</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">ph_inf</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Model a step followed by exponential decay
+t0: time of step
+amplitude: size of step
+baseline: long_run behavior
+tau: decay time constant</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/preprocess.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">decay_step_model</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">ph_inf</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Model a step followed by exponential decay</span>
+<span class="sd">    t0: time of step</span>
+<span class="sd">    amplitude: size of step</span>
+<span class="sd">    baseline: long_run behavior</span>
+<span class="sd">    tau: decay time constant</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t0</span>
+    <span class="n">y</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">ph_inf</span> <span class="o">-</span> <span class="p">(</span><span class="n">ph_inf</span><span class="o">-</span><span class="n">initial</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">/</span> <span class="n">tau</span><span class="p">)</span>
+    <span class="n">y</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial</span>
+    <span class="k">return</span> <span class="n">y</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.preprocess.binarize_ph" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">binarize_ph</span><span class="p">(</span><span class="n">ph_signal</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">task_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Binarizes the photodiode signal using the midpoint of the signal. Use local midpoints if given a tau.
+New version of this script uses a high pass filter and then peaks to find timepoints at which the signal changes by
+a lot and fast. We then try to find the exact timepoints when this happens by localizing runs where the high pass
+filter result is away from 0. We find the change in average signal before and after these timepoints to get
+a sense of whether it's an event onset or offset. Finally, we assume we'll find some noise so we threshold these
+onsets and offsets by the point of greatest difference in changes (heuristic for Otsu threshold)
+:param event_threshold: (float) - tells us how many standard deviations away from the mean to look for events after
+bandpass filtering for events
+:param ph_signal: This is the photodiode signal itself (array of floats)
+:param sampling_rate: How many samples per second (float)
+:param task_time: This is how long the task took (in minutes). Helpful to zoom in on particular data regions (float)
+:return: ph_signal_bin: np.array (same length signal as the input) only now the values should only be 1 and 0.
+:return: event_onsets_final: Array of event onsets - this gives the indices of each run in ph_signal_bin where a series of 1s will start
+:return: event_offsets_final np.array - same as above but telling the indices of when each run of 1s ends.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/preprocess.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">binarize_ph</span><span class="p">(</span><span class="n">ph_signal</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">task_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Binarizes the photodiode signal using the midpoint of the signal. Use local midpoints if given a tau.</span>
+<span class="sd">    New version of this script uses a high pass filter and then peaks to find timepoints at which the signal changes by</span>
+<span class="sd">    a lot and fast. We then try to find the exact timepoints when this happens by localizing runs where the high pass</span>
+<span class="sd">    filter result is away from 0. We find the change in average signal before and after these timepoints to get</span>
+<span class="sd">    a sense of whether it&#39;s an event onset or offset. Finally, we assume we&#39;ll find some noise so we threshold these</span>
+<span class="sd">    onsets and offsets by the point of greatest difference in changes (heuristic for Otsu threshold)</span>
+<span class="sd">    :param event_threshold: (float) - tells us how many standard deviations away from the mean to look for events after</span>
+<span class="sd">    bandpass filtering for events</span>
+<span class="sd">    :param ph_signal: This is the photodiode signal itself (array of floats)</span>
+<span class="sd">    :param sampling_rate: How many samples per second (float)</span>
+<span class="sd">    :param task_time: This is how long the task took (in minutes). Helpful to zoom in on particular data regions (float)</span>
+<span class="sd">    :return: ph_signal_bin: np.array (same length signal as the input) only now the values should only be 1 and 0.</span>
+<span class="sd">    :return: event_onsets_final: Array of event onsets - this gives the indices of each run in ph_signal_bin where a series of 1s will start</span>
+<span class="sd">    :return: event_offsets_final np.array - same as above but telling the indices of when each run of 1s ends.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">primary_color</span> <span class="o">=</span> <span class="s2">&quot;mediumblue&quot;</span>
+    <span class="k">if</span> <span class="n">task_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">total_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">task_time</span><span class="o">*</span><span class="n">sampling_rate</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">total_time</span> <span class="o">=</span> <span class="n">ph_signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">ph_signal_bin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">total_time</span><span class="p">,</span> <span class="p">))</span>
+
+    <span class="c1"># step 1. quick detrend to remove slow drift</span>
+    <span class="n">detrended_ph</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">detrend</span><span class="p">(</span><span class="n">ph_signal</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">detrended_ph</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detrended Photodiode signal distribution&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="n">detrended_minmaxnorm_ph</span> <span class="o">=</span> <span class="p">(</span><span class="n">detrended_ph</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">detrended_ph</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">detrended_ph</span><span class="p">)</span><span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">detrended_ph</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">detrended_minmaxnorm_ph</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detrended and minmax ph signal distribution&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="c1"># step 2: baseline estimation</span>
+    <span class="c1"># baseline = np.percentile(detrended_ph, 15)</span>
+
+    <span class="c1"># trying out different approaches to filtering</span>
+    <span class="c1"># 15 hz for ir95</span>
+    <span class="n">sos</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="s1">&#39;hp&#39;</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;sos&#39;</span><span class="p">)</span>
+    <span class="n">filtered</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfiltfilt</span><span class="p">(</span><span class="n">sos</span><span class="p">,</span> <span class="n">detrended_minmaxnorm_ph</span><span class="p">)</span>
+    <span class="n">stdev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">filtered</span><span class="p">)</span>
+    <span class="c1"># The idea with this method of processing, slightly more complicated than midpoint</span>
+    <span class="c1"># is to take points significantly far away from 4 * stdeviations of the high passed signal</span>
+    <span class="c1"># Then sequentially take pre and post averages to dictate signs. If sign is positive, then the value after this</span>
+    <span class="c1"># is 1, otherwise 0.</span>
+
+    <span class="c1"># ph_signal = filtered</span>
+    <span class="n">timepoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ph_signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># issue with this method of detecting events is that</span>
+    <span class="c1"># with IR95 session 3, had to use 4 std dev</span>
+    <span class="c1"># for IR94 session 1, signal is feeble, need to use a different thing</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">timepoints</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">filtered</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">event_threshold</span> <span class="o">*</span> <span class="n">stdev</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">))</span>
+    <span class="n">buffer</span> <span class="o">=</span> <span class="mf">0.06</span><span class="o">*</span><span class="n">sampling_rate</span>
+    <span class="n">sample_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.045</span><span class="o">*</span><span class="n">sampling_rate</span><span class="p">)</span>
+    <span class="n">event_breakpoint</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">event_onsets_initial</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">event_offsets_initial</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">sign_changes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sample_num</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">events</span><span class="p">):</span>
+        <span class="c1"># deal with multiple events and looping</span>
+        <span class="k">if</span> <span class="n">sample_num</span> <span class="o">&lt;=</span> <span class="n">event_breakpoint</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">nearby_occurrences</span> <span class="o">=</span> <span class="n">events</span><span class="p">[(</span><span class="n">events</span> <span class="o">&lt;</span> <span class="n">sample_num</span> <span class="o">+</span> <span class="n">buffer</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">events</span> <span class="o">&gt;</span> <span class="n">sample_num</span> <span class="o">-</span> <span class="n">buffer</span><span class="p">)]</span>
+        <span class="n">num_events</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nearby_occurrences</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_events</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">avg_sample_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">nearby_occurrences</span><span class="p">))</span>
+            <span class="n">event_breakpoint</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">nearby_occurrences</span><span class="p">)</span> <span class="o">+</span> <span class="n">buffer</span>
+            <span class="n">max_sample_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">nearby_occurrences</span><span class="p">))</span>
+            <span class="n">min_sample_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">nearby_occurrences</span><span class="p">))</span>
+            <span class="c1"># if max_sample_num - min_sample_num &gt; sample_size:</span>
+            <span class="n">sign_change</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">detrended_minmaxnorm_ph</span><span class="p">[</span><span class="n">max_sample_num</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">detrended_minmaxnorm_ph</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">max_sample_num</span><span class="o">+</span><span class="n">sample_size</span><span class="p">)])</span> <span class="o">-</span>
+                       <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">detrended_minmaxnorm_ph</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">min_sample_num</span><span class="o">-</span><span class="n">sample_size</span><span class="p">):</span><span class="n">min_sample_num</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">avg_sample_num</span> <span class="o">=</span> <span class="n">nearby_occurrences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">sign_change</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">detrended_minmaxnorm_ph</span><span class="p">[</span><span class="n">avg_sample_num</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">detrended_minmaxnorm_ph</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">avg_sample_num</span><span class="o">+</span><span class="n">sample_size</span><span class="p">)])</span> <span class="o">-</span>
+                           <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">detrended_minmaxnorm_ph</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">avg_sample_num</span><span class="o">-</span><span class="n">sample_size</span><span class="p">):</span><span class="n">avg_sample_num</span><span class="p">]))</span>
+        <span class="c1"># print(sign_change)</span>
+        <span class="c1"># plt.plot(ph_signal[avg_sample_num-sample_size:avg_sample_num+sample_size])</span>
+        <span class="c1"># plt.show()</span>
+        <span class="k">if</span> <span class="n">sign_change</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># positive, event_onset</span>
+            <span class="n">event_onsets_initial</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">avg_sample_num</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">sign_change</span><span class="p">)])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">event_offsets_initial</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">avg_sample_num</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">sign_change</span><span class="p">)])</span>
+        <span class="n">sign_changes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">sign_change</span><span class="p">))</span>
+
+    <span class="c1"># find a threshold to use for marking events that depends on the difference in mean signal before or after an event</span>
+    <span class="c1"># this depends on having multiple peaks in our resulting distribution, which may not be true, in which case we&#39;ll</span>
+    <span class="c1"># run into issues</span>
+    <span class="c1"># Create a histogram</span>
+    <span class="n">hist</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">sign_changes</span><span class="p">)</span>
+
+    <span class="n">sign_change_drop</span> <span class="o">=</span> <span class="n">otsu_threshold</span><span class="p">(</span><span class="n">sign_changes</span><span class="p">)</span>
+    <span class="n">event_onsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">event_onsets_initial</span><span class="p">)</span>
+    <span class="n">event_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">event_offsets_initial</span><span class="p">)</span>
+
+    <span class="n">event_detection_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">filtered</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">event_detection_signal</span><span class="p">[</span><span class="n">event_onsets</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">event_detection_signal</span><span class="p">[</span><span class="n">event_offsets</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="n">event_onsets</span> <span class="o">=</span> <span class="n">event_onsets</span><span class="p">[</span><span class="n">event_onsets</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">sign_change_drop</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">event_offsets</span> <span class="o">=</span> <span class="n">event_offsets</span><span class="p">[</span><span class="n">event_offsets</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">sign_change_drop</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">sign_changes</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">primary_color</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Histogram of sign changes </span><span class="se">\n</span><span class="s1">Threshold </span><span class="si">{</span><span class="n">sign_change_drop</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="c1"># Add another vertical line at a specific value using plt.vlines</span>
+        <span class="c1"># Force matplotlib to calculate the plot layout</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+        <span class="n">ymax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">sign_change_drop</span><span class="p">,</span> <span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="n">ymax</span><span class="o">*</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Otsu Threshold&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">ymax</span><span class="p">])</span>
+        <span class="c1"># plt.tight_layout()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="si">}</span><span class="s2">/results/Otsu_thresholding_sample.svg&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Initial passthrough events&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">event_onsets</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">event_offsets</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_onsets</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">250</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_offsets</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">250</span><span class="p">:</span>
+        <span class="n">event_onsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">event_onsets_initial</span><span class="p">)</span>
+        <span class="n">event_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">event_offsets_initial</span><span class="p">)</span>
+        <span class="n">event_onsets</span> <span class="o">=</span> <span class="n">event_onsets</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">event_offsets</span> <span class="o">=</span> <span class="n">event_offsets</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># okay so we have some events for onsets and offsets, the next step is to make these times more precise.</span>
+    <span class="c1"># for each onset, and offset we will fit a radioactive decay with step function to get the precise time that</span>
+    <span class="c1"># the transition step started, which should make our estimates much more robust.</span>
+
+    <span class="n">better_event_onsets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">better_event_offsets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">event_window_samples</span> <span class="o">=</span> <span class="mf">0.075</span> <span class="o">*</span> <span class="n">sampling_rate</span>
+    <span class="c1"># for now take 75 msec before and after each event as our window</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">event_onset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">event_onsets</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">start_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">event_onset</span> <span class="o">-</span> <span class="n">event_window_samples</span><span class="p">))</span>
+        <span class="n">end_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">detrended_minmaxnorm_ph</span><span class="p">),</span> <span class="n">event_onset</span> <span class="o">+</span> <span class="n">event_window_samples</span><span class="p">))</span>
+        <span class="n">segment_to_fit</span> <span class="o">=</span> <span class="n">detrended_minmaxnorm_ph</span><span class="p">[</span><span class="n">start_idx</span><span class="p">:</span><span class="n">end_idx</span><span class="p">]</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">segment_to_fit</span><span class="p">))</span> <span class="o">+</span> <span class="n">start_idx</span><span class="p">)</span> <span class="o">/</span> <span class="n">sampling_rate</span>
+        <span class="c1"># print(times)</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">debug_2</span><span class="o">=</span><span class="n">debug</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">debug_2</span><span class="o">=</span><span class="kc">False</span>
+        <span class="n">popt</span> <span class="o">=</span> <span class="n">fitting_ph_response</span><span class="p">(</span><span class="n">segment_to_fit</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug_2</span><span class="p">)</span>
+        <span class="c1"># we fit the response function, but we only really need the start time</span>
+        <span class="n">better_event_onsets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">popt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">sampling_rate</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="p">,</span> <span class="n">event_offset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">event_offsets</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">start_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">event_offset</span> <span class="o">-</span> <span class="n">event_window_samples</span><span class="p">))</span>
+        <span class="n">end_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">detrended_minmaxnorm_ph</span><span class="p">),</span> <span class="n">event_offset</span> <span class="o">+</span> <span class="n">event_window_samples</span><span class="p">))</span>
+        <span class="n">segment_to_fit</span> <span class="o">=</span> <span class="n">detrended_minmaxnorm_ph</span><span class="p">[</span><span class="n">start_idx</span><span class="p">:</span><span class="n">end_idx</span><span class="p">]</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">segment_to_fit</span><span class="p">))</span> <span class="o">+</span> <span class="n">start_idx</span><span class="p">)</span> <span class="o">/</span> <span class="n">sampling_rate</span>
+        <span class="c1"># print(times)</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">debug_2</span><span class="o">=</span><span class="n">debug</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">debug_2</span><span class="o">=</span><span class="kc">False</span>
+        <span class="n">popt</span> <span class="o">=</span> <span class="n">fitting_ph_response</span><span class="p">(</span><span class="n">segment_to_fit</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug_2</span><span class="p">)</span>
+        <span class="c1"># we fit the response function, but we only really need the start time</span>
+        <span class="n">better_event_offsets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">popt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">sampling_rate</span><span class="p">))</span>
+
+    <span class="n">event_onsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">better_event_onsets</span><span class="p">)</span>
+    <span class="n">event_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">better_event_offsets</span><span class="p">)</span>
+    <span class="n">event_onsets_final</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">event_offsets_final</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Now we have all onsets and offsets, recreate our binarized signals using this</span>
+    <span class="c1"># first check that these are the same length, and that the first event_onset is first</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">event_onsets</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_offsets</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">event_onsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">event_offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Events detected are the same size and make sense&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">event_onsets</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_onsets</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_offsets</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;On events and off events do not have the same size&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Issue with start or stop, check manual timestamping&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_onsets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_offsets</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">event_onset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">event_onsets</span><span class="p">):</span>
+            <span class="n">possible_offsets</span> <span class="o">=</span> <span class="n">event_offsets</span><span class="p">[</span><span class="n">event_offsets</span><span class="o">&gt;</span><span class="n">event_onset</span><span class="p">]</span>
+            <span class="n">best_offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">possible_offsets</span><span class="p">)</span>
+            <span class="n">ph_signal_bin</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">event_onset</span><span class="p">):</span> <span class="nb">int</span><span class="p">(</span><span class="n">best_offset</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.</span>
+            <span class="n">event_onsets_final</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event_onset</span><span class="p">)</span>
+            <span class="n">event_offsets_final</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_offset</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_onsets</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_offsets</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">event_offset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">event_offsets</span><span class="p">):</span>
+            <span class="n">possible_onsets</span> <span class="o">=</span> <span class="n">event_onsets</span><span class="p">[</span><span class="n">event_onsets</span><span class="o">&lt;</span><span class="n">event_offset</span><span class="p">]</span>
+            <span class="n">best_onset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">possible_onsets</span><span class="p">)</span>
+            <span class="n">ph_signal_bin</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">best_onset</span><span class="p">):</span> <span class="nb">int</span><span class="p">(</span><span class="n">event_offset</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.</span>
+            <span class="n">event_onsets_final</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_onset</span><span class="p">)</span>
+            <span class="n">event_offsets_final</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event_offset</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">event_onset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">event_onsets</span><span class="p">):</span>
+            <span class="n">possible_offsets</span> <span class="o">=</span> <span class="n">event_offsets</span><span class="p">[</span><span class="n">event_offsets</span><span class="o">&gt;</span><span class="n">event_onset</span><span class="p">]</span>
+            <span class="n">best_offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">possible_offsets</span><span class="p">)</span>
+            <span class="n">ph_signal_bin</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">event_onset</span><span class="p">):</span> <span class="nb">int</span><span class="p">(</span><span class="n">best_offset</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.</span>
+            <span class="n">event_onsets_final</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event_onset</span><span class="p">)</span>
+            <span class="n">event_offsets_final</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_offset</span><span class="p">)</span>
+
+    <span class="n">event_onsets_final</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">event_onsets_final</span><span class="p">)</span>
+    <span class="n">event_offsets_final</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">event_offsets_final</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;huh&#39;</span><span class="p">)</span>
+        <span class="c1"># code here to visualize</span>
+
+        <span class="n">app</span> <span class="o">=</span> <span class="n">mkQApp</span><span class="p">()</span>
+
+        <span class="c1"># Create main window that can contain several viewers</span>
+        <span class="n">win</span> <span class="o">=</span> <span class="n">MainViewer</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_auto_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">ph_signal</span><span class="p">,</span> <span class="n">detrended_minmaxnorm_ph</span><span class="p">,</span> <span class="n">filtered</span><span class="p">,</span> <span class="n">event_detection_signal</span><span class="p">,</span>
+                                 <span class="n">event_threshold</span> <span class="o">*</span> <span class="n">stdev</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">filtered</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="o">-</span><span class="n">event_threshold</span> <span class="o">*</span> <span class="n">stdev</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">filtered</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span><span class="o">.</span><span class="n">T</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">t_start</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Raw Photodiode&#39;</span><span class="p">,</span><span class="s1">&#39;Min-max + Detrended Photodiode signal&#39;</span><span class="p">,</span> <span class="s1">&#39;Band pass filtered Photodiode signal&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;Events Detected after bubbling procedure&#39;</span><span class="p">,</span> <span class="s1">&#39;std dev&#39;</span><span class="p">,</span> <span class="s1">&#39;std dev 2&#39;</span><span class="p">]</span>
+        <span class="c1"># Create a viewer for signal</span>
+        <span class="c1"># T_start essentially rereferences the start time of the dataset, but leaves the annotations alone</span>
+        <span class="c1"># be wary of this</span>
+        <span class="n">view1</span> <span class="o">=</span> <span class="n">TraceViewer</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">t_start</span><span class="p">,</span> <span class="s1">&#39;Photodiode&#39;</span><span class="p">,</span> <span class="n">channel_names</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+
+        <span class="c1"># TO DO</span>
+        <span class="c1"># Figure out a better way to scale the different signals when presented</span>
+        <span class="c1"># view1.params[&#39;scale_mode&#39;] = &#39;same_for_all&#39;</span>
+        <span class="n">view1</span><span class="o">.</span><span class="n">auto_scale</span><span class="p">()</span>
+        <span class="n">win</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="n">view1</span><span class="p">)</span>
+
+        <span class="c1"># show main window and run Qapp</span>
+        <span class="n">win</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;wait&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ph_signal_bin</span><span class="p">,</span> <span class="n">event_onsets_final</span><span class="p">,</span> <span class="n">event_offsets_final</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.preprocess.BCI_LFP_processing" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">BCI_LFP_processing</span><span class="p">(</span><span class="n">lfp_signals</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>This code is meant to resample BCI data down to a numpy array of a more managable sampling, and get
+rid of power line noise
+:param lfp_signals:
+:param sampling_rate:
+:return:</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/preprocess.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">BCI_LFP_processing</span><span class="p">(</span><span class="n">lfp_signals</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This code is meant to resample BCI data down to a numpy array of a more managable sampling, and get</span>
+<span class="sd">    rid of power line noise</span>
+<span class="sd">    :param lfp_signals:</span>
+<span class="sd">    :param sampling_rate:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Will take SU 30K Hz down to 1K</span>
+    <span class="c1"># Will take iEEG macrocontacts from 2K down to 1K</span>
+    <span class="k">if</span> <span class="n">sampling_rate</span> <span class="o">==</span> <span class="mi">30000</span><span class="p">:</span>
+        <span class="n">first_factor</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">low_freq</span> <span class="o">=</span> <span class="mi">30</span>
+        <span class="n">high_freq</span> <span class="o">=</span> <span class="mi">3000</span>
+        <span class="c1"># bandpass for spikes down to 10K, and then decimate after</span>
+        <span class="n">downsampled_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">decimate</span><span class="p">(</span><span class="n">lfp_signals</span><span class="p">,</span> <span class="n">first_factor</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">effective_fs</span> <span class="o">=</span> <span class="n">sampling_rate</span><span class="o">/</span><span class="n">first_factor</span>
+        <span class="n">butterworth_bandpass</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="n">low_freq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">),</span> <span class="s1">&#39;bp&#39;</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">effective_fs</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;sos&#39;</span><span class="p">)</span>
+        <span class="n">bandpass_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfiltfilt</span><span class="p">(</span><span class="n">butterworth_bandpass</span><span class="p">,</span> <span class="n">downsampled_signal</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">second_factor</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">downsampled_signal_2</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">decimate</span><span class="p">(</span><span class="n">bandpass_signal</span><span class="p">,</span> <span class="n">second_factor</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">effective_fs</span> <span class="o">/=</span> <span class="n">second_factor</span>
+    <span class="k">elif</span> <span class="n">sampling_rate</span> <span class="o">==</span> <span class="mi">2000</span><span class="p">:</span>
+        <span class="n">first_factor</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">low_freq</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="n">high_freq</span> <span class="o">=</span> <span class="mi">900</span>
+        <span class="c1"># bandpass for spikes down to 1K, and then decimate after</span>
+        <span class="n">butterworth_bandpass</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="n">low_freq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">),</span> <span class="s1">&#39;bp&#39;</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;sos&#39;</span><span class="p">)</span>
+        <span class="n">bandpass_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfiltfilt</span><span class="p">(</span><span class="n">butterworth_bandpass</span><span class="p">,</span> <span class="n">lfp_signals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">downsampled_signal_2</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">decimate</span><span class="p">(</span><span class="n">bandpass_signal</span><span class="p">,</span> <span class="n">first_factor</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">effective_fs</span> <span class="o">=</span> <span class="n">sampling_rate</span><span class="o">/</span><span class="n">first_factor</span>
+    <span class="c1"># print(effective_fs)</span>
+    <span class="n">f0</span> <span class="o">=</span> <span class="mf">60.</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="mf">30.0</span>  <span class="c1"># Quality Factor</span>
+    <span class="n">b_notch</span><span class="p">,</span> <span class="n">a_notch</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">iirnotch</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">effective_fs</span><span class="p">)</span>
+    <span class="n">processed_signals</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b_notch</span><span class="p">,</span> <span class="n">a_notch</span><span class="p">,</span> <span class="n">downsampled_signal_2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Get harmonics out of the signal as well, up to 300</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+        <span class="n">b_notch</span><span class="p">,</span> <span class="n">a_notch</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">iirnotch</span><span class="p">(</span><span class="n">f0</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">effective_fs</span><span class="p">)</span>
+        <span class="n">processed_signals</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b_notch</span><span class="p">,</span> <span class="n">a_notch</span><span class="p">,</span> <span class="n">processed_signals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">processed_signals</span><span class="p">,</span> <span class="n">effective_fs</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.preprocess.broadband_seeg_processing" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">broadband_seeg_processing</span><span class="p">(</span><span class="n">lfp_signals</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">lowfreq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>This function takes in an lfp signal and performs basic processing. This function is janky but that's only
+because decimations of too big a factor result in artifacts, so I need one solution for 32K, and a different one
+for other sampling rates.
+Preprocessing is as follows, downsample once. We want to make sure we stay above Nyquist limit, so then we run our
+a 4th order Butterworth to bandpass from lowfreq to highfreq. Downsample once more to get down to 1KHz sampling rate
+Finally, we'll pass through a Notch filter to get rid of powerline noise and associated harmonics.
+WARNING: This is NOT good for European data because of the power line noise there(its 50Hz)
+:param lfp_signals: (np.array) (1, n_samples)
+:param sampling_rate: (int)
+:param lowfreq: (int) lower frequency for bandpass
+:param high_freq: (int) higher frequency for bandpass
+:return: processed_signals: numpy array shape (1, n_samples)
+:return: effective_fs: (int) Final sampling rate after processing</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/preprocess.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span>
+<span class="normal">475</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">broadband_seeg_processing</span><span class="p">(</span><span class="n">lfp_signals</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">lowfreq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function takes in an lfp signal and performs basic processing. This function is janky but that&#39;s only</span>
+<span class="sd">    because decimations of too big a factor result in artifacts, so I need one solution for 32K, and a different one</span>
+<span class="sd">    for other sampling rates.</span>
+<span class="sd">    Preprocessing is as follows, downsample once. We want to make sure we stay above Nyquist limit, so then we run our</span>
+<span class="sd">    a 4th order Butterworth to bandpass from lowfreq to highfreq. Downsample once more to get down to 1KHz sampling rate</span>
+<span class="sd">    Finally, we&#39;ll pass through a Notch filter to get rid of powerline noise and associated harmonics.</span>
+<span class="sd">    WARNING: This is NOT good for European data because of the power line noise there(its 50Hz)</span>
+<span class="sd">    :param lfp_signals: (np.array) (1, n_samples)</span>
+<span class="sd">    :param sampling_rate: (int)</span>
+<span class="sd">    :param lowfreq: (int) lower frequency for bandpass</span>
+<span class="sd">    :param high_freq: (int) higher frequency for bandpass</span>
+<span class="sd">    :return: processed_signals: numpy array shape (1, n_samples)</span>
+<span class="sd">    :return: effective_fs: (int) Final sampling rate after processing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># realizing now that this first line is tricky, think a little bit more about how this will work</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sampling_rate</span> <span class="o">&gt;=</span> <span class="mi">32000</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">sampling_rate</span> <span class="o">&lt;</span> <span class="mi">33000</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">high_freq</span> <span class="o">==</span> <span class="mi">1000</span><span class="p">:</span>
+            <span class="n">second_factor</span> <span class="o">=</span> <span class="mi">8</span>
+        <span class="k">elif</span> <span class="n">high_freq</span> <span class="o">==</span> <span class="mi">2000</span><span class="p">:</span>
+            <span class="n">second_factor</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">second_factor</span> <span class="o">=</span> <span class="mi">8</span>
+        <span class="n">first_factor</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="c1"># for microLFP, this brings us down to 8KHz</span>
+        <span class="n">downsampled_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">decimate</span><span class="p">(</span><span class="n">lfp_signals</span><span class="p">,</span> <span class="n">first_factor</span><span class="p">)</span>
+        <span class="n">effective_fs</span> <span class="o">=</span> <span class="n">sampling_rate</span><span class="o">/</span><span class="n">first_factor</span>
+        <span class="n">butterworth_bandpass</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="n">lowfreq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">),</span> <span class="s1">&#39;bp&#39;</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">effective_fs</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;sos&#39;</span><span class="p">)</span>
+        <span class="n">bandpass_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfiltfilt</span><span class="p">(</span><span class="n">butterworth_bandpass</span><span class="p">,</span> <span class="n">downsampled_signal</span><span class="p">)</span>
+        <span class="c1"># for microLFP, this brings us down to 1/2 Khz</span>
+        <span class="n">downsampled_signal_2</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">decimate</span><span class="p">(</span><span class="n">bandpass_signal</span><span class="p">,</span> <span class="n">second_factor</span><span class="p">)</span>
+        <span class="n">effective_fs</span> <span class="o">/=</span> <span class="n">second_factor</span>
+    <span class="k">elif</span> <span class="n">sampling_rate</span> <span class="o">==</span> <span class="mi">8000</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">high_freq</span> <span class="o">==</span> <span class="mi">1000</span><span class="p">:</span>
+            <span class="n">second_factor</span> <span class="o">=</span> <span class="mi">8</span>
+        <span class="k">elif</span> <span class="n">high_freq</span> <span class="o">==</span> <span class="mi">2000</span><span class="p">:</span>
+            <span class="n">second_factor</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">second_factor</span> <span class="o">=</span> <span class="mi">8</span>
+        <span class="c1"># first_factor = 1</span>
+        <span class="n">butterworth_bandpass</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="n">lowfreq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">),</span> <span class="s1">&#39;bp&#39;</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;sos&#39;</span><span class="p">)</span>
+        <span class="n">bandpass_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfiltfilt</span><span class="p">(</span><span class="n">butterworth_bandpass</span><span class="p">,</span> <span class="n">lfp_signals</span><span class="p">)</span>
+        <span class="c1"># for macroLFP, this brings us down to 1 Khz</span>
+        <span class="n">downsampled_signal_2</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">decimate</span><span class="p">(</span><span class="n">bandpass_signal</span><span class="p">,</span> <span class="n">second_factor</span><span class="p">)</span>
+        <span class="n">effective_fs</span> <span class="o">=</span> <span class="n">sampling_rate</span><span class="o">/</span><span class="n">second_factor</span>
+    <span class="k">elif</span> <span class="n">sampling_rate</span> <span class="o">==</span> <span class="mi">4000</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">high_freq</span> <span class="o">==</span> <span class="mi">1000</span><span class="p">:</span>
+            <span class="n">second_factor</span> <span class="o">=</span> <span class="mi">4</span>
+            <span class="n">bp_freq</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="k">elif</span> <span class="n">high_freq</span> <span class="o">==</span> <span class="mi">2000</span><span class="p">:</span>
+            <span class="n">second_factor</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="n">bp_freq</span> <span class="o">=</span> <span class="mi">1999</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Figure out better downsampling scheme&#39;</span><span class="p">)</span>
+        <span class="n">butterworth_bandpass</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="n">lowfreq</span><span class="p">,</span> <span class="n">bp_freq</span><span class="p">),</span> <span class="s1">&#39;bp&#39;</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;sos&#39;</span><span class="p">)</span>
+        <span class="n">bandpass_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfiltfilt</span><span class="p">(</span><span class="n">butterworth_bandpass</span><span class="p">,</span> <span class="n">lfp_signals</span><span class="p">)</span>
+        <span class="c1"># for macroLFP, this brings us down to 1 Khz</span>
+        <span class="n">downsampled_signal_2</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">decimate</span><span class="p">(</span><span class="n">bandpass_signal</span><span class="p">,</span> <span class="n">second_factor</span><span class="p">)</span>
+        <span class="n">effective_fs</span> <span class="o">=</span> <span class="n">sampling_rate</span> <span class="o">/</span> <span class="n">second_factor</span>
+    <span class="k">elif</span> <span class="n">sampling_rate</span> <span class="o">==</span> <span class="mi">2000</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">high_freq</span> <span class="o">==</span> <span class="mi">1000</span><span class="p">:</span>
+            <span class="n">second_factor</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="n">butterworth_bandpass</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="n">lowfreq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">),</span> <span class="s1">&#39;bp&#39;</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;sos&#39;</span><span class="p">)</span>
+            <span class="n">bandpass_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfiltfilt</span><span class="p">(</span><span class="n">butterworth_bandpass</span><span class="p">,</span> <span class="n">lfp_signals</span><span class="p">)</span>
+            <span class="c1"># for macroLFP, this brings us down to 1 Khz</span>
+            <span class="n">downsampled_signal_2</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">decimate</span><span class="p">(</span><span class="n">bandpass_signal</span><span class="p">,</span> <span class="n">second_factor</span><span class="p">)</span>
+            <span class="n">effective_fs</span> <span class="o">=</span> <span class="n">sampling_rate</span> <span class="o">/</span> <span class="n">second_factor</span>
+        <span class="k">elif</span> <span class="n">high_freq</span> <span class="o">==</span> <span class="mi">2000</span><span class="p">:</span>
+            <span class="c1"># don&#39;t need to do anything</span>
+            <span class="n">downsampled_signal_2</span> <span class="o">=</span> <span class="n">lfp_signals</span>
+            <span class="n">effective_fs</span> <span class="o">=</span> <span class="n">sampling_rate</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Figure out better downsampling scheme&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid sampling rate </span><span class="si">{</span><span class="n">sampling_rate</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">f0</span> <span class="o">=</span> <span class="mf">60.</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="mf">30.0</span>  <span class="c1"># Quality Factor</span>
+    <span class="n">b_notch</span><span class="p">,</span> <span class="n">a_notch</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">iirnotch</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">effective_fs</span><span class="p">)</span>
+    <span class="n">processed_signals</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b_notch</span><span class="p">,</span> <span class="n">a_notch</span><span class="p">,</span> <span class="n">downsampled_signal_2</span><span class="p">)</span>
+
+    <span class="c1"># Get harmonics out of the signal as well, up to 300</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+        <span class="n">b_notch</span><span class="p">,</span> <span class="n">a_notch</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">iirnotch</span><span class="p">(</span><span class="n">f0</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">effective_fs</span><span class="p">)</span>
+        <span class="n">processed_signals</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b_notch</span><span class="p">,</span> <span class="n">a_notch</span><span class="p">,</span> <span class="n">processed_signals</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">processed_signals</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">effective_fs</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.preprocess.preprocess_dataset" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">preprocess_dataset</span><span class="p">(</span><span class="n">file_paths</span><span class="p">,</span> <span class="n">neuro_folder_name</span><span class="p">,</span> <span class="n">low_pass</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">events_file</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Read in all data from a given directory and run basic preprocessing on it so I can load it live on my shitty
+computer.
+:param file_paths: (list) A list of filenames. Ex(['LAC1.ncs','LAC2.ncs'])
+:param neuro_folder_name: (Path) The folderpath where the data is held
+:param task: (optional) A string that dictates the task name, only use if you have the event labels already, so already parsed
+through the photodiode file and annotated the task duration
+:param events_file: (optional) (Path) Where the annotation file is located, needed if task is given.
+:param low_pass: the largest frequency to use for band-pass filtering
+:return: dataset: Numpy array, shape is (n_channels, n_samples)
+:return: eff_fs: Effective sampling rate
+:return: electrode_names: List of electrode names</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/preprocess.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">478</span>
+<span class="normal">479</span>
+<span class="normal">480</span>
+<span class="normal">481</span>
+<span class="normal">482</span>
+<span class="normal">483</span>
+<span class="normal">484</span>
+<span class="normal">485</span>
+<span class="normal">486</span>
+<span class="normal">487</span>
+<span class="normal">488</span>
+<span class="normal">489</span>
+<span class="normal">490</span>
+<span class="normal">491</span>
+<span class="normal">492</span>
+<span class="normal">493</span>
+<span class="normal">494</span>
+<span class="normal">495</span>
+<span class="normal">496</span>
+<span class="normal">497</span>
+<span class="normal">498</span>
+<span class="normal">499</span>
+<span class="normal">500</span>
+<span class="normal">501</span>
+<span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span>
+<span class="normal">510</span>
+<span class="normal">511</span>
+<span class="normal">512</span>
+<span class="normal">513</span>
+<span class="normal">514</span>
+<span class="normal">515</span>
+<span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">preprocess_dataset</span><span class="p">(</span><span class="n">file_paths</span><span class="p">,</span> <span class="n">neuro_folder_name</span><span class="p">,</span> <span class="n">low_pass</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">events_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read in all data from a given directory and run basic preprocessing on it so I can load it live on my shitty</span>
+<span class="sd">    computer.</span>
+<span class="sd">    :param file_paths: (list) A list of filenames. Ex([&#39;LAC1.ncs&#39;,&#39;LAC2.ncs&#39;])</span>
+<span class="sd">    :param neuro_folder_name: (Path) The folderpath where the data is held</span>
+<span class="sd">    :param task: (optional) A string that dictates the task name, only use if you have the event labels already, so already parsed</span>
+<span class="sd">    through the photodiode file and annotated the task duration</span>
+<span class="sd">    :param events_file: (optional) (Path) Where the annotation file is located, needed if task is given.</span>
+<span class="sd">    :param low_pass: the largest frequency to use for band-pass filtering</span>
+<span class="sd">    :return: dataset: Numpy array, shape is (n_channels, n_samples)</span>
+<span class="sd">    :return: eff_fs: Effective sampling rate</span>
+<span class="sd">    :return: electrode_names: List of electrode names</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">eff_fs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">electrode_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">micro_file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">file_paths</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">micro_file_path</span><span class="p">)</span>
+        <span class="n">split_tup</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">micro_file_path</span><span class="p">)</span>
+        <span class="n">ncs_filename</span> <span class="o">=</span> <span class="n">split_tup</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ncs_filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;photo&#39;</span><span class="p">):</span>
+            <span class="n">lfp_signal</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">interp</span><span class="p">,</span> <span class="n">timestamps</span> <span class="o">=</span> <span class="n">read_task_ncs</span><span class="p">(</span><span class="n">neuro_folder_name</span><span class="p">,</span> <span class="n">micro_file_path</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+                                                                        <span class="n">events_file</span><span class="o">=</span><span class="n">events_file</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;timestamps below&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span>
+            <span class="c1"># assume photo is 8K and we&#39;re getting down to 1000</span>
+            <span class="k">if</span> <span class="n">low_pass</span> <span class="o">==</span> <span class="mi">1000</span><span class="p">:</span>
+                <span class="n">first_factor</span> <span class="o">=</span> <span class="mi">8</span>
+            <span class="k">elif</span> <span class="n">low_pass</span> <span class="o">==</span> <span class="mi">2000</span><span class="p">:</span>
+                <span class="n">first_factor</span> <span class="o">=</span> <span class="mi">4</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">first_factor</span> <span class="o">=</span> <span class="mi">8</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="n">sample_rate</span> <span class="o">/</span> <span class="n">first_factor</span>
+            <span class="n">processed_lfp</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">decimate</span><span class="p">(</span><span class="n">lfp_signal</span><span class="p">,</span> <span class="n">first_factor</span><span class="p">)</span>
+            <span class="n">downsampled_timestamps</span> <span class="o">=</span> <span class="n">timestamps</span><span class="p">[::</span><span class="n">first_factor</span><span class="p">]</span>
+            <span class="c1"># processed_timestamps = signal.decimate(timestamps, first_factor)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sliced timestamps below&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">downsampled_timestamps</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lfp_signal</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">read_task_ncs</span><span class="p">(</span><span class="n">neuro_folder_name</span><span class="p">,</span> <span class="n">micro_file_path</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+                                                          <span class="n">events_file</span><span class="o">=</span><span class="n">events_file</span><span class="p">)</span>
+            <span class="n">processed_lfp</span><span class="p">,</span> <span class="n">fs</span> <span class="o">=</span> <span class="n">broadband_seeg_processing</span><span class="p">(</span><span class="n">lfp_signal</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">low_pass</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ind</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">file_paths</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">processed_lfp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">processed_lfp</span>
+            <span class="n">eff_fs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
+            <span class="n">electrode_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ncs_filename</span><span class="p">)</span>
+            <span class="n">og_file</span> <span class="o">=</span> <span class="n">micro_file_path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Currently the loading of photodiode is 3 ms different in size(it&#39;s more than the others)</span>
+            <span class="k">if</span> <span class="n">processed_lfp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">micro_file_path</span><span class="si">}</span><span class="s1"> array is larger than </span><span class="si">{</span><span class="n">og_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">processed_lfp</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">processed_lfp</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:</span><span class="n">processed_lfp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">processed_lfp</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">processed_lfp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">eff_fs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
+            <span class="n">electrode_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ncs_filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ncs_filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;photo&#39;</span><span class="p">):</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">downsampled_timestamps</span>
+    <span class="n">eff_fs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
+    <span class="n">electrode_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Timepoints&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">eff_fs</span><span class="p">,</span> <span class="n">electrode_names</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.preprocess.save_small_dataset" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">save_small_dataset</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">events_file</span><span class="p">,</span> <span class="n">low_pass</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">data_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Load, process, and savedata.
+:param subject: (string) subject identifier
+:param session: (string) subject session
+:param task: (string) task name, used to select only part of entire ncs file, assuming annotations file exists
+:param events_file: (Path) path to where events annotation file is located
+:param low_pass: (int) specify low pass frequency, usually
+:param data_directory: (path) specify where data directory is
+:return:</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/preprocess.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">save_small_dataset</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">events_file</span><span class="p">,</span> <span class="n">low_pass</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">data_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load, process, and savedata.</span>
+<span class="sd">    :param subject: (string) subject identifier</span>
+<span class="sd">    :param session: (string) subject session</span>
+<span class="sd">    :param task: (string) task name, used to select only part of entire ncs file, assuming annotations file exists</span>
+<span class="sd">    :param events_file: (Path) path to where events annotation file is located</span>
+<span class="sd">    :param low_pass: (int) specify low pass frequency, usually</span>
+<span class="sd">    :param data_directory: (path) specify where data directory is</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">data_directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data_directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="si">}</span><span class="s2">/data/</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s2">/raw&quot;</span><span class="p">)</span>
+    <span class="n">results_directory</span> <span class="o">=</span> <span class="n">data_directory</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;preprocessed&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">results_directory</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">results_directory</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Results Directory already Exists&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">results_directory</span><span class="p">)</span>
+    <span class="n">all_files_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">)</span>
+    <span class="c1"># electrode_files = [file_path for file_path in all_files_list if (re.match(&#39;m.*ncs&#39;, file_path) and not</span>
+    <span class="c1">#                file_path.endswith(&quot;.nse&quot;))]</span>
+    <span class="n">electrode_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">file_path</span> <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">all_files_list</span> <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.ncs&#39;</span><span class="p">)]</span>
+    <span class="n">electrode_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="c1"># electrode_files.append(&#39;photo1.ncs&#39;)</span>
+    <span class="n">dataset</span><span class="p">,</span> <span class="n">eff_fs</span><span class="p">,</span> <span class="n">electrode_names</span> <span class="o">=</span> <span class="n">preprocess_dataset</span><span class="p">(</span><span class="n">electrode_files</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+                                                          <span class="n">events_file</span><span class="o">=</span><span class="n">events_file</span><span class="p">,</span> <span class="n">low_pass</span><span class="o">=</span><span class="n">low_pass</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">eff_fs</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Different effective sampling rates across files&#39;</span><span class="p">)</span>
+    <span class="n">bp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">eff_fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_directory</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s1">_lowpass_</span><span class="si">{</span><span class="n">bp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+             <span class="n">electrode_names</span><span class="o">=</span><span class="n">electrode_names</span><span class="p">,</span> <span class="n">eff_fs</span><span class="o">=</span><span class="n">eff_fs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.preprocess.save_as_npy" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">save_as_npy</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task_name</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">events_file</span><span class="p">,</span> <span class="n">electrode_selection</span><span class="p">,</span> <span class="n">one_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Load data from neuralynx files and package them into .npy files. No preprocessing done to the data, so microwires,
+and macrocontacts at different sampling rates, treated separately.
+:param subject: (string) subject identifier
+:param session: (string) session identifier
+:param task_name: (string) task identifier
+:param data_directory: (Path) path object that tells us where the raw data lives (if in the cluster, it won't be in
+our expected data/subject/session style, hence why this function is the way it is)
+:param events_file: (Path) path object that tells us where the events file, ideally the events_file contains one
+event titled f"{task_name} duration"
+:param electrode_selection: (string) Whether to save macrocontact or microwire data
+:param one_file: (optional) (bool) whether to package data into one file. If false, package data into different files
+:return:</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/preprocess.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span>
+<span class="normal">633</span>
+<span class="normal">634</span>
+<span class="normal">635</span>
+<span class="normal">636</span>
+<span class="normal">637</span>
+<span class="normal">638</span>
+<span class="normal">639</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span>
+<span class="normal">652</span>
+<span class="normal">653</span>
+<span class="normal">654</span>
+<span class="normal">655</span>
+<span class="normal">656</span>
+<span class="normal">657</span>
+<span class="normal">658</span>
+<span class="normal">659</span>
+<span class="normal">660</span>
+<span class="normal">661</span>
+<span class="normal">662</span>
+<span class="normal">663</span>
+<span class="normal">664</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">save_as_npy</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task_name</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">events_file</span><span class="p">,</span> <span class="n">electrode_selection</span><span class="p">,</span> <span class="n">one_file</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load data from neuralynx files and package them into .npy files. No preprocessing done to the data, so microwires,</span>
+<span class="sd">    and macrocontacts at different sampling rates, treated separately.</span>
+<span class="sd">    :param subject: (string) subject identifier</span>
+<span class="sd">    :param session: (string) session identifier</span>
+<span class="sd">    :param task_name: (string) task identifier</span>
+<span class="sd">    :param data_directory: (Path) path object that tells us where the raw data lives (if in the cluster, it won&#39;t be in</span>
+<span class="sd">    our expected data/subject/session style, hence why this function is the way it is)</span>
+<span class="sd">    :param events_file: (Path) path object that tells us where the events file, ideally the events_file contains one</span>
+<span class="sd">    event titled f&quot;{task_name} duration&quot;</span>
+<span class="sd">    :param electrode_selection: (string) Whether to save macrocontact or microwire data</span>
+<span class="sd">    :param one_file: (optional) (bool) whether to package data into one file. If false, package data into different files</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Hopefully your file structure is like mine</span>
+    <span class="n">results_directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="si">}</span><span class="s2">/data/</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s2">/preprocessed&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">results_directory</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">results_directory</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Results Directory already Exists&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">results_directory</span><span class="p">)</span>
+    <span class="n">all_files_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">electrode_selection</span> <span class="o">==</span> <span class="s2">&quot;microwire&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">all_files_list</span><span class="p">)</span>
+        <span class="n">electrode_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">file_path</span> <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">all_files_list</span> <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.ncs&#39;</span><span class="p">)</span>
+                           <span class="ow">and</span> <span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;mic1&#39;</span><span class="p">)]</span>
+        <span class="n">electrode_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">eff_fs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">electrode_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">electrode_files</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">micro_file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">electrode_files</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">micro_file_path</span><span class="p">)</span>
+            <span class="n">split_tup</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">micro_file_path</span><span class="p">)</span>
+            <span class="n">ncs_filename</span> <span class="o">=</span> <span class="n">split_tup</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">lfp_signal</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">interp</span><span class="p">,</span> <span class="n">timestamps</span> <span class="o">=</span> <span class="n">read_task_ncs</span><span class="p">(</span><span class="n">data_directory</span><span class="p">,</span> <span class="n">micro_file_path</span><span class="p">,</span>
+                                                                        <span class="n">task</span><span class="o">=</span><span class="n">task_name</span><span class="p">,</span>
+                                                                        <span class="n">events_file</span><span class="o">=</span><span class="n">events_file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">one_file</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ind</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">dataset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">electrode_files</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">lfp_signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                    <span class="n">dataset</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">lfp_signal</span>
+                    <span class="n">eff_fs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)</span>
+                    <span class="n">electrode_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ncs_filename</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dataset</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">lfp_signal</span>
+                    <span class="n">eff_fs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)</span>
+                    <span class="n">electrode_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ncs_filename</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dataset</span> <span class="o">=</span> <span class="n">lfp_signal</span>
+                <span class="n">bp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">))</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_directory</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task_name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">ncs_filename</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">bp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span>
+                         <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">electrode_name</span><span class="o">=</span><span class="n">ncs_filename</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">electrode_selection</span> <span class="o">==</span> <span class="s2">&quot;photodiode&quot;</span><span class="p">:</span>
+        <span class="n">electrode_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">file_path</span> <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">all_files_list</span> <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.ncs&#39;</span><span class="p">)</span>
+                           <span class="ow">and</span> <span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;photo&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Photo&#39;</span><span class="p">)]</span>
+        <span class="n">electrode_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">eff_fs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">electrode_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">electrode_files</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">micro_file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">electrode_files</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">micro_file_path</span><span class="p">)</span>
+            <span class="n">split_tup</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">micro_file_path</span><span class="p">)</span>
+            <span class="n">ncs_filename</span> <span class="o">=</span> <span class="n">split_tup</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">lfp_signal</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">interp</span><span class="p">,</span> <span class="n">timestamps</span> <span class="o">=</span> <span class="n">read_task_ncs</span><span class="p">(</span><span class="n">data_directory</span><span class="p">,</span> <span class="n">micro_file_path</span><span class="p">,</span>
+                                                                        <span class="n">task</span><span class="o">=</span><span class="n">task_name</span><span class="p">,</span>
+                                                                        <span class="n">events_file</span><span class="o">=</span><span class="n">events_file</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">lfp_signal</span>
+            <span class="n">bp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">))</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_directory</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task_name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">ncs_filename</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">bp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span>
+                <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">electrode_name</span><span class="o">=</span><span class="n">ncs_filename</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">)</span>
+            <span class="c1"># for debug purposes, also save a version of this file at 32KHz</span>
+            <span class="n">og_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lfp_signal</span><span class="p">)</span> <span class="o">/</span> <span class="n">sample_rate</span>
+            <span class="p">(</span><span class="n">lfp_signal_upsampled</span><span class="p">,</span> <span class="n">timestamps_upsampled</span><span class="p">)</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">lfp_signal</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">og_len</span><span class="o">*</span><span class="mi">32000</span><span class="p">),</span> <span class="n">timestamps</span><span class="p">)</span>
+            <span class="n">dataset_upsampled</span> <span class="o">=</span> <span class="n">lfp_signal_upsampled</span>
+            <span class="n">bp_up</span> <span class="o">=</span> <span class="mi">32000</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_directory</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task_name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">ncs_filename</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">bp_up</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span>
+                <span class="n">dataset</span><span class="o">=</span><span class="n">dataset_upsampled</span><span class="p">,</span> <span class="n">electrode_name</span><span class="o">=</span><span class="n">ncs_filename</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">bp_up</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps_upsampled</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">electrode_selection</span> <span class="o">==</span> <span class="s2">&quot;macrocontact&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="c1">########### TO DO</span>
+        <span class="c1"># the function will be the same, but just don&#39;t know how to do the electrode selection (maybe use lazy reader</span>
+        <span class="c1"># to exclude files with a certain sample rate?</span>
+    <span class="k">if</span> <span class="n">one_file</span><span class="p">:</span>
+        <span class="n">bp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">eff_fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_directory</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task_name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">electrode_selection</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">bp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span>
+                 <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">electrode_names</span><span class="o">=</span><span class="n">electrode_names</span><span class="p">,</span> <span class="n">eff_fs</span><span class="o">=</span><span class="n">eff_fs</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.preprocess.make_trialwise_data" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">make_trialwise_data</span><span class="p">(</span><span class="n">event_times</span><span class="p">,</span> <span class="n">electrode_names</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>This function serves to convert a dataset that is from start to stop, into one that is organized by trials.
+:param event_times: (timestamps for trial onsets, offsets, or anything of interest)
+:param electrode_names: (list) list of strings that contain the name for each signal
+:param fs: (int) sampling rate
+:param dataset: (np.array) raw data
+:param tmin: (opt)
+:param tmax: (opt)
+:param baseline: (opt) Tuple that defines the period to use as baseline
+:param annotations: mne annotations object
+:return: epochs_object</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/preprocess.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span>
+<span class="normal">687</span>
+<span class="normal">688</span>
+<span class="normal">689</span>
+<span class="normal">690</span>
+<span class="normal">691</span>
+<span class="normal">692</span>
+<span class="normal">693</span>
+<span class="normal">694</span>
+<span class="normal">695</span>
+<span class="normal">696</span>
+<span class="normal">697</span>
+<span class="normal">698</span>
+<span class="normal">699</span>
+<span class="normal">700</span>
+<span class="normal">701</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_trialwise_data</span><span class="p">(</span><span class="n">event_times</span><span class="p">,</span> <span class="n">electrode_names</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=-</span><span class="mf">1.</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function serves to convert a dataset that is from start to stop, into one that is organized by trials.</span>
+<span class="sd">    :param event_times: (timestamps for trial onsets, offsets, or anything of interest)</span>
+<span class="sd">    :param electrode_names: (list) list of strings that contain the name for each signal</span>
+<span class="sd">    :param fs: (int) sampling rate</span>
+<span class="sd">    :param dataset: (np.array) raw data</span>
+<span class="sd">    :param tmin: (opt)</span>
+<span class="sd">    :param tmax: (opt)</span>
+<span class="sd">    :param baseline: (opt) Tuple that defines the period to use as baseline</span>
+<span class="sd">    :param annotations: mne annotations object</span>
+<span class="sd">    :return: epochs_object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># The safest way to do this is to build a mne object, first step is to create the info for that object</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">event_times</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">events</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_times</span>
+    <span class="n">events</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">event_times</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],))[:]</span> <span class="c1">#rule_codes commented out for now because i need something to run</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">mne_info</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">create_info</span><span class="p">(</span><span class="n">electrode_names</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">ch_types</span><span class="o">=</span><span class="s1">&#39;seeg&#39;</span><span class="p">)</span>
+    <span class="n">raw_data</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">RawArray</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">mne_info</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">annotations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">raw_data</span><span class="o">.</span><span class="n">set_annotations</span><span class="p">(</span><span class="n">annotations</span><span class="p">)</span>
+
+    <span class="n">num_electrodes</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">shape</span>
+    <span class="c1"># Trying to compare some things</span>
+    <span class="n">epochs_object</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">Epochs</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="n">tmin</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="n">baseline</span><span class="p">,</span>
+                               <span class="n">reject_by_annotation</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">trial_based_data</span> <span class="o">=</span> <span class="n">epochs_object</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">epochs_object</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">Epochs</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="n">tmin</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="n">baseline</span><span class="p">,</span>
+                               <span class="n">reject_by_annotation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">epochs_object</span><span class="p">,</span> <span class="n">trial_based_data</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.preprocess.smooth_data" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">smooth_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Smooth data by taking the average in windows, and stepping by some amount of time
+Expects data to be 3D (number of trials X number of electrodes X number of timepoints)
+We will smooth by taking the centered average about a window, so the smoothed data will be smaller than expected
+:param data: np.array
+:param fs: (int) sampling rate
+:param window: (float) in seconds, how much to average over, the larger this is the more our signal is smeared.
+:param step: (float) in seconds. How much to step forward, determines new_fs
+:return: smoothed_data, new_fs</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/preprocess.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">704</span>
+<span class="normal">705</span>
+<span class="normal">706</span>
+<span class="normal">707</span>
+<span class="normal">708</span>
+<span class="normal">709</span>
+<span class="normal">710</span>
+<span class="normal">711</span>
+<span class="normal">712</span>
+<span class="normal">713</span>
+<span class="normal">714</span>
+<span class="normal">715</span>
+<span class="normal">716</span>
+<span class="normal">717</span>
+<span class="normal">718</span>
+<span class="normal">719</span>
+<span class="normal">720</span>
+<span class="normal">721</span>
+<span class="normal">722</span>
+<span class="normal">723</span>
+<span class="normal">724</span>
+<span class="normal">725</span>
+<span class="normal">726</span>
+<span class="normal">727</span>
+<span class="normal">728</span>
+<span class="normal">729</span>
+<span class="normal">730</span>
+<span class="normal">731</span>
+<span class="normal">732</span>
+<span class="normal">733</span>
+<span class="normal">734</span>
+<span class="normal">735</span>
+<span class="normal">736</span>
+<span class="normal">737</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">smooth_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Smooth data by taking the average in windows, and stepping by some amount of time</span>
+<span class="sd">    Expects data to be 3D (number of trials X number of electrodes X number of timepoints)</span>
+<span class="sd">    We will smooth by taking the centered average about a window, so the smoothed data will be smaller than expected</span>
+<span class="sd">    :param data: np.array</span>
+<span class="sd">    :param fs: (int) sampling rate</span>
+<span class="sd">    :param window: (float) in seconds, how much to average over, the larger this is the more our signal is smeared.</span>
+<span class="sd">    :param step: (float) in seconds. How much to step forward, determines new_fs</span>
+<span class="sd">    :return: smoothed_data, new_fs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># first create array that is the processed shape</span>
+    <span class="n">num_epochs</span><span class="p">,</span> <span class="n">num_electrodes</span><span class="p">,</span> <span class="n">num_timepoints</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+    <span class="c1"># why should our smoothed data be this?</span>
+    <span class="c1"># we&#39;d like to smooth data by taking averages with a window size and moving by a certain step</span>
+    <span class="c1"># ideally window is centered, effectively meaning that we can only take as many timepoints that equal to</span>
+    <span class="c1"># (num_timepoints/fs - step) / step and this simplifies to below</span>
+    <span class="n">smoothed_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_epochs</span><span class="p">,</span> <span class="n">num_electrodes</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_timepoints</span><span class="o">/</span><span class="p">(</span><span class="n">fs</span><span class="o">*</span><span class="n">step</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">smoothed_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+        <span class="c1"># print(i)</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">smoothed_data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">:</span><span class="nb">int</span><span class="p">((</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">window</span><span class="o">*</span><span class="n">fs</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="n">step</span><span class="o">*</span><span class="n">fs</span> <span class="o">+</span> <span class="n">window</span><span class="o">*</span><span class="n">fs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">num_timepoints</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;There is an issue with this code and the estimation of the smoothed data size&#39;</span><span class="p">)</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">i</span><span class="o">*</span><span class="n">step</span><span class="o">*</span><span class="n">fs</span> <span class="o">-</span> <span class="n">window</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">smoothed_data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">):</span> <span class="n">num_timepoints</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># print(&#39;int&#39;)</span>
+            <span class="c1"># print(data.shape)</span>
+            <span class="c1"># print(i * step * fs)</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">step</span> <span class="o">*</span> <span class="n">fs</span>
+            <span class="n">smoothed_data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="o">-</span><span class="n">window</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">fs</span><span class="p">):</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">window</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">fs</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">new_fs</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">step</span>
+    <span class="k">return</span> <span class="n">smoothed_data</span><span class="p">,</span> <span class="n">new_fs</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

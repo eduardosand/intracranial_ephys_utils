@@ -1,0 +1,1499 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../load_data/">
+      
+      
+        <link rel="next" href="../preprocess/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon_3.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Look at data - intracranial_ephys_utils</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#manual-processing-tools" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="intracranial_ephys_utils" class="md-header__button md-logo" aria-label="intracranial_ephys_utils" data-md-component="logo">
+      
+  <img src="../../assets/logo_3.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            intracranial_ephys_utils
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Look at data
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="intracranial_ephys_utils" class="md-nav__button md-logo" aria-label="intracranial_ephys_utils" data-md-component="logo">
+      
+  <img src="../../assets/logo_3.png" alt="logo">
+
+    </a>
+    intracranial_ephys_utils
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intracranial_Ephys_Utils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Documentation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../load_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loading data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Look at data
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Look at data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.manual_process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        manual_process
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.manual_process.reformat_event_labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        reformat_event_labels
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.manual_process.photodiode_check_viewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        photodiode_check_viewer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.manual_process.photodiode_event_check_viewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        photodiode_event_check_viewer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.manual_process.data_clean_viewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        data_clean_viewer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.manual_process.write_timestamps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        write_timestamps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.manual_process.su_timestamp_process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        su_timestamp_process
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intracranial_ephys_utils.manual_process.get_annotated_task_start_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_annotated_task_start_time
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../preprocess/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preprocessing data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plot_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plot data (left over)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="manual-processing-tools">Manual Processing tools</h1>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="intracranial_ephys_utils.manual_process"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.manual_process.reformat_event_labels" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">reformat_event_labels</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>This script takes the events files, reads the timestamps in, and organizes them suitably for
+the data_viewer. Outputs the events as a csv file
+:param subject: (str). Subject
+:param session: (str). Session
+:param task: (srt). Task the subject completed in this session
+:param data_directory: (Path). The Path object that points to the neuralynx data directory
+:param annotations_directory: (Path). The Path object that points to where the annotations file will go.
+:param extension: str optional.
+:return:</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/manual_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">reformat_event_labels</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This script takes the events files, reads the timestamps in, and organizes them suitably for</span>
+<span class="sd">    the data_viewer. Outputs the events as a csv file</span>
+<span class="sd">    :param subject: (str). Subject</span>
+<span class="sd">    :param session: (str). Session</span>
+<span class="sd">    :param task: (srt). Task the subject completed in this session</span>
+<span class="sd">    :param data_directory: (Path). The Path object that points to the neuralynx data directory</span>
+<span class="sd">    :param annotations_directory: (Path). The Path object that points to where the annotations file will go.</span>
+<span class="sd">    :param extension: str optional.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">event_times</span><span class="p">,</span> <span class="n">event_labels</span><span class="p">,</span> <span class="n">global_start</span><span class="p">,</span> <span class="n">event_file</span> <span class="o">=</span> <span class="n">get_event_times</span><span class="p">(</span><span class="n">data_directory</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">extension</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_times</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">source_epoch</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[],</span> <span class="p">[],</span> <span class="p">[]])</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;duration&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">event_times_sec</span> <span class="o">=</span> <span class="n">event_times</span><span class="o">*</span><span class="mi">10</span><span class="o">**-</span><span class="mi">6</span><span class="o">-</span><span class="n">global_start</span>
+        <span class="n">durations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">event_times_sec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">))</span><span class="o">*</span><span class="mf">0.5</span>
+        <span class="n">source_epoch</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">event_times_sec</span><span class="p">,</span> <span class="n">durations</span><span class="p">,</span> <span class="n">event_labels</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;duration&#39;</span><span class="p">,</span>
+                                                                                                     <span class="s1">&#39;label&#39;</span><span class="p">])</span>
+
+    <span class="n">file_root</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">event_file</span><span class="p">)</span>
+    <span class="n">annotations_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">file_root</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+    <span class="k">if</span> <span class="n">annotations_file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">annotations_directory</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Annotations File exists, so nothing was written. Double check to see if it matches expectation.&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">source_epoch</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">annotations_directory</span> <span class="o">/</span> <span class="n">annotations_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">event_file</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.manual_process.photodiode_check_viewer" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">photodiode_check_viewer</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">diagnostic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">task_start</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">events_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>This script is a generalized dataviewer to look at a photodiode signal, and bring up the events.
+With the viewer, we can make annotations and save them to a csv file. Additionally, if the diagnostic optional
+parameter is set to True, this function will also preprocess the photodiode to check that the signal on TTL is good.
+:param subject: (string) The patient ID
+:param session: (string) Session of the experiment. Useful if patient completed more than one session of a task.
+:param task: (string) Which task
+:param data_directory: (Path object) Where the data lives
+:param annotations_directory: (Path object) Where we want to put the annotations of the data
+:param diagnostic: (bool) (optional) If True we will also plot diagnostics, and preprocess photodiode and overlay
+it.
+:param task_start: (float) (optional) The start time of the task
+:param events_filename: (str) (optional) The extension of the file (in case multiple datasets in the same folder)
+:return:</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/manual_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">photodiode_check_viewer</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">diagnostic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">task_start</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">events_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This script is a generalized dataviewer to look at a photodiode signal, and bring up the events.</span>
+<span class="sd">    With the viewer, we can make annotations and save them to a csv file. Additionally, if the diagnostic optional</span>
+<span class="sd">    parameter is set to True, this function will also preprocess the photodiode to check that the signal on TTL is good.</span>
+<span class="sd">    :param subject: (string) The patient ID</span>
+<span class="sd">    :param session: (string) Session of the experiment. Useful if patient completed more than one session of a task.</span>
+<span class="sd">    :param task: (string) Which task</span>
+<span class="sd">    :param data_directory: (Path object) Where the data lives</span>
+<span class="sd">    :param annotations_directory: (Path object) Where we want to put the annotations of the data</span>
+<span class="sd">    :param diagnostic: (bool) (optional) If True we will also plot diagnostics, and preprocess photodiode and overlay</span>
+<span class="sd">    it.</span>
+<span class="sd">    :param task_start: (float) (optional) The start time of the task</span>
+<span class="sd">    :param events_filename: (str) (optional) The extension of the file (in case multiple datasets in the same folder)</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Underlying assumption is that data is organized as subject/session/raw, this is where the .ncs files live</span>
+    <span class="n">all_files_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">)</span>
+    <span class="c1"># electrode_files = [file_path for file_path in all_files_list if (re.match(&#39;m.*ncs&#39;, file_path) and not</span>
+    <span class="c1">#                file_path.endswith(&quot;.nse&quot;))]</span>
+
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">events_filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.nev&#39;</span><span class="p">,</span> <span class="s1">&#39;.ncs&#39;</span><span class="p">)</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Events&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ext</span> <span class="o">!=</span> <span class="s1">&#39;.ncs&#39;</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Most likely multiple photodiode files, picking </span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2"> now&quot;</span><span class="p">)</span>
+        <span class="n">ph_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">file_path</span> <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">all_files_list</span> <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">ext</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;photo1&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Photo&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PH_Diode&#39;</span><span class="p">))]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ph_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">file_path</span> <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">all_files_list</span> <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.ncs&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;photo1&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Photo&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PH_Diode&#39;</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ph_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Multiple photodiode files picking the base one now&quot;</span><span class="p">)</span>
+            <span class="n">ph_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">file</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">ph_files</span> <span class="k">if</span> <span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;photo1.ncs&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;photo.ncs&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PH_Diode&#39;</span><span class="p">))]</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ph_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">ph_filename</span> <span class="o">=</span> <span class="n">ph_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># We&#39;ll read in the photodiode signal</span>
+    <span class="n">ph_signal</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">interp</span><span class="p">,</span> <span class="n">timestamps</span> <span class="o">=</span> <span class="n">read_task_ncs</span><span class="p">(</span><span class="n">data_directory</span><span class="p">,</span> <span class="n">ph_filename</span><span class="p">)</span>
+
+    <span class="c1"># we&#39;ll make some sanity plots to check photodiode at a glance, and preprocess to double-check event trigger</span>
+    <span class="c1"># is good</span>
+    <span class="k">if</span> <span class="n">diagnostic</span><span class="p">:</span>
+        <span class="n">diagnostic_time_series_plot</span><span class="p">(</span><span class="n">ph_signal</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">electrode_name</span><span class="o">=</span><span class="s1">&#39;Photodiode&#39;</span><span class="p">)</span>
+        <span class="c1"># Use the diagnostic plot to limit the time interval we process photodiode in</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Type start time (in seconds) if not the start of signal, else press enter: &#39;</span><span class="p">)</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Type end time (in seconds) if not the end of signal, else press enter: &#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">start_time</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start_time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">end_time</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">end_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ph_signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">end_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">end_time</span><span class="p">)</span>
+
+        <span class="n">ph_signal</span> <span class="o">=</span> <span class="n">ph_signal</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">start_time</span><span class="o">*</span><span class="n">sampling_rate</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">sampling_rate</span> <span class="o">*</span> <span class="n">end_time</span><span class="p">)]</span>
+        <span class="c1"># timestamps = timestamps[int(start_time*sampling_rate):int(sampling_rate * end_time)]</span>
+        <span class="n">t_start</span> <span class="o">=</span> <span class="n">start_time</span>
+
+        <span class="c1"># next step to this is to add my thresholding for photodiode</span>
+        <span class="n">ph_signal_bin</span> <span class="o">=</span> <span class="n">binarize_ph</span><span class="p">(</span><span class="n">ph_signal</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">ph_signal</span><span class="p">,</span> <span class="n">ph_signal_bin</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ph_filename</span><span class="p">,</span> <span class="s1">&#39;Photodiode Binarized&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">t_start</span> <span class="o">=</span> <span class="n">task_start</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">ph_signal</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ph_filename</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">mkQApp</span><span class="p">()</span>
+
+    <span class="c1"># Create main window that can contain several viewers</span>
+    <span class="n">win</span> <span class="o">=</span> <span class="n">MainViewer</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_auto_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Create a viewer for signal</span>
+    <span class="c1"># T_start essentially rereferences the start time of the dataset, but leaves the annotations alone</span>
+    <span class="c1"># be wary of this</span>
+    <span class="n">view1</span> <span class="o">=</span> <span class="n">TraceViewer</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">t_start</span><span class="p">,</span> <span class="s1">&#39;Photodiode&#39;</span><span class="p">,</span> <span class="n">channel_names</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+
+    <span class="c1"># TO DO</span>
+    <span class="c1"># Figure out a better way to scale the different signals when presented</span>
+    <span class="c1"># view1.params[&#39;scale_mode&#39;] = &#39;same_for_all&#39;</span>
+    <span class="n">view1</span><span class="o">.</span><span class="n">auto_scale</span><span class="p">()</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="n">view1</span><span class="p">)</span>
+
+    <span class="c1"># annotation file details</span>
+    <span class="n">possible_labels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s1"> duration&#39;</span><span class="p">]</span>
+    <span class="n">file_root</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">events_filename</span><span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">annotations_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">file_root</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+    <span class="n">source_epoch</span> <span class="o">=</span> <span class="n">CsvEpochSource</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">possible_labels</span><span class="p">)</span>
+
+    <span class="c1"># create a viewer for the encoder itself</span>
+    <span class="n">view2</span> <span class="o">=</span> <span class="n">EpochEncoder</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source_epoch</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Tagging events&#39;</span><span class="p">)</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="n">view2</span><span class="p">)</span>
+
+    <span class="c1"># show main window and run Qapp</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.manual_process.photodiode_event_check_viewer" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">photodiode_event_check_viewer</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>This code will plot the ph_signal, the binarized signal and the computed event onsets and offsets
+with the goal of getting the types of events properly annotated.
+:param dataset: (np.array)
+:parma labels: (np.array) - label associated with dataset
+:param sampling_rate: (float)
+:param event_onsets: (np.array)
+:param event_offsets: (np.array)
+:param annotations_directory: (Path object)
+:return: .csv file</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/manual_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">photodiode_event_check_viewer</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This code will plot the ph_signal, the binarized signal and the computed event onsets and offsets</span>
+<span class="sd">    with the goal of getting the types of events properly annotated.</span>
+<span class="sd">    :param dataset: (np.array)</span>
+<span class="sd">    :parma labels: (np.array) - label associated with dataset</span>
+<span class="sd">    :param sampling_rate: (float)</span>
+<span class="sd">    :param event_onsets: (np.array)</span>
+<span class="sd">    :param event_offsets: (np.array)</span>
+<span class="sd">    :param annotations_directory: (Path object)</span>
+<span class="sd">    :return: .csv file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t_start</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># change and make an argument if needed</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">mkQApp</span><span class="p">()</span>
+
+    <span class="c1"># Create main window that can contain several viewers</span>
+    <span class="n">win</span> <span class="o">=</span> <span class="n">MainViewer</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_auto_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Create a viewer for signal</span>
+    <span class="c1"># T_start essentially rereferences the start time of the dataset, but leaves the annotations alone</span>
+    <span class="c1"># be wary of this</span>
+    <span class="n">view1</span> <span class="o">=</span> <span class="n">TraceViewer</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">t_start</span><span class="p">,</span> <span class="s1">&#39;Photodiode Signals&#39;</span><span class="p">,</span> <span class="n">channel_names</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+
+    <span class="c1"># TO DO</span>
+    <span class="c1"># Figure out a better way to scale the different signals when presented</span>
+    <span class="c1"># view1.params[&#39;scale_mode&#39;] = &#39;same_for_all&#39;</span>
+    <span class="n">view1</span><span class="o">.</span><span class="n">auto_scale</span><span class="p">()</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="n">view1</span><span class="p">)</span>
+
+    <span class="c1"># annotation file details</span>
+    <span class="n">possible_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;block start&#39;</span><span class="p">,</span> <span class="s1">&#39;trial start&#39;</span><span class="p">,</span> <span class="s1">&#39;feedback&#39;</span><span class="p">,</span> <span class="s1">&#39;event&#39;</span><span class="p">]</span>
+    <span class="n">events_filename</span> <span class="o">=</span> <span class="n">annotations_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s1">_ph_events.csv&#39;</span>
+
+    <span class="n">source_epoch</span> <span class="o">=</span> <span class="n">CsvEpochSource</span><span class="p">(</span><span class="n">events_filename</span><span class="p">,</span> <span class="n">possible_labels</span><span class="p">)</span>
+
+    <span class="c1"># create a viewer for the encoder itself</span>
+    <span class="n">view2</span> <span class="o">=</span> <span class="n">EpochEncoder</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source_epoch</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Tagging events&#39;</span><span class="p">)</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="n">view2</span><span class="p">)</span>
+
+    <span class="c1"># show main window and run Qapp</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.manual_process.data_clean_viewer" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">data_clean_viewer</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">electrode_names</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>This function serves to look at lfp signals and look at which is the reference or to look at the
+macrowires and clean the data for epileptic activity
+Current: Only array functionality, so data should be hard loaded as an array for this function to work
+:param subject: (string) subject id
+:param session: (string) session id
+:param task: (string) task id
+:param annotations_directory: (Path) path object
+:param electrode_names: (1d array)
+:param dataset: (n_electrodes, n_timepoints)
+:param fs: (int)
+:return:</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/manual_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">data_clean_viewer</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">electrode_names</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">fs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function serves to look at lfp signals and look at which is the reference or to look at the</span>
+<span class="sd">    macrowires and clean the data for epileptic activity</span>
+<span class="sd">    Current: Only array functionality, so data should be hard loaded as an array for this function to work</span>
+<span class="sd">    :param subject: (string) subject id</span>
+<span class="sd">    :param session: (string) session id</span>
+<span class="sd">    :param task: (string) task id</span>
+<span class="sd">    :param annotations_directory: (Path) path object</span>
+<span class="sd">    :param electrode_names: (1d array)</span>
+<span class="sd">    :param dataset: (n_electrodes, n_timepoints)</span>
+<span class="sd">    :param fs: (int)</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">possible_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bad epileptic activity macro&#39;</span><span class="p">,</span> <span class="s1">&#39;bad eight hertz noise&#39;</span><span class="p">,</span> <span class="s1">&#39;bad epileptic activity micro&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;bad epileptic activity both&#39;</span><span class="p">,</span> <span class="s1">&#39;reference electrode&#39;</span><span class="p">,</span> <span class="s1">&#39;microPED electrode&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;white noise electrode&#39;</span><span class="p">,</span> <span class="s1">&#39;clipping noise electrode&#39;</span><span class="p">,</span> <span class="s1">&#39;epileptic macrocontact&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;white noise macrocontact&#39;</span><span class="p">]</span>
+    <span class="n">cleaning_task</span> <span class="o">=</span> <span class="s1">&#39;seizure_data_cleaning&#39;</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">annotations_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">cleaning_task</span><span class="si">}</span><span class="s1">_events.csv&#39;</span>
+    <span class="n">source_epoch</span> <span class="o">=</span> <span class="n">CsvEpochSource</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">possible_labels</span><span class="p">)</span>
+
+    <span class="n">t_start</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="c1"># you must first create a main Qt application (for event loop)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">mkQApp</span><span class="p">()</span>
+
+    <span class="c1"># Create the main window that can contain several viewers</span>
+    <span class="n">win</span> <span class="o">=</span> <span class="n">MainViewer</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_auto_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># create a viewer for signal</span>
+    <span class="n">view1</span> <span class="o">=</span> <span class="n">TraceViewer</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">t_start</span><span class="p">,</span> <span class="s1">&#39;Microwires&#39;</span><span class="p">,</span> <span class="n">channel_names</span><span class="o">=</span><span class="n">electrode_names</span><span class="p">)</span>
+    <span class="c1"># view1 = TraceViewer.from_neo_analogsignal(analog_signals, &#39;sigs&#39;)</span>
+    <span class="n">view1</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;scale_mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;same_for_all&#39;</span>
+    <span class="n">view1</span><span class="o">.</span><span class="n">auto_scale</span><span class="p">()</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="n">view1</span><span class="p">)</span>
+
+    <span class="c1"># create a viewer for the encoder itself</span>
+    <span class="n">view2</span> <span class="o">=</span> <span class="n">EpochEncoder</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source_epoch</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Tagging events&#39;</span><span class="p">)</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="n">view2</span><span class="p">)</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># view3 = EventList(source=source_epoch, name=&#39;events&#39;)</span>
+    <span class="c1"># win.add_view(view3)</span>
+    <span class="c1"># show main window and run Qapp</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.manual_process.write_timestamps" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">write_timestamps</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">event_folder</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">local_data_directory</span><span class="p">,</span> <span class="n">events_filename</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Looks in event folders for labels. Takse labels and converts them to machine time and places into a .txt file useful
+for spike sorting.
+:param subject: (string) Subject identifier
+:param session: (string) Session identifier (1 if subject only completed one run of the experiment.
+:param task: (string) Task identifier. The task or experiment subject completed.
+:param annotations_directory: This is the folder where manual annotations are found
+:param event_folder: This is the folder where events live (helpful to get global machine time)
+:param local_data_directory:  This is where the microwire data to be sorted is
+:param events_filename: If multiple events exist
+:return: None. A txt file is generated with relative timestamps if needed, or not if not needed.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/manual_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">write_timestamps</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">event_folder</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">local_data_directory</span><span class="p">,</span>
+                     <span class="n">events_filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Looks in event folders for labels. Takse labels and converts them to machine time and places into a .txt file useful</span>
+<span class="sd">    for spike sorting.</span>
+<span class="sd">    :param subject: (string) Subject identifier</span>
+<span class="sd">    :param session: (string) Session identifier (1 if subject only completed one run of the experiment.</span>
+<span class="sd">    :param task: (string) Task identifier. The task or experiment subject completed.</span>
+<span class="sd">    :param annotations_directory: This is the folder where manual annotations are found</span>
+<span class="sd">    :param event_folder: This is the folder where events live (helpful to get global machine time)</span>
+<span class="sd">    :param local_data_directory:  This is where the microwire data to be sorted is</span>
+<span class="sd">    :param events_filename: If multiple events exist</span>
+<span class="sd">    :return: None. A txt file is generated with relative timestamps if needed, or not if not needed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file_root</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">events_filename</span><span class="p">)</span>
+    <span class="n">labels_file</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">annotations_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">file_root</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">)</span>
+    <span class="n">task_label</span> <span class="o">=</span> <span class="n">labels_file</span><span class="p">[</span><span class="n">labels_file</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2"> duration&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_label</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No label found for task. Please re-run script to find task relevant data.&#39;</span><span class="p">)</span>
+    <span class="n">start_time_sec</span> <span class="o">=</span> <span class="n">task_label</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">end_time_sec</span> <span class="o">=</span> <span class="n">start_time_sec</span> <span class="o">+</span> <span class="n">task_label</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">events_filename</span><span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">global_start</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_event_times</span><span class="p">(</span><span class="n">event_folder</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+    <span class="c1"># microsec_sec = 10**-6</span>
+    <span class="n">sec_microsec</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="mi">6</span>
+    <span class="n">start_time_machine</span> <span class="o">=</span> <span class="p">(</span><span class="n">start_time_sec</span> <span class="o">+</span> <span class="n">global_start</span><span class="p">)</span> <span class="o">*</span> <span class="n">sec_microsec</span>
+    <span class="n">end_time_machine</span> <span class="o">=</span> <span class="p">(</span><span class="n">end_time_sec</span> <span class="o">+</span> <span class="n">global_start</span><span class="p">)</span> <span class="o">*</span> <span class="n">sec_microsec</span>
+    <span class="n">timestamps_file</span> <span class="o">=</span> <span class="n">local_data_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;timestampsInclude.txt&quot;</span>
+    <span class="n">specified_file</span> <span class="o">=</span> <span class="n">annotations_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;which_files.txt&quot;</span>
+    <span class="c1"># generate directory if it doesn&#39;t exist</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">local_data_directory</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">local_data_directory</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">timestamps_file</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">start_time_machine</span><span class="p">)</span><span class="si">}</span><span class="s1">    </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">end_time_machine</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">specified_file</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file_root</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.manual_process.su_timestamp_process" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">su_timestamp_process</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">results_directory</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Master script that runs basic pipeline to get timestamps file for sorting minimally using OSort Matlab scripts.
+:param subject: (str). Subject identifier
+:param session: (str). Session identifier, useful if subject ran more than one session.
+:param task: (str). Task identifier. The task the subject ran.
+:param data_directory: (Path). Path object to data where events file and photodiode file lives
+:param annotations_directory: (Path). Path object that points to where we'd like to store annotations and metadata.
+:param results_directory: (Path). Path object that points to where the timestampInclude.txt file will end up. Ideally
+ends up in spike_sorting folder alongside 'raw' folder that contains microwire .ncs files</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/manual_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">su_timestamp_process</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">results_directory</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Master script that runs basic pipeline to get timestamps file for sorting minimally using OSort Matlab scripts.</span>
+<span class="sd">    :param subject: (str). Subject identifier</span>
+<span class="sd">    :param session: (str). Session identifier, useful if subject ran more than one session.</span>
+<span class="sd">    :param task: (str). Task identifier. The task the subject ran.</span>
+<span class="sd">    :param data_directory: (Path). Path object to data where events file and photodiode file lives</span>
+<span class="sd">    :param annotations_directory: (Path). Path object that points to where we&#39;d like to store annotations and metadata.</span>
+<span class="sd">    :param results_directory: (Path). Path object that points to where the timestampInclude.txt file will end up. Ideally</span>
+<span class="sd">    ends up in spike_sorting folder alongside &#39;raw&#39; folder that contains microwire .ncs files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># double check if there are multiple events files</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">global_start</span><span class="p">,</span> <span class="n">event_files</span> <span class="o">=</span> <span class="n">get_event_times</span><span class="p">(</span><span class="n">data_directory</span><span class="p">)</span>
+
+    <span class="c1"># separate pipelines for one vs multiple events files</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">event_files</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">([]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Multiple Events Files, we will go through the separate datasets one at a time&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">event_files</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">event_file</span> <span class="ow">in</span> <span class="n">event_files</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Loading event file: </span><span class="si">{</span><span class="n">event_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="n">event_file</span><span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span>
+            <span class="c1"># print(ext)</span>
+            <span class="n">reformat_event_labels</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+            <span class="n">photodiode_check_viewer</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">diagnostic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                    <span class="n">events_filename</span><span class="o">=</span><span class="n">event_file</span><span class="p">)</span>
+            <span class="n">file_root</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">event_file</span><span class="p">)</span>
+            <span class="n">labels_file</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">annotations_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">file_root</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">)</span>
+            <span class="n">task_label</span> <span class="o">=</span> <span class="n">labels_file</span><span class="p">[</span><span class="n">labels_file</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2"> duration&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_label</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">target_file</span> <span class="o">=</span> <span class="n">event_file</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;You have determined that </span><span class="si">{</span><span class="n">event_file</span><span class="si">}</span><span class="s1"> has task relevant data&#39;</span><span class="p">)</span>
+                <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;One Event File, loading now&#39;</span><span class="p">)</span>
+        <span class="n">reformat_event_labels</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">)</span>
+        <span class="n">photodiode_check_viewer</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">diagnostic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                <span class="n">events_filename</span><span class="o">=</span><span class="n">event_files</span><span class="p">)</span>
+        <span class="n">file_root</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">event_files</span><span class="p">)</span>
+        <span class="n">labels_file</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">annotations_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">file_root</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">)</span>
+        <span class="n">task_label</span> <span class="o">=</span> <span class="n">labels_file</span><span class="p">[</span><span class="n">labels_file</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2"> duration&quot;</span><span class="p">]</span>
+        <span class="n">target_file</span> <span class="o">=</span> <span class="n">event_files</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Writing machine time timestamps for the task to spike_sorting folder&#39;</span><span class="p">)</span>
+        <span class="n">write_timestamps</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">data_directory</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">,</span> <span class="n">results_directory</span><span class="p">,</span>
+                         <span class="n">events_filename</span><span class="o">=</span><span class="n">target_file</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s2">&quot;No events file seems to have been made. Maybe you didn&#39;t add a task event?&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="intracranial_ephys_utils.manual_process.get_annotated_task_start_time" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_annotated_task_start_time</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>This function serves as a helper function to grab the start and end times of the task, after annotating the
+photodiode script. Will only work if annotations file exists, and duration event has been made.
+Recall that loading in .ncs files relies on loading in many segments of variable length, so we typically load in
+more data than what start and end time would have you believe
+:param subject:
+:param session:
+:param task:
+:param annotations_directory:
+:return: start_time_sec (float) Start time in seconds for the task. Reference is the start of the file recording.
+:return: end_time_sec (float) End time in seconds for the task. Reference is the start of the file recording.
+:return: duration (float) Duration in seconds for the task.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>intracranial_ephys_utils/manual_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_annotated_task_start_time</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">annotations_directory</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function serves as a helper function to grab the start and end times of the task, after annotating the</span>
+<span class="sd">    photodiode script. Will only work if annotations file exists, and duration event has been made.</span>
+<span class="sd">    Recall that loading in .ncs files relies on loading in many segments of variable length, so we typically load in</span>
+<span class="sd">    more data than what start and end time would have you believe</span>
+<span class="sd">    :param subject:</span>
+<span class="sd">    :param session:</span>
+<span class="sd">    :param task:</span>
+<span class="sd">    :param annotations_directory:</span>
+<span class="sd">    :return: start_time_sec (float) Start time in seconds for the task. Reference is the start of the file recording.</span>
+<span class="sd">    :return: end_time_sec (float) End time in seconds for the task. Reference is the start of the file recording.</span>
+<span class="sd">    :return: duration (float) Duration in seconds for the task.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">labels_file</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">annotations_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s1">_events.csv&#39;</span><span class="p">)</span>
+    <span class="n">task_label</span> <span class="o">=</span> <span class="n">labels_file</span><span class="p">[</span><span class="n">labels_file</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2"> duration&quot;</span><span class="p">]</span>
+    <span class="n">start_time_sec</span> <span class="o">=</span> <span class="n">task_label</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">end_time_sec</span> <span class="o">=</span> <span class="n">start_time_sec</span> <span class="o">+</span> <span class="n">task_label</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">start_time_sec</span><span class="p">,</span> <span class="n">end_time_sec</span><span class="p">,</span> <span class="n">task_label</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
