@@ -22,7 +22,7 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
     :param extension: str optional.
     :return:
     """
-    event_times, event_labels, global_start, event_file = get_event_times(data_directory, extension=extension)
+    event_times, event_labels, global_start, event_files = get_event_times(data_directory, extension=extension)
     if len(event_times) == 0:
         source_epoch = pd.DataFrame(np.array([[], [], []]).T, columns=['time', 'duration', 'label'])
     else:
@@ -31,13 +31,13 @@ def reformat_event_labels(subject, session, task, data_directory, annotations_di
         source_epoch = pd.DataFrame(np.array([event_times_sec, durations, event_labels]).T, columns=['time', 'duration',
                                                                                                      'label'])
 
-    file_root, _ = os.path.splitext(event_file)
+    file_root, _ = os.path.splitext(event_files[0])
     annotations_file = f'{subject}_{session}_{task}_{file_root}.csv'
     if annotations_file in os.listdir(annotations_directory):
         print('Annotations File exists, so nothing was written. Double check to see if it matches expectation.')
     else:
         source_epoch.to_csv(annotations_directory / annotations_file, index=False)
-    return event_file
+    return event_files[0]
 
 
 def photodiode_check_viewer(subject, session, task, data_directory, annotations_directory, diagnostic=False,
