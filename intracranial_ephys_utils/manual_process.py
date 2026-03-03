@@ -315,7 +315,7 @@ def su_timestamp_process(subject, session, task, data_directory, annotations_dir
         file_root, _ = os.path.splitext(event_files[0])
         labels_file = pd.read_csv(annotations_directory / f'{subject}_{session}_{task}_{file_root}.csv')
         task_label = labels_file[labels_file.label == f"{task} duration"]
-        target_file = event_files
+        target_file = event_files[0]
 
     try:
         print('Writing machine time timestamps for the task to spike_sorting folder')
