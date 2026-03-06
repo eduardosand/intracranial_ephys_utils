@@ -185,7 +185,7 @@ def photodiode_event_check_viewer(subject, session, task, dataset, labels, sampl
     app.exec()
 
 
-def data_clean_viewer(subject, session, task, annotations_directory, electrode_names, dataset, fs):
+def data_clean_viewer(subject, session, task, annotations_directory, electrode_names, dataset, fs, colors=None, visibles=None):
     """
     This function serves to look at lfp signals and look at which is the reference or to look at the
     macrowires and clean the data for epileptic activity
@@ -198,6 +198,10 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
     :param dataset: (n_electrodes, n_timepoints)
     :param fs: (int)
     :return:
+
+    Args:
+        visibles: (opt)
+        colors: (opt)
     """
     possible_labels = ['bad epileptic activity macro', 'bad eight hertz noise', 'bad epileptic activity micro',
                        'bad epileptic activity both', 'reference electrode', 'microPED electrode',
@@ -218,13 +222,23 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
     view1 = TraceViewer.from_numpy(dataset.T, fs, t_start, 'Microwires', channel_names=electrode_names)
     # view1 = TraceViewer.from_neo_analogsignal(analog_signals, 'sigs')
     view1.params['scale_mode'] = 'same_for_all'
+    view1.params['display_labels'] = True
+    view1.params['label_size'] = 15
+    # And also parameters for each channel
+    if colors is not None:
+        for ch_ind, ch_name in enumerate(electrode_names):
+            view1.by_channel_params[f'ch{ch_ind}', 'color'] = colors[ch_ind]
+
+    if visibles is not None:
+        for ch_ind, ch_name in enumerate(electrode_names):
+            view1.by_channel_params[f'ch{ch_ind}', 'visible'] = visibles[ch_ind]
+
     view1.auto_scale()
     win.add_view(view1)
 
     # create a viewer for the encoder itself
     view2 = EpochEncoder(source=source_epoch, name='Tagging events')
     win.add_view(view2)
-
     #
     # view3 = EventList(source=source_epoch, name='events')
     # win.add_view(view3)
