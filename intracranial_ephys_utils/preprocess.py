@@ -169,7 +169,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     event_onsets_initial = []
     event_offsets_initial = []
 
-    sign_changes = []
+    sign_changes_pos = []
+    sign_changes_neg = []
     for i, sample_num in enumerate(events):
         # deal with multiple events and looping
         if sample_num <= event_breakpoint:
@@ -193,18 +194,18 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
         # plt.show()
         if sign_change > 0:
             # positive, event_onset
-            event_onsets_initial.append([avg_sample_num, abs(sign_change)])
+            event_onsets_initial.append([avg_sample_num, sign_change])
+            sign_changes_pos.append(sign_change)
         else:
-            event_offsets_initial.append([avg_sample_num, abs(sign_change)])
-        sign_changes.append(abs(sign_change))
+            event_offsets_initial.append([avg_sample_num, sign_change])
+            sign_changes_neg.append(sign_change)
 
     # find a threshold to use for marking events that depends on the difference in mean signal before or after an event
     # this depends on having multiple peaks in our resulting distribution, which may not be true, in which case we'll
     # run into issues
-    # Create a histogram
-    hist, bins = np.histogram(sign_changes)
 
-    sign_change_drop = otsu_threshold(sign_changes)
+    sign_change_drop_neg = otsu_threshold(sign_changes_neg)
+    sign_change_drop_pos = otsu_threshold(sign_changes_pos)
     event_onsets = np.array(event_onsets_initial)
     event_offsets = np.array(event_offsets_initial)
 
@@ -212,20 +213,34 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     event_detection_signal[event_onsets[:,0].astype(int)] = 1
     event_detection_signal[event_offsets[:,0].astype(int)] = -1
 
-    event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop, 0]
-    event_offsets = event_offsets[event_offsets[:,1] > sign_change_drop, 0]
+    event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop_pos, 0]
+    event_offsets = event_offsets[event_offsets[:,1] > sign_change_drop_neg, 0]
     if debug:
         fig, ax = plt.subplots()
-        ax.hist(sign_changes, bins=100, color=primary_color)
-        ax.set_title(f'Histogram of sign changes \nThreshold {sign_change_drop}')# Add another vertical line at a specific value using plt.vlines
+        ax.hist(sign_changes_neg, bins=100, color=primary_color)
+        ax.set_title(f'Histogram of sign changes \nThreshold {sign_change_drop_neg}')# Add another vertical line at a specific value using plt.vlines
         # Force matplotlib to calculate the plot layout
         plt.draw()
         ymax = ax.get_ylim()[1]
-        ax.vlines(x=sign_change_drop, ymin=0, ymax=ymax*1.2, color='black', linestyle='dashed', linewidth=1, label='Otsu Threshold')
+        ax.vlines(x=sign_change_drop_neg, ymin=0, ymax=ymax*1.2, color='black', linestyle='dashed', linewidth=1, label='Otsu Threshold')
         ax.legend()
         plt.ylim([0, ymax])
         # plt.tight_layout()
-        plt.savefig(f"{os.pardir}/results/Otsu_thresholding_sample.svg")
+        plt.savefig(f"{os.pardir}/results/Otsu_thresholding_sample_negative.svg")
+        plt.show()
+
+
+        fig, ax = plt.subplots()
+        ax.hist(sign_changes_pos, bins=100, color=primary_color)
+        ax.set_title(f'Histogram of sign changes \nThreshold {sign_change_drop_pos}')# Add another vertical line at a specific value using plt.vlines
+        # Force matplotlib to calculate the plot layout
+        plt.draw()
+        ymax = ax.get_ylim()[1]
+        ax.vlines(x=sign_change_drop_pos, ymin=0, ymax=ymax*1.2, color='black', linestyle='dashed', linewidth=1, label='Otsu Threshold')
+        ax.legend()
+        plt.ylim([0, ymax])
+        # plt.tight_layout()
+        plt.savefig(f"{os.pardir}/results/Otsu_thresholding_sample_positive.svg")
         plt.show()
     print('Initial passthrough events')
     print(len(event_onsets))
