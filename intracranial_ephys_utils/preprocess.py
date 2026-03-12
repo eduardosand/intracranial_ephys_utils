@@ -241,7 +241,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
 
     better_event_onsets = []
     better_event_offsets = []
-    event_window_samples = 0.075 * sampling_rate
+    # original 75 msec
+    event_window_samples = 0.05 * sampling_rate
     # for now take 75 msec before and after each event as our window
     for i, event_onset in enumerate(event_onsets):
         print(i)
@@ -250,7 +251,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
         segment_to_fit = detrended_minmaxnorm_ph[start_idx:end_idx]
         times = (np.arange(len(segment_to_fit)) + start_idx) / sampling_rate
         # print(times)
-        if i ==0:
+        if i==0:
             debug_2=debug
         else:
             debug_2=False
@@ -284,6 +285,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
         print(len(event_onsets))
     elif len(event_onsets) != len(event_offsets):
         print('On events and off events do not have the same size')
+        print(len(event_onsets))
+        print(len(event_offsets))
     else:
         print('Issue with start or stop, check manual timestamping')
     if len(event_onsets) > len(event_offsets):
