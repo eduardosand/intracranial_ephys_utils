@@ -247,6 +247,22 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
 
     app.exec()
 
+    quality_annotations_file_name = annotations_directory / f'{subject}_{session}_{task}_electrode_quality_annotations.csv'
+
+    if os.path.isfile(quality_annotations_file_name):
+        print('Quality annotations file already exists')
+        run_data_view_bool = input("Overwrite? [y/n]")
+    else:
+        run_data_view_bool = 'y'
+
+    if run_data_view_bool == 'y':
+        # once the app is done running retrieve the colors, save them to a .csv file
+        new_colors = np.empty((len(electrode_names),), dtype=object)
+        for chind, ch_name in enumerate(electrode_names):
+            new_colors[int(chind)] = view1.by_channel_params[f'ch{chind}', 'color'].name()
+
+        changed_colors_dataframe = pd.DataFrame(np.array([electrode_names, new_colors]).T, columns=['Electrode Name', 'Color'])
+        changed_colors_dataframe.to_csv(quality_annotations_file_name)
 
 def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory,
                      events_filename):
