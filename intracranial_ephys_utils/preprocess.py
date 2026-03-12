@@ -163,7 +163,8 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     print(len(events))
     # originally 0.06
     buffer = 0.05*sampling_rate
-    sample_size = int(0.045*sampling_rate)
+    # originally 0.045
+    sample_size = int(0.035*sampling_rate)
     event_breakpoint = 0
     event_onsets_initial = []
     event_offsets_initial = []
