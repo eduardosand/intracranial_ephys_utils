@@ -698,7 +698,8 @@ def make_trialwise_data(event_times, electrode_names, fs, dataset, tmin=-1., tma
     :param tmax: (opt)
     :param baseline: (opt) Tuple that defines the period to use as baseline
     :param annotations: mne annotations object
-    :return: epochs_object
+    :return: epochs_object: full mne object
+    :return: trial_based_data. shape should be n_epochs, n_channels, n_times
     """
 
     # The safest way to do this is to build a mne object, first step is to create the info for that object
@@ -710,8 +711,6 @@ def make_trialwise_data(event_times, electrode_names, fs, dataset, tmin=-1., tma
     raw_data = mne.io.RawArray(dataset, mne_info)
     if annotations is not None:
         raw_data.set_annotations(annotations)
-
-    num_electrodes, num_samples = dataset.shape
     # Trying to compare some things
     epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=baseline,
                                reject_by_annotation=False)
@@ -755,3 +754,59 @@ def smooth_data(data, fs, window, step):
             smoothed_data[:, :, i] = np.mean(data[:, :, int(start-window/2*fs): int(start + window/2*fs)], axis=2)
     new_fs = 1 / step
     return smoothed_data, new_fs
+
+def featurize(epochs_dataset, feature, norm=False):
+    """
+    This functions assumes mne epochs_object is provided which is set up as
+    n_epochs(trials) X n_electrodes(observations) X n_timepoints(observations in time).
+    Splits up and reorganizes data by a certain feature. So if feature was feedback, it'll add a dimension and reformat
+    the data appropriately.
+    :param epochs_object: ndarray. shape (n_trials X n_electrodes X n_timepoints) Trial-locked data.
+    :param feature: (np.array) size (n_epochs, )
+    :param norm: (optional) (bool) whether to z-score the data or just center
+    :return: organized_data_mean: (ndarray) shape (n_electrodes, n_cond, n_timepoints)
+    :return: organized_data: (ndarray) shape (n_epochs, n_electrodes, n_cond, n_timepoints)
+    :return: inv_feature_dict: (dict) keys are the values, values are the features they correspond to
+    """
+    n_epochs, n_electrodes, n_timepoints = epochs_dataset.shape
+    features = sorted(set(list(feature)))
+    feature_dict = {}
+    feature_key_values = [(value, ind) for ind, value in enumerate(features)]
+    feature_dict.update(feature_key_values)
+    inv_feature_dict = {}
+    feature_key_values = [(ind, value) for ind, value in enumerate(features)]
+    inv_feature_dict.update(feature_key_values)
+    # rule_split = [list(rule[~np.isnan(rt)]).count(i) for i in set(list(rule[~np.isnan(rt)]))]
+    feature_split = [list(feature).count(i) for i in features]
+    # Here, we're making a better epochs object that is also factored by condition
+    # n_trials = min(feature_split)
+    organized_data = np.zeros((max(feature_split), n_electrodes, len(features), n_timepoints))
+    # organized_data = np.zeros((n_trials, n_electrodes, len(rule_dimensions), n_timepoints))
+    organized_data[organized_data == 0] = np.nan
+    for electrode in range(n_electrodes):
+        counts_dict = {}
+        key_values = [(i, 0) for i in feature]
+        counts_dict.update(key_values)
+        for epoch in range(n_epochs):
+            curr_feature = list(feature)[epoch]
+            curr_count = counts_dict[curr_feature]
+            organized_data[curr_count, electrode, feature_dict[curr_feature], :] = epochs_dataset[epoch,
+                                                                                                  electrode, :]
+            counts_dict[curr_feature] += 1
+
+    # Center our data within electrodes
+    if norm:
+        # We'd like to normalize the regular data with respect to the trial itself
+        organized_data = ((organized_data - np.nanmean(organized_data, axis=3, keepdims=True)) /
+                                            np.nanstd(organized_data, axis=3, keepdims=True))
+        organized_data_mean = np.nanmean(organized_data, axis=0)
+        # organized_data_mean -= np.nanmean(organized_data_mean.reshape((n_electrodes, -1)), 1)[:, None, None]
+        # organized_data_mean /= np.nanstd(organized_data_mean.reshape((n_electrodes, -1)), 1)[:, None, None]
+    else:
+        organized_data_mean = np.nanmean(organized_data, axis=0)
+        # organized_data_mean -= np.nanmean(organized_data_mean.reshape((n_electrodes, -1)), 1)[:, None, None]
+        # organized_data_center_within_trial = organized_data - np.expand_dims(np.nanmean(organized_data, axis=3),
+        #                                                                      axis=3)
+        # organized_data_mean = np.nanmean(organized_data_center_within_trial, axis=0)
+        # organized_data_mean -= np.nanmean(organized_data_mean.reshape((n_electrodes, -1)), 1)[:, None, None]
+    return organized_data_mean, organized_data, inv_feature_dict
