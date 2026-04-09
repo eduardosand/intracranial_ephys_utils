@@ -214,7 +214,7 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, deb
     event_detection_signal[event_offsets[:,0].astype(int)] = -1
 
     event_onsets = event_onsets[event_onsets[:,1] > sign_change_drop_pos, 0]
-    event_offsets = event_offsets[event_offsets[:,1] > sign_change_drop_neg, 0]
+    event_offsets = event_offsets[event_offsets[:,1] < sign_change_drop_neg, 0]
     if debug:
         fig, ax = plt.subplots()
         ax.hist(sign_changes_neg, bins=100, color=primary_color)
@@ -769,6 +769,7 @@ def featurize(epochs_dataset, feature, norm=False):
     :return: inv_feature_dict: (dict) keys are the values, values are the features they correspond to
     """
     n_epochs, n_electrodes, n_timepoints = epochs_dataset.shape
+    print(feature)
     features = sorted(set(list(feature)))
     feature_dict = {}
     feature_key_values = [(value, ind) for ind, value in enumerate(features)]
@@ -809,4 +810,7 @@ def featurize(epochs_dataset, feature, norm=False):
         #                                                                      axis=3)
         # organized_data_mean = np.nanmean(organized_data_center_within_trial, axis=0)
         # organized_data_mean -= np.nanmean(organized_data_mean.reshape((n_electrodes, -1)), 1)[:, None, None]
+    print(features)
+    print(feature_key_values)
+    print(inv_feature_dict)
     return organized_data_mean, organized_data, inv_feature_dict
