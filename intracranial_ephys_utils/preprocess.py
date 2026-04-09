@@ -103,7 +103,7 @@ def fitting_ph_response(segment_to_fit, times, debug=False):
     return popt
 
 
-def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=2, debug=True):
+def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=3, debug=True):
     """
     Binarizes the photodiode signal using the midpoint of the signal. Use local midpoints if given a tau.
     New version of this script uses a high pass filter and then peaks to find timepoints at which the signal changes by
