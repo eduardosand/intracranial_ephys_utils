@@ -8,6 +8,7 @@ from .preprocess import binarize_ph
 import os
 import pandas as pd
 from pathlib import Path
+from typing import Optional, Tuple
 
 
 def reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=None):
@@ -185,7 +186,8 @@ def photodiode_event_check_viewer(subject, session, task, dataset, labels, sampl
     app.exec()
 
 
-def data_clean_viewer(subject, session, task, annotations_directory, electrode_names, dataset, fs, colors=None, visibles=None):
+def data_clean_viewer(subject: str, session: str, task: str, annotations_directory: Path, electrode_names: list,
+                      dataset: np.array, fs: float, colors: Optional[list]=None, visibles: Optional[list]=None):
     """
     This function serves to look at lfp signals and look at which is the reference or to look at the
     macrowires and clean the data for epileptic activity
@@ -201,6 +203,9 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
         fs: (float)
         visibles: (opt)
         colors: (opt)
+
+    Returns:
+
     """
     possible_labels = ['bad epileptic activity macro', 'bad eight hertz noise', 'bad epileptic activity micro',
                        'bad epileptic activity both', 'reference electrode', 'microPED electrode',
