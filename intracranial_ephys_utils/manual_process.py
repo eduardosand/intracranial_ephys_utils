@@ -190,16 +190,15 @@ def data_clean_viewer(subject, session, task, annotations_directory, electrode_n
     This function serves to look at lfp signals and look at which is the reference or to look at the
     macrowires and clean the data for epileptic activity
     Current: Only array functionality, so data should be hard loaded as an array for this function to work
-    :param subject: (string) subject id
-    :param session: (string) session id
-    :param task: (string) task id
-    :param annotations_directory: (Path) path object
-    :param electrode_names: (1d array)
-    :param dataset: (n_electrodes, n_timepoints)
-    :param fs: (int)
-    :return:
 
     Args:
+        subject: (string) subject id
+        session: (string) session id
+        task: (string) task id
+        annotations_directory: (Path object)
+        electrode_names: (1d array)
+        dataset: (n_electrodes, n_timepoints)
+        fs: (float)
         visibles: (opt)
         colors: (opt)
     """

@@ -11,6 +11,7 @@ import warnings
 import mne
 import scipy.optimize as optimize
 from ephyviewer import mkQApp, MainViewer, TraceViewer, CsvEpochSource, EpochEncoder
+from fractions import Fraction
 
 def otsu_intraclass_variance(time_series: np.array, threshold: float):
     """
@@ -406,93 +407,33 @@ def BCI_LFP_processing(lfp_signals, sampling_rate):
     return processed_signals, effective_fs
 
 
-def broadband_seeg_processing(lfp_signals, sampling_rate, lowfreq, high_freq):
+def broadband_seeg_processing(lfp_signals, sampling_rate, target_sampling_rate, notch_f0=60.):
     """
-    This function takes in an lfp signal and performs basic processing. This function is janky but that's only
-    because decimations of too big a factor result in artifacts, so I need one solution for 32K, and a different one
-    for other sampling rates.
-    Preprocessing is as follows, downsample once. We want to make sure we stay above Nyquist limit, so then we run our
-    a 4th order Butterworth to bandpass from lowfreq to highfreq. Downsample once more to get down to 1KHz sampling rate
-    Finally, we'll pass through a Notch filter to get rid of powerline noise and associated harmonics.
+    This function takes in an lfp signal and performs basic processing. LFP signals are resampled using polyphasic
+    resampling. From there, the signal is high passed with a cut off of 0.5 Hz. Then a notch filter is applied to remove
+    power line noise.
     WARNING: This is NOT good for European data because of the power line noise there(its 50Hz)
     :param lfp_signals: (np.array) (1, n_samples)
     :param sampling_rate: (int)
-    :param lowfreq: (int) lower frequency for bandpass
-    :param high_freq: (int) higher frequency for bandpass
+    :param target_sampling_rate: (int) desired sampling rate for data
     :return: processed_signals: numpy array shape (1, n_samples)
     :return: effective_fs: (int) Final sampling rate after processing
     """
-    # realizing now that this first line is tricky, think a little bit more about how this will work
-    if (sampling_rate >= 32000) and (sampling_rate < 33000):
-        if high_freq == 1000:
-            second_factor = 8
-        elif high_freq == 2000:
-            second_factor = 4
-        else:
-            second_factor = 8
-        first_factor = 4
-        # for microLFP, this brings us down to 8KHz
-        downsampled_signal = signal.decimate(lfp_signals, first_factor)
-        effective_fs = sampling_rate/first_factor
-        butterworth_bandpass = signal.butter(4, (lowfreq, high_freq), 'bp', fs=effective_fs, output='sos')
-        bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, downsampled_signal)
-        # for microLFP, this brings us down to 1/2 Khz
-        downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
-        effective_fs /= second_factor
-    elif sampling_rate == 8000:
-        if high_freq == 1000:
-            second_factor = 8
-        elif high_freq == 2000:
-            second_factor = 4
-        else:
-            second_factor = 8
-        # first_factor = 1
-        butterworth_bandpass = signal.butter(4, (lowfreq, high_freq), 'bp', fs=sampling_rate, output='sos')
-        bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, lfp_signals)
-        # for macroLFP, this brings us down to 1 Khz
-        downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
-        effective_fs = sampling_rate/second_factor
-    elif sampling_rate == 4000:
-        if high_freq == 1000:
-            second_factor = 4
-            bp_freq = 1000
-        elif high_freq == 2000:
-            second_factor = 2
-            bp_freq = 1999
-        else:
-            raise Exception(f'Figure out better downsampling scheme')
-        butterworth_bandpass = signal.butter(4, (lowfreq, bp_freq), 'bp', fs=sampling_rate, output='sos')
-        bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, lfp_signals)
-        # for macroLFP, this brings us down to 1 Khz
-        downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
-        effective_fs = sampling_rate / second_factor
-    elif sampling_rate == 2000:
-        if high_freq == 1000:
-            second_factor = 2
-            butterworth_bandpass = signal.butter(4, (lowfreq, high_freq), 'bp', fs=sampling_rate, output='sos')
-            bandpass_signal = signal.sosfiltfilt(butterworth_bandpass, lfp_signals)
-            # for macroLFP, this brings us down to 1 Khz
-            downsampled_signal_2 = signal.decimate(bandpass_signal, second_factor)
-            effective_fs = sampling_rate / second_factor
-        elif high_freq == 2000:
-            # don't need to do anything
-            downsampled_signal_2 = lfp_signals
-            effective_fs = sampling_rate
-        else:
-            raise Exception(f'Figure out better downsampling scheme')
-    else:
-        raise Exception(f'Invalid sampling rate {sampling_rate}')
-
-    f0 = 60.
+    frac = Fraction(target_sampling_rate, sampling_rate).limit_denominator(1000)
+    L, M = frac.numerator, frac.denominator
+    downsampled_signals = signal.resample_poly(lfp_signals, L, M, window=('kaiser', 8.0))
+    eff_fs = sampling_rate * L / M
+    sos = signal.butter(4, 0.5, btype='highpass', fs=eff_fs, output='sos')
+    drift_filtered_signals  = signal.sosfiltfilt(sos, downsampled_signals)
     q = 30.0  # Quality Factor
-    b_notch, a_notch = signal.iirnotch(f0, q, effective_fs)
-    processed_signals = signal.filtfilt(b_notch, a_notch, downsampled_signal_2)
+    b_notch, a_notch = signal.iirnotch(notch_f0, q, eff_fs)
+    processed_signals = signal.filtfilt(b_notch, a_notch, drift_filtered_signals)
 
     # Get harmonics out of the signal as well, up to 300
     for i in range(2, 6):
-        b_notch, a_notch = signal.iirnotch(f0*i, q, effective_fs)
+        b_notch, a_notch = signal.iirnotch(notch_f0*i, q, eff_fs)
         processed_signals = signal.filtfilt(b_notch, a_notch, processed_signals)
-    return processed_signals, int(effective_fs)
+    return processed_signals, int(eff_fs)
 
 
 def preprocess_dataset(file_paths, neuro_folder_name, low_pass=1000, task=None, events_file=None):
@@ -525,8 +466,6 @@ def preprocess_dataset(file_paths, neuro_folder_name, low_pass=1000, task=None, 
                 first_factor = 8
             elif low_pass == 2000:
                 first_factor = 4
-            else:
-                first_factor = 8
             fs = sample_rate / first_factor
             processed_lfp = signal.decimate(lfp_signal, first_factor)
             downsampled_timestamps = timestamps[::first_factor]
@@ -536,7 +475,7 @@ def preprocess_dataset(file_paths, neuro_folder_name, low_pass=1000, task=None, 
         else:
             lfp_signal, sample_rate, _, _ = read_task_ncs(neuro_folder_name, micro_file_path, task=task,
                                                           events_file=events_file)
-            processed_lfp, fs = broadband_seeg_processing(lfp_signal, sample_rate, 0.1, low_pass)
+            processed_lfp, fs = broadband_seeg_processing(lfp_signal, sample_rate, low_pass)
         if ind == 0:
             dataset = np.zeros((len(file_paths)+1, processed_lfp.shape[0]))
             dataset[ind, :] = processed_lfp
@@ -556,7 +495,6 @@ def preprocess_dataset(file_paths, neuro_folder_name, low_pass=1000, task=None, 
             electrode_names.append(ncs_filename)
         if ncs_filename.startswith('photo'):
             dataset[-1, :] = downsampled_timestamps
-    eff_fs.append(fs)
     electrode_names.append('Timepoints')
     return dataset, eff_fs, electrode_names
 
