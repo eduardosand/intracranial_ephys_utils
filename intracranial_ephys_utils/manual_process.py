@@ -1,7 +1,7 @@
 from ephyviewer import mkQApp, MainViewer, TraceViewer, CsvEpochSource, EpochEncoder
 import numpy as np
 import warnings
-
+from ephyviewer.myqt import QT
 from .load_data import read_task_ncs, get_event_times
 from .plot_data import diagnostic_time_series_plot
 from .preprocess import binarize_ph
@@ -9,6 +9,27 @@ import os
 import pandas as pd
 from pathlib import Path
 from typing import Optional, Tuple
+
+# Preset colors used when coloring channels by quality/type in data_clean_viewer.
+# Qt's color dialog holds up to 16 custom color slots (indices 0–15).
+PRESET_CUSTOM_COLORS = [
+    '#FF0000',  # red           – bad epileptic activity
+    '#FF69B4',  # pink          – epileptic spread
+    '#0000FF',  # dark blue     – out of brain
+    '#FFFF00',  # yellow        – white matter
+    '#800080',  # purple        – events/peripherals
+    '#550000',  # maroon        – reference microwire
+    '#FF00FF',  # magenta       – epileptic macrocontact
+    '#800000',  # dark red      – bad epileptic activity (micro)
+    '#808000',  # olive         – bad epileptic activity (both)
+    '#008080',  # teal          – white noise macrocontact
+    '#FFFFFF',  # white         – bad 8 Hz noise
+    '#C0C0C0',  # light grey    – clipping noise
+    '#808080',  # mid grey      – microPED electrode
+    '#404040',  # dark grey     – spare
+    '#000080',  # navy          – spare
+    '#800080',  # purple        – spare
+]
 
 
 def reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=None):
@@ -209,7 +230,7 @@ def data_clean_viewer(subject: str, session: str, task: str, annotations_directo
     """
     possible_labels = ['bad epileptic activity macro', 'bad eight hertz noise', 'bad epileptic activity micro',
                        'bad epileptic activity both', 'reference electrode', 'microPED electrode',
-                       'white noise electrode', 'clipping noise electrode', 'epileptic macrocontact',
+                       'white noise electrode', 'clipping noise electrode',
                        'white noise macrocontact']
     cleaning_task = 'seizure_data_cleaning'
     file_path = annotations_directory / f'{subject}_{session}_{task}_{cleaning_task}_events.csv'
@@ -222,6 +243,9 @@ def data_clean_viewer(subject: str, session: str, task: str, annotations_directo
     # Create the main window that can contain several viewers
     win = MainViewer(debug=True, show_auto_scale=True)
 
+    max_slots = 16  # Qt hard-limits custom colors to 16 slots
+    for slot_index, color_value in enumerate(PRESET_CUSTOM_COLORS[:max_slots]):
+        QT.QColorDialog.setCustomColor(slot_index, QT.QColor(color_value))
     # create a viewer for signal
     view1 = TraceViewer.from_numpy(dataset.T, fs, t_start, 'Microwires', channel_names=electrode_names)
     # view1 = TraceViewer.from_neo_analogsignal(analog_signals, 'sigs')
