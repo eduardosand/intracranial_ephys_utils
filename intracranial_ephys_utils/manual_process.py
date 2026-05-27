@@ -10,26 +10,33 @@ import pandas as pd
 from pathlib import Path
 from typing import Optional, Tuple
 
-# Preset colors used when coloring channels by quality/type in data_clean_viewer.
-# Qt's color dialog holds up to 16 custom color slots (indices 0–15).
-PRESET_CUSTOM_COLORS = [
-    '#FF0000',  # red           – bad epileptic activity
-    '#FF69B4',  # pink          – epileptic spread
-    '#0000FF',  # dark blue     – out of brain
-    '#FFFF00',  # yellow        – white matter
-    '#800080',  # purple        – events/peripherals
-    '#550000',  # maroon        – reference microwire
-    '#FF00FF',  # magenta       – epileptic macrocontact
-    '#800000',  # dark red      – bad epileptic activity (micro)
-    '#808000',  # olive         – bad epileptic activity (both)
-    '#008080',  # teal          – white noise macrocontact
-    '#FFFFFF',  # white         – bad 8 Hz noise
-    '#C0C0C0',  # light grey    – clipping noise
-    '#808080',  # mid grey      – microPED electrode
-    '#404040',  # dark grey     – spare
-    '#000080',  # navy          – spare
-    '#800080',  # purple        – spare
-]
+def data_cleaning_metadata():
+    """
+    Dictionary that includes names and corresponding hexcodes
+    Returns:
+
+    """
+    # Preset colors used when coloring channels by quality/type in data_clean_viewer.
+    # Qt's color dialog holds up to 16 custom color slots (indices 0–15).
+    PRESET_CUSTOM_COLORS = [
+        '#FF0000',  # red           – epileptic source
+        '#FF69B4',  # pink          – epileptic spread
+        '#0000FF',  # dark blue     – out of brain
+        '#FFFF00',  # yellow        – white matter
+        '#800080',  # purple        – events/peripherals
+        '#550000',  # maroon        – reference microwire
+        '#55FF00',  # green         – usable
+        '#800000',  # dark red      – bad epileptic activity (micro)
+        '#808000',  # olive         – bad epileptic activity (both)
+        '#008080',  # teal          – white noise macrocontact
+        '#FFFFFF',  # white         – bad 8 Hz noise
+        '#C0C0C0',  # light grey    – clipping noise
+        '#808080',  # mid grey      – microPED electrode
+        '#404040',  # dark grey     – spare
+        '#000080',  # navy          – spare
+        '#800080',  # purple        – spare
+    ]
+    return PRESET_CUSTOM_COLORS
 
 
 def reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=None):
@@ -244,6 +251,7 @@ def data_clean_viewer(subject: str, session: str, task: str, annotations_directo
     win = MainViewer(debug=True, show_auto_scale=True)
 
     max_slots = 16  # Qt hard-limits custom colors to 16 slots
+    PRESET_CUSTOM_COLORS = data_cleaning_metadata()
     for slot_index, color_value in enumerate(PRESET_CUSTOM_COLORS[:max_slots]):
         QT.QColorDialog.setCustomColor(slot_index, QT.QColor(color_value))
     # create a viewer for signal
