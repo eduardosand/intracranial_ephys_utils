@@ -435,6 +435,85 @@ def broadband_seeg_processing(lfp_signals, sampling_rate, target_sampling_rate, 
         processed_signals = signal.filtfilt(b_notch, a_notch, processed_signals)
     return processed_signals, int(eff_fs)
 
+def min_power_drop(bundle_signals, sampling_frequency, debug=False, wire_names=None, base_folder=None):
+    # take power estimates for wires within a bundle
+    # drop the one with the lowest power
+    # assume that there is a reference wire, so there is a lowest wire
+    power_measure_period = .030  # msec
+    # n_samples
+    n_wires, n_samples = bundle_signals.shape
+    power_measurements = np.zeros((n_wires, int(n_samples / (power_measure_period * sampling_frequency))))
+    num_samples_per_measure = int(
+        power_measure_period * sampling_frequency)  # amount of samples used in each calculation of power
+    for j in range(int(n_samples / num_samples_per_measure)):
+        # square and then average the amplitude over a certain period
+        start_time_samples = int(j * num_samples_per_measure)
+        power_measurements[:, j] = np.mean(bundle_signals[:,
+        start_time_samples:start_time_samples + num_samples_per_measure] ** 2, axis=1)
+
+    # with that, let's plot power distribution as sanity check, and then isolate the silent wire
+    # Normalized data for prettier distribution plots
+    power_measurements_std = np.std(power_measurements, axis=1).T
+    power_measurements_mean = np.median(power_measurements, axis=1).T
+    # thresholding data to account for epileptic spikes, outlier power calculations
+    # max mask
+    power_threshold = 3
+    max_replacement_array = np.round(np.array((power_measurements_mean + power_threshold * power_measurements_std)).T,
+                                     4)
+    max_mask = (power_measurements.T >=
+                (power_measurements_mean
+                 + power_threshold * power_measurements_std)).T
+
+    # min mask
+    min_mask = (power_measurements.T <=
+                (power_measurements_mean
+                 - power_threshold * power_measurements_std)).T
+    min_replacement_array = np.round(np.array((power_measurements_mean - power_threshold * power_measurements_std)).T,
+                                     4)
+
+    # Broadcast to match the mask
+    for col in range(power_measurements_mean.shape[0]):
+        col_max_mask = max_mask[col, :]
+        power_measurements[col, col_max_mask] = max_replacement_array[col]
+        col_min_mask = min_mask[col, :]
+        power_measurements[col, col_min_mask] = min_replacement_array[col]
+
+    # find the wire with minimal mean power, and drop it from our data
+    means_power_measurements = np.mean(power_measurements, axis=1)
+    min_electrode_ind = np.argmin(means_power_measurements, axis=0)
+
+    if debug:
+        print('Debug Mode: Plotting Power Measurements.')
+        n_bins = 100
+        fig, ax = plt.subplots(2, 4, figsize=(12, 5))
+        colors = ['black', 'red', 'orange', 'gold', 'green', 'blue', 'purple', 'pink']
+        for i in range(power_measurements.shape[0]):
+            col_num = i // 4
+            row_num = i % 4
+            if i == min_electrode_ind:
+                bins = np.linspace(np.min(power_measurements[i, :]), np.max(power_measurements[i, :]), n_bins)
+                ax[col_num, row_num].hist(power_measurements[i, :], bins=bins, color=colors[i], label=wire_names[i],
+                                          alpha=1., density=False)
+                ax[col_num, row_num].set_xscale('linear')
+            else:
+                # bins = np.linspace(np.min(power_measurements[i, :]), 0.8 * np.max(power_measurements[i, :]), n_bins)
+                logbins = np.logspace(np.log10(np.min(power_measurements[i, :])),
+                                      np.log10(np.max(power_measurements[i, :])), n_bins)
+                ax[col_num, row_num].hist(power_measurements[i, :], bins=logbins, color=colors[i], label=wire_names[i],
+                                          alpha=1., density=False)
+                ax[col_num, row_num].set_xscale('log')
+            if row_num == 0:
+                ax[col_num, row_num].set_ylabel('Sample Counts')
+            if col_num == 1:
+                ax[col_num, row_num].set_xlabel('Amplitude')
+            ax[col_num, row_num].legend()
+        fig.suptitle(f'Power distributions of wires \n with {power_measure_period}s long samples')
+        # plt.tight_layout()
+        plt.savefig(base_folder / f'{wire_names[0][0:4]}_silent_wire.svg')
+        plt.savefig(base_folder / f'{wire_names[0][0:4]}_silent_wire.png')
+        plt.show()
+    return min_electrode_ind
+
 
 def preprocess_dataset(file_paths, neuro_folder_name, low_pass=1000, task=None, events_file=None):
     """
