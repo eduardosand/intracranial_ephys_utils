@@ -36,7 +36,16 @@ def data_cleaning_metadata():
         '#000080',  # navy          – spare
         '#800080',  # purple        – spare
     ]
-    return PRESET_CUSTOM_COLORS
+    PRESET_CUSTOM_COLORS_DICT = {
+        '#ff0000': "Epileptic Source",
+        '#ff69b4': "Epileptic Spread",
+        '#0000ff': "Out of Brain",
+        '#ffff00': "White Matter",
+        '#800080': "Events and Peripherals",
+        '#550000': "Reference Microwire",
+        '#55ff00': "Clean"
+    }
+    return PRESET_CUSTOM_COLORS, PRESET_CUSTOM_COLORS_DICT
 
 
 def reformat_event_labels(subject, session, task, data_directory, annotations_directory, extension=None):
@@ -251,7 +260,7 @@ def data_clean_viewer(subject: str, session: str, task: str, annotations_directo
     win = MainViewer(debug=True, show_auto_scale=True)
 
     max_slots = 16  # Qt hard-limits custom colors to 16 slots
-    PRESET_CUSTOM_COLORS = data_cleaning_metadata()
+    PRESET_CUSTOM_COLORS, COLORS_DICT = data_cleaning_metadata()
     for slot_index, color_value in enumerate(PRESET_CUSTOM_COLORS[:max_slots]):
         QT.QColorDialog.setCustomColor(slot_index, QT.QColor(color_value))
     # create a viewer for signal
@@ -294,10 +303,13 @@ def data_clean_viewer(subject: str, session: str, task: str, annotations_directo
     if run_data_view_bool == 'y':
         # once the app is done running retrieve the colors, save them to a .csv file
         new_colors = np.empty((len(electrode_names),), dtype=object)
+        quality_labels = np.empty((len(electrode_names),), dtype=object)
         for chind, ch_name in enumerate(electrode_names):
             new_colors[int(chind)] = view1.by_channel_params[f'ch{chind}', 'color'].name()
-
-        changed_colors_dataframe = pd.DataFrame(np.array([electrode_names, new_colors]).T, columns=['Electrode Name', 'Color'])
+            quality_labels[int(chind)] = COLORS_DICT[view1.by_channel_params[f'ch{chind}', 'color'].name()]
+        ch_names = [elec_name.split('_')[0] for elec_name in electrode_names]
+        changed_colors_dataframe = pd.DataFrame(np.array([ch_names, electrode_names, new_colors, quality_labels]).T,
+                                                columns=['Channel Name', 'Electrode Name with localization', 'Color', "Quality Label"])
         changed_colors_dataframe.to_csv(quality_annotations_file_name)
 
 def write_timestamps(subject, session, task, event_folder, annotations_directory, local_data_directory,
