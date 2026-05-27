@@ -729,11 +729,12 @@ def make_trialwise_data(event_times, electrode_names, fs, dataset, tmin=-1., tma
     if annotations is not None:
         raw_data.set_annotations(annotations)
     # Trying to compare some things
-    epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=baseline,
-                               reject_by_annotation=False)
-    trial_based_data = epochs_object.get_data(copy=True)
+    # epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=baseline,
+    #                            reject_by_annotation=False)
+    # trial_based_data = epochs_object.get_data(copy=True)
     epochs_object = mne.Epochs(raw_data, events, tmax=tmax, tmin=tmin, baseline=baseline,
                                reject_by_annotation=True)
+    trial_based_data = epochs_object.get_data(copy=True)
     return epochs_object, trial_based_data
 
 
