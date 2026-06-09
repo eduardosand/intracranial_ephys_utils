@@ -26,7 +26,7 @@ def data_cleaning_metadata():
         '#800080',  # purple        – events/peripherals
         '#550000',  # maroon        – reference microwire
         '#55FF00',  # green         – usable
-        '#800000',  # dark red      – bad epileptic activity (micro)
+        '#800000',  # dark red      – uPED/heartbeat electrode
         '#808000',  # olive         – bad epileptic activity (both)
         '#008080',  # teal          – white noise macrocontact
         '#FFFFFF',  # white         – bad 8 Hz noise
@@ -43,6 +43,7 @@ def data_cleaning_metadata():
         '#ffff00': "White Matter",
         '#800080': "Events and Peripherals",
         '#550000': "Reference Microwire",
+        '#800000': "uPED/Heartbeat Microwire",
         '#55ff00': "Clean"
     }
     return PRESET_CUSTOM_COLORS, PRESET_CUSTOM_COLORS_DICT
@@ -295,7 +296,7 @@ def data_clean_viewer(subject: str, session: str, task: str, annotations_directo
     quality_annotations_file_name = annotations_directory / f'{subject}_{session}_{task}_electrode_quality_annotations.csv'
 
     if os.path.isfile(quality_annotations_file_name):
-        print('Quality annotations file already exists')
+        print('Electrode quality annotations file already exists')
         run_data_view_bool = input("Overwrite? [y/n]")
     else:
         run_data_view_bool = 'y'

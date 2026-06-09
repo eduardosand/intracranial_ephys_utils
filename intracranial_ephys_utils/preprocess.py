@@ -831,4 +831,4 @@ def featurize(epochs_dataset, feature, norm=False):
     print(features)
     print(feature_key_values)
     print(inv_feature_dict)
-    return organized_data_mean, organized_data, inv_feature_dict
+    return organized_data_mean, organized_data, inv_feature_dict, counts_dict
