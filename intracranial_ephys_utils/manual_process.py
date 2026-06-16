@@ -27,7 +27,7 @@ def data_cleaning_metadata():
         '#550000',  # maroon        – reference microwire
         '#55FF00',  # green         – usable
         '#800000',  # dark red      – uPED/heartbeat electrode
-        '#808000',  # olive         – bad epileptic activity (both)
+        '#808000',  # olive         – clipping, overly noisy, white noise microwires
         '#008080',  # teal          – white noise macrocontact
         '#FFFFFF',  # white         – bad 8 Hz noise
         '#C0C0C0',  # light grey    – clipping noise
@@ -44,7 +44,8 @@ def data_cleaning_metadata():
         '#800080': "Events and Peripherals",
         '#550000': "Reference Microwire",
         '#800000': "uPED/Heartbeat Microwire",
-        '#55ff00': "Clean"
+        '#55ff00': "Clean",
+        '#808000': "Clipping/Noisy Microwire"
     }
     return PRESET_CUSTOM_COLORS, PRESET_CUSTOM_COLORS_DICT
 
