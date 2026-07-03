@@ -247,9 +247,7 @@ def data_clean_viewer(subject: str, session: str, task: str, annotations_directo
 
     """
     possible_labels = ['bad epileptic activity macro', 'bad eight hertz noise', 'bad epileptic activity micro',
-                       'bad epileptic activity both', 'reference electrode', 'microPED electrode',
-                       'white noise electrode', 'clipping noise electrode',
-                       'white noise macrocontact']
+                       'bad epileptic activity both']
     cleaning_task = 'seizure_data_cleaning'
     file_path = annotations_directory / f'{subject}_{session}_{task}_{cleaning_task}_events.csv'
     source_epoch = CsvEpochSource(file_path, possible_labels)
