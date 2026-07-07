@@ -787,7 +787,7 @@ def featurize(epochs_dataset, feature, norm=False):
     :return: inv_feature_dict: (dict) keys are the values, values are the features they correspond to
     """
     n_epochs, n_electrodes, n_timepoints = epochs_dataset.shape
-    print(feature)
+    # print(feature)
     features = sorted(set(list(feature)))
     feature_dict = {}
     feature_key_values = [(value, ind) for ind, value in enumerate(features)]
@@ -829,6 +829,6 @@ def featurize(epochs_dataset, feature, norm=False):
         # organized_data_mean = np.nanmean(organized_data_center_within_trial, axis=0)
         # organized_data_mean -= np.nanmean(organized_data_mean.reshape((n_electrodes, -1)), 1)[:, None, None]
     print(features)
-    print(feature_key_values)
-    print(inv_feature_dict)
+    # print(feature_key_values)
+    # print(inv_feature_dict)
     return organized_data_mean, organized_data, inv_feature_dict, counts_dict
