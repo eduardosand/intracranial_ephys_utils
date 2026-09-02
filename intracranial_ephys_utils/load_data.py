@@ -128,6 +128,9 @@ def get_event_times(neuralynx_data_directory: Path, extension: Optional[str] = N
         events_file = None
     else:
         print(f'Found files: {events_files}')
+        event_times = None
+        event_labels = None
+        global_start = None
     return event_times, event_labels, global_start, events_files
 
 

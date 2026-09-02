@@ -828,7 +828,7 @@ def featurize(epochs_dataset, feature, norm=False):
         #                                                                      axis=3)
         # organized_data_mean = np.nanmean(organized_data_center_within_trial, axis=0)
         # organized_data_mean -= np.nanmean(organized_data_mean.reshape((n_electrodes, -1)), 1)[:, None, None]
-    print(features)
+    # print(features)
     # print(feature_key_values)
     # print(inv_feature_dict)
     return organized_data_mean, organized_data, inv_feature_dict, counts_dict
