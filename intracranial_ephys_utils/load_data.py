@@ -5,6 +5,7 @@ from scipy.interpolate import CubicSpline
 import warnings
 import pandas as pd
 from pathlib import Path
+from dateutil.parser import parse, ParserError
 from typing import Optional, Tuple
 
 def get_file_info(directory: Path, start: str, file_extension: str) -> Path:
@@ -86,9 +87,6 @@ def get_event_times(neuralynx_data_directory: Path, extension: Optional[str] = N
     if len(events_files) == 1:
         # with one events file, read in the photodiode file
         events_file = events_files[0]
-        event_reader = read_file(neuralynx_data_directory / events_file)
-        event_reader.parse_header()
-
         ph_file = events_file.replace(".nev", ".ncs")
         ph_file = ph_file.replace("Events", "photo1")
         if os.path.exists(neuralynx_data_directory / ph_file):
@@ -98,21 +96,27 @@ def get_event_times(neuralynx_data_directory: Path, extension: Optional[str] = N
             file_list = os.listdir(neuralynx_data_directory)
             better_file_list = [file for file in file_list if file.endswith('.ncs')]
             ph_reader = read_file(neuralynx_data_directory / better_file_list[0])
-            warnings.warn(f"No photodiode file found. Using {better_file_list[0]}")
+            warnings.warn(f"No photodiode file found. Using {better_file_list[0]} for event time annotation.")
         try:
             ph_reader.parse_header()
             global_start = ph_reader.global_t_start
         except OSError:
             warnings.warn("OSError. Inquire further. Previous errors were from a header missing information.")
-        # global_start_event_reader = event_reader.global_t_start
+
+        event_reader = read_file(neuralynx_data_directory / events_file)
+        try:
+            event_reader.parse_header()
+        except ParserError:
+            print(
+                "ParserError when reading the event times. In the past, this has been due to missing RecordingClosed in header.")
         try:
             event_times, _, event_labels = event_reader.get_event_timestamps()
             if 'global_start' not in locals():
                 global_start = event_times[0]
                 warnings.warn("No files to choose from. Is there neuralynx data in this folder?")
         except IndexError:
-            warnings.warn("No events found")
-            event_times, event_labels = [], []
+            warnings.warn("No events found or faulty header. Using photodiode file to get global machine time start.")
+            event_times, event_labels = None, None
             ph_path = get_file_info(neuralynx_data_directory, "photo", ".ncs")
             ph_reader = read_file(ph_path)
             ph_reader.parse_header()
@@ -120,7 +124,7 @@ def get_event_times(neuralynx_data_directory: Path, extension: Optional[str] = N
         events_files = [events_file]
     elif len(events_files) == 0:
         warnings.warn("No events file found, Using Photodiode file to get global machine time start")
-        event_times, event_labels = [], []
+        event_times, event_labels = None, None
         ph_path = get_file_info(neuralynx_data_directory, "photo", ".ncs")
         ph_reader = read_file(ph_path)
         ph_reader.parse_header()
