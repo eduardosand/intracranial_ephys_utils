@@ -212,6 +212,8 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
     n_segments = ncs_reader._nb_segment
     sampling_rate = ncs_reader.get_signal_sampling_rate()
 
+    precision = 8 # how to deal with python round off / truncation errors
+
     # This loop is to get around files that have weird events files, or task wasn't in the annotation
     if task is not None:
         if events_file is None:
@@ -254,18 +256,18 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
         task_start_segment_index = 0
         task_end_segment_index = n_segments-1
         task_start = 0
-        task_end = round(ncs_reader.segment_t_stop(block_index=0, seg_index=task_end_segment_index), 4)
+        task_end = round(ncs_reader.segment_t_stop(block_index=0, seg_index=task_end_segment_index), precision)
 
     # I believe this is in number of seconds till start(if theoretically correct), the problem is that the sampling
     # rate is an average given to us by neuralynx
     task_start_segment_time = round(ncs_reader.get_signal_t_start(block_index=0,
-                                                                  seg_index=task_start_segment_index), 4) # seconds
+                                                                  seg_index=task_start_segment_index), precision) # seconds
     # to be precise ignore a certain number of samples from task_start_segment_time
     # we should really only ever be 4 decimal place precise for up to 32K
     task_start_segment_diff = int(round(task_start - task_start_segment_time, 4) * sampling_rate)  # samples
 
     # to be precise ignore that last n samples past task_end
-    task_end_segment_time = round(ncs_reader.segment_t_stop(block_index=0, seg_index=task_end_segment_index), 4)
+    task_end_segment_time = round(ncs_reader.segment_t_stop(block_index=0, seg_index=task_end_segment_index), precision)
     task_end_segment_diff = int(round(task_end_segment_time-task_end, 4) * sampling_rate)
 
     array_size = round(task_end-task_start, 4) * sampling_rate
@@ -274,7 +276,7 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
     ncs_signal = np.zeros((int(array_size), ))
     for i in range(task_start_segment_index, task_end_segment_index+1):
         # First stop. Get the time_segment_start and t_end for each segment.
-        time_segment_start = ncs_reader.get_signal_t_start(block_index=0, seg_index=i)
+        time_segment_start = np.round(ncs_reader.get_signal_t_start(block_index=0, seg_index=i), precision)
         seg_size = ncs_reader.get_signal_size(block_index=0, seg_index=i)  # samples
         signal_segment = ncs_reader.get_analogsignal_chunk(seg_index=i)
         if i == task_start_segment_index:
@@ -296,7 +298,7 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
             ncs_signal[start_index:start_index+seg_size] = ncs_reader.rescale_signal_raw_to_float(signal_segment,
                                                                                                   dtype='float32').T[0]
         if i > task_start_segment_index:
-            previous_segment_stop = ncs_reader.segment_t_stop(block_index=0, seg_index=i-1)
+            previous_segment_stop = np.round(ncs_reader.segment_t_stop(block_index=0, seg_index=i-1), precision)
             if abs(time_segment_start-previous_segment_stop) < 1/sampling_rate:
                 continue
             else:
@@ -310,9 +312,9 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                 previous_seg_signal = ncs_reader.get_analogsignal_chunk(seg_index=i-1)
                 previous_seg_signal_scaled = ncs_reader.rescale_signal_raw_to_float(previous_seg_signal,
                                                                                     dtype='float32').T[0]
-                previous_seg_time_start = ncs_reader.get_signal_t_start(block_index=0, seg_index=i-1)
+                previous_seg_time_start = np.round(ncs_reader.get_signal_t_start(block_index=0, seg_index=i-1), precision)
                 previous_seg_size_samples = ncs_reader.get_signal_size(block_index=0, seg_index=i-1)
-                curr_seg_time_end = ncs_reader.segment_t_stop(block_index=0, seg_index=i)
+                curr_seg_time_end = np.round(ncs_reader.segment_t_stop(block_index=0, seg_index=i), precision)
                 print('info about this segment')
                 print(sampling_rate)
                 print(previous_seg_time_start)
@@ -333,12 +335,13 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                 missing_samples = missing_samples_end_ind-missing_samples_start_ind
                 if missing_samples < 0:
                     print('What happens on the subsequent segment?')
-                    print(ncs_reader.get_signal_t_start(block_index=0, seg_index=i+1))
-                    print(ncs_reader.get_signal_t_start(block_index=0, seg_index=i+1) - curr_seg_time_end)
+                    next_seg_time_start = np.round(ncs_reader.get_signal_t_start(block_index=0, seg_index=i+1),precision)
+                    print(next_seg_time_start)
+                    print(next_seg_time_start - curr_seg_time_end)
 
                     print('comparing signals and starts')
-                    starts = [ncs_reader.get_signal_t_start(block_index=0, seg_index=j) for j in range(task_start_segment_index+1, task_end_segment_index+1)]
-                    stops = [ncs_reader.segment_t_stop(block_index=0, seg_index=j) for j in range(task_start_segment_index, task_end_segment_index)]
+                    starts = [np.round(ncs_reader.get_signal_t_start(block_index=0, seg_index=j),precision) for j in range(task_start_segment_index+1, task_end_segment_index+1)]
+                    stops = [np.round(ncs_reader.segment_t_stop(block_index=0, seg_index=j),precision) for j in range(task_start_segment_index, task_end_segment_index)]
                     diff = np.array(starts)-np.array(stops)
                     print(diff)
                     neg_diffs = [diff_i for diff_i in diff if diff_i < 0]
