@@ -316,6 +316,7 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                 print('info about this segment')
                 print(previous_seg_time_start)
                 print(previous_seg_size_samples)
+                print(previous_segment_stop)
                 print(time_segment_start)
                 print(curr_seg_time_end)
                 current_seg_signal_scaled = ncs_signal[start_index:start_index+seg_size]
