@@ -338,7 +338,11 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                     next_seg_time_start = np.round(ncs_reader.get_signal_t_start(block_index=0, seg_index=i+1),precision)
                     print(next_seg_time_start)
                     print(next_seg_time_start - curr_seg_time_end)
-
+                    print("Task time")
+                    task_time = task_end_segment_time-task_start_segment_time
+                    print(task_time*sampling_rate)
+                    print(task_time*32768)
+                    print(task_time*32768-task_time*sampling_rate)
                     print('comparing signals and starts')
                     starts = [np.round(ncs_reader.get_signal_t_start(block_index=0, seg_index=j),precision) for j in range(task_start_segment_index+1, task_end_segment_index+1)]
                     stops = [np.round(ncs_reader.segment_t_stop(block_index=0, seg_index=j),precision) for j in range(task_start_segment_index, task_end_segment_index)]
