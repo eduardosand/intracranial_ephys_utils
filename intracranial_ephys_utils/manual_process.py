@@ -116,8 +116,13 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
         if len(ph_files) > 1:
             warnings.warn("Multiple photodiode files picking the base one now")
             ph_files = [file for file in ph_files if (file.endswith('photo1.ncs') or file.endswith('Photo1.ncs') or file.startswith('PH_Diode'))]
-    assert len(ph_files) == 1
-    ph_filename = ph_files[0]
+
+    if len(ph_files) == 0:
+        warnings.warn("No photodiode file automatically found.")
+        ph_filename = str(input("What is the filename of the photodiode file? Use the full extension and don't make a mistake."))
+        print(f"Thank you. Looking for {ph_filename} in {data_directory} now.")
+    else:
+        ph_filename = ph_files[0]
 
     # We'll read in the photodiode signal
     ph_signal, sampling_rate, interp, timestamps = read_task_ncs(data_directory, ph_filename)
