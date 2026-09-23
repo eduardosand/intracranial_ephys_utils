@@ -333,8 +333,8 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                 missing_samples = missing_samples_end_ind-missing_samples_start_ind
                 if missing_samples < 0:
                     print('comparing signals')
-                    print(previous_seg_signal_scaled[-missing_samples:])
-                    print(current_seg_signal_scaled[:missing_samples])
+                    print(previous_seg_signal_scaled[missing_samples:])
+                    print(current_seg_signal_scaled[:-missing_samples])
                 # Define a range around the missing samples
                 range_size = 100
 
