@@ -334,7 +334,7 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                 if missing_samples < 0:
                     print('comparing signals and starts')
                     starts = [ncs_reader.get_signal_t_start(block_index=0, seg_index=j) for j in range(task_start_segment_index+1, task_end_segment_index+1)]
-                    stops = [ncs_reader.get_signal_t_stop(block_index=0, seg_index=j) for j in range(task_start_segment_index, task_end_segment_index)]
+                    stops = [ncs_reader.segment_t_stop(block_index=0, seg_index=j) for j in range(task_start_segment_index, task_end_segment_index)]
                     diff = np.array(starts)-np.array(stops)
                     print(diff)
                     print(len(diff<0))

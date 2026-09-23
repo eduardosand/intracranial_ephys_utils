@@ -119,7 +119,7 @@ def photodiode_check_viewer(subject, session, task, data_directory, annotations_
 
     if len(ph_files) == 0:
         warnings.warn("No photodiode file automatically found.")
-        ph_filename = str(input("What is the filename of the photodiode file? Use the full extension and don't make a mistake."))
+        ph_filename = str(input("What is the filename of the photodiode file? Use the full extension and don't make a mistake. \n"))
         print(f"Thank you. Looking for {ph_filename} in {data_directory} now.")
     else:
         ph_filename = ph_files[0]
