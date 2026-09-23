@@ -338,6 +338,7 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                     diff = np.array(starts)-np.array(stops)
                     print(diff)
                     neg_diffs = [diff_i for diff_i in diff if diff_i < 0]
+                    print(sum(neg_diffs)*sampling_rate)
                     print(sum(neg_diffs))
                     print(len(diff<0))
                     print(previous_seg_signal_scaled[missing_samples:])
