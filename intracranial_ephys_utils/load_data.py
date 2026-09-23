@@ -348,10 +348,12 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                     stops = [np.round(ncs_reader.segment_t_stop(block_index=0, seg_index=j),precision) for j in range(task_start_segment_index, task_end_segment_index)]
                     diff = np.array(starts)-np.array(stops)
                     print(diff)
-                    neg_diffs = [diff_i for diff_i in diff if diff_i < 0]
+                    neg_diffs = diff[diff<0]
+                    pos_diffs = diff[diff>0]
+                    print('neg_diffs', sum(neg_diffs))
+                    print('pos_diffs', sum(pos_diffs))
                     print(sum(neg_diffs)*sampling_rate)
                     print(sum(neg_diffs))
-                    print(len(diff<0))
                     print(previous_seg_signal_scaled[missing_samples:])
                     print(current_seg_signal_scaled[:-missing_samples])
                 # Define a range around the missing samples
