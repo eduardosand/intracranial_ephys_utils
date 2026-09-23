@@ -314,6 +314,7 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                 previous_seg_size_samples = ncs_reader.get_signal_size(block_index=0, seg_index=i-1)
                 curr_seg_time_end = ncs_reader.segment_t_stop(block_index=0, seg_index=i)
                 print('info about this segment')
+                print(sampling_rate)
                 print(previous_seg_time_start)
                 print(previous_seg_size_samples)
                 print(previous_segment_stop)
