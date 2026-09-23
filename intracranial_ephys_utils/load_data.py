@@ -313,6 +313,11 @@ def read_task_ncs(folder_name: Path, file: str, task: Optional[str]=None, events
                 previous_seg_time_start = ncs_reader.get_signal_t_start(block_index=0, seg_index=i-1)
                 previous_seg_size_samples = ncs_reader.get_signal_size(block_index=0, seg_index=i-1)
                 curr_seg_time_end = ncs_reader.segment_t_stop(block_index=0, seg_index=i)
+                print('info about this segment')
+                print(previous_seg_time_start)
+                print(previous_seg_size_samples)
+                print(time_segment_start)
+                print(curr_seg_time_end)
                 current_seg_signal_scaled = ncs_signal[start_index:start_index+seg_size]
                 data_y = np.concatenate((previous_seg_signal_scaled, current_seg_signal_scaled))
                 data_t = np.concatenate((np.linspace(previous_seg_time_start, previous_segment_stop,
