@@ -331,7 +331,6 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=3., de
     event_offsets_final = np.array(event_offsets_final)
 
     if debug:
-        print('huh')
         # code here to visualize
 
         app = mkQApp()
@@ -359,7 +358,6 @@ def binarize_ph(ph_signal, sampling_rate, task_time=None, event_threshold=3., de
         # show main window and run Qapp
         win.show()
         app.exec()
-    print('wait')
 
     return ph_signal_bin, event_onsets_final, event_offsets_final
 
