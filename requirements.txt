@@ -9,7 +9,7 @@ future==1.0.0
 h5io==0.2.4
 h5py>=3.11.0
 lazy_loader==0.4
-mne==1.7.0
+mne>=1.7.0
 neo>=0.13.3
 nibabel==5.2.1
 numpy==1.26.4
